@@ -8,7 +8,9 @@ p
       a(href='/about') About
     li
       p Dataset :
-      select
-        - each dataset in datasets
-          option
-            #{dataset}
+      form
+          select(name='dataset_select', onchange='OnSelect(this.form.dataset_select)')
+            option Select a dataset
+            - each dataset in datasets
+              option
+                #{dataset}
