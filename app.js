@@ -41,7 +41,7 @@ app.configure('production', function(){
 app.get('/', function(req, res){
   console.log(app.settings.local_config);
   res.render('index', {
-    title: 'Express'
+    title: 'j.nome.s'
   });
 });
 
