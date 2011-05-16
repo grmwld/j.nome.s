@@ -3,7 +3,9 @@
  * Module dependencies.
  */
 
-var express = require('express');
+var express = require('express')
+  , Resource = require('express-resource')
+  , expose = require('express-expose');
 
 var app = module.exports = express.createServer();
 
@@ -28,7 +30,7 @@ app.configure('development', function(){
 
 app.configure('production', function(){
   app.use(express.errorHandler()); 
-  console.log('Application started in production mode.')
+  console.log('Application started in production mode.');
 });
 
 // Routes
