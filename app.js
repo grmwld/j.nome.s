@@ -3,9 +3,11 @@
  * Module dependencies.
  */
 
-var express = require('express')
+var fs = require('fs')
+  , express = require('express')
   , Resource = require('express-resource')
   , expose = require('express-expose');
+  //, lJSON = require('commonjs-utils/lib/json');
 
 var app = module.exports = express.createServer();
 
@@ -14,6 +16,7 @@ var app = module.exports = express.createServer();
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
+  app.set('local_config', JSON.parse(fs.readFileSync(process.cwd() + '/config.json')));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
@@ -36,6 +39,7 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', function(req, res){
+  console.log(app.settings.local_config);
   res.render('index', {
     title: 'Express'
   });
