@@ -56,6 +56,8 @@ app.get('/about', function(req, res){
   });
 });
 
+dataset = app.resource('dataset', require('./controllers/dataset'));
+
 // Only listen on $ node app.js
 
 if (!module.parent) {
