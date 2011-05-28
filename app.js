@@ -7,7 +7,6 @@ var fs = require('fs')
   , express = require('express')
   , Resource = require('express-resource')
   , expose = require('express-expose');
-  //, lJSON = require('commonjs-utils/lib/json');
 
 var app = module.exports = express.createServer();
 
@@ -39,9 +38,9 @@ app.configure('production', function(){
 // Routes
 
 app.get('/', function(req, res){
-  console.log(app.settings.local_config);
   res.render('index', {
-    title: 'Express'
+    title: 'j.nome.s',
+    datasets: app.settings.local_config['datasets']
   });
 });
 

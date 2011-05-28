@@ -1,2 +1,16 @@
 h1= title
 p Welcome to #{title}
+p
+  ul
+    li
+      a(href='/help') Help
+    li
+      a(href='/about') About
+    li
+      p Dataset :
+      form
+          select(name='dataset_select', onchange='OnSelect(this.form.dataset_select)')
+            option Select a dataset
+            - each dataset in datasets
+              option
+                #{dataset}
