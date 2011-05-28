@@ -44,6 +44,18 @@ app.get('/', function(req, res){
   });
 });
 
+app.get('/help', function(req, res){
+  res.render('help', {
+    title: 'Help'
+  });
+});
+
+app.get('/about', function(req, res){
+  res.render('about', {
+    title: 'About'
+  });
+});
+
 // Only listen on $ node app.js
 
 if (!module.parent) {
