@@ -10,12 +10,30 @@ var fs = require('fs')
 
 var app = module.exports = express.createServer();
 
+function loadUserConfig(){
+  var configs = {}
+    , configs_dir = process.cwd() + '/config'
+    , filepath = ''
+    , filenoext = '';
+  fs.readdir(configs_dir, function(err, files){
+    files.forEach(function(file){
+      filepath = configs_dir + '/' + file;
+      filenoext = file.split('.')[0];
+      configs[filenoext] = JSON.parse(fs.readFileSync(filepath));
+    });
+  });
+  app.locals({
+    config: configs
+  })
+}
+
 // Configuration
+
+loadUserConfig();
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.set('local_config', JSON.parse(fs.readFileSync(process.cwd() + '/config.json')));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
@@ -39,8 +57,7 @@ app.configure('production', function(){
 
 app.get('/', function(req, res){
   res.render('index', {
-    title: 'j.nome.s',
-    datasets: app.settings.local_config['datasets']
+    title: 'j.nome.s'
   });
 });
 

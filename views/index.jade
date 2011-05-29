@@ -11,6 +11,6 @@ p
       form
           select(name='dataset_select', onchange='OnSelect(this.form.dataset_select)')
             option Select a dataset
-            - each dataset in datasets
+            - each dataset in config.global.datasets
               option
                 #{dataset}
