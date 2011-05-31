@@ -6,7 +6,10 @@
 var fs = require('fs')
   , express = require('express')
   , Resource = require('express-resource')
-  , expose = require('express-expose');
+  , expose = require('express-expose')
+  , mongoose = require('mongoose')
+  , models = require('./models')
+  , Dataset;
 
 var app = module.exports = express.createServer();
 
