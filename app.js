@@ -30,12 +30,6 @@ function loadUserConfig(){
   })
 }
 
-function loadDataset(req, res, next){
-  db = mongoose.connect('mongodb://localhost/Xentr42');
-  req.currentDb = db;
-  next();
-}
-
 // Configuration
 
 loadUserConfig();
@@ -82,16 +76,16 @@ app.get('/about', function(req, res){
   });
 });
 
-app.get('/dataset/:dataset', loadDataset, function(req, res){
-  var reference = new Reference();
-  reference.findById('scaffold_19000', function(err, doc){
-    res.render('dataset', {
-      title: req.params.dataset
-    , seq: doc.data
-    });
-  });
-});
-//dataset = app.resource('dataset', require('./controllers/dataset'));
+//app.get('/dataset/:dataset', loadDataset, function(req, res){
+  //var reference = new Reference();
+  //reference.findById('scaffold_19000', function(err, doc){
+    //res.render('dataset', {
+      //title: req.params.dataset
+    //, seq: doc.data
+    //});
+  //});
+//});
+dataset = app.resource('dataset', require('./controllers/dataset'));
 
 // Only listen on $ node app.js
 
