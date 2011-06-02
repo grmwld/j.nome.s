@@ -8,8 +8,8 @@ var fs = require('fs')
   , Resource = require('express-resource')
   , expose = require('express-expose')
   , mongoose = require('mongoose')
-  , models = require('./models')
-  , Dataset;
+  , Reference = require('./models/reference').Reference
+  , db;
 
 var app = module.exports = express.createServer();
 
@@ -28,6 +28,12 @@ function loadUserConfig(){
   app.locals({
     config: configs
   })
+}
+
+function loadDataset(req, res, next){
+  db = mongoose.connect('mongodb://localhost/Xentr42');
+  req.currentDb = db;
+  next();
 }
 
 // Configuration
@@ -76,7 +82,16 @@ app.get('/about', function(req, res){
   });
 });
 
-dataset = app.resource('dataset', require('./controllers/dataset'));
+app.get('/dataset/:dataset', loadDataset, function(req, res){
+  var reference = new Reference();
+  reference.findById('scaffold_19000', function(err, doc){
+    res.render('dataset', {
+      title: req.params.dataset
+    , seq: doc.data
+    });
+  });
+});
+//dataset = app.resource('dataset', require('./controllers/dataset'));
 
 // Only listen on $ node app.js
 
