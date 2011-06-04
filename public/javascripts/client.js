@@ -4,6 +4,7 @@
  * @param {Object} dropdown menu
  * @return {Boolean}
  * @api public
+ */
 function OnSelect(dropdown)
 {
   var myindex  = dropdown.selectedIndex
