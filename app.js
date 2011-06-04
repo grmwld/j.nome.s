@@ -8,6 +8,9 @@ var fs = require('fs')
   , mongoose = require('mongoose');
 
 
+/**
+ * Create the main app
+ */
 var app = module.exports = express.createServer();
 
 
@@ -32,7 +35,9 @@ function loadUserConfig(){
 }
 
 
-// Configuration
+/**
+ * Configuration of the express app
+ */
 
 loadUserConfig();
 
@@ -59,7 +64,9 @@ app.configure('production', function(){
 });
 
 
-// Routes
+/**
+ * Map routes to app functions
+ */
 
 app.get('/', function(req, res){
   res.render('index', {
@@ -83,8 +90,9 @@ var dataset = require('./controllers/dataset');
 dataset.route(app);
 
 
-// Only listen on $ node app.js
-
+/**
+ * Start the express app
+ */
 if (!module.parent) {
   app.listen(3000);
   console.log("j.nome.s listening on port %d", app.address().port);
