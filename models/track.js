@@ -1,3 +1,7 @@
+/**
+ * Module dependencies
+ */
+
 var util = require('util')
   , mongoose = require('mongoose')
   , async = require('async')
