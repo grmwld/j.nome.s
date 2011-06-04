@@ -1,3 +1,9 @@
+/**
+ * Function to handle a selected dataset in a dropdown menu
+ *
+ * @param {Object} dropdown menu
+ * @return {Boolean}
+ * @api public
 function OnSelect(dropdown)
 {
   var myindex  = dropdown.selectedIndex
