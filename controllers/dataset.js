@@ -1,7 +1,7 @@
 var mongoose = require('mongoose')
   , dbutils = require('../lib/dbutils')
   , Reference = require('../models/reference').Reference
-  , Track = require('../models/track').createTrack;
+  , Track = require('../models/track').Track;
 
 var route = function(app){
 
@@ -19,12 +19,10 @@ var route = function(app){
     });
   });
 
-  app.get('/datasets/:dataset/:seqid/:start/:stop/:tracks', dbutils.connect, function(req, res){
+  app.get('/datasets/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
     var tracksNames = req.params.tracks
-      , track = Track(tracksNames, tracksNames);
-    track.find({
-      seqid: req.params.seqid
-    }, function(err, docs){
+      , track = new Track(tracksNames, tracksNames);
+    track.fetchInInterval(req.params.seqid, req.params.start, req.params.end, function(err, docs){
       res.send(docs);
     });
   });

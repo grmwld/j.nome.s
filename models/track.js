@@ -4,7 +4,7 @@ var mongoose = require('mongoose')
 
 // Mongoose Schema.
 
-var Track = new Schema({
+var TrackSchema = new Schema({
   seqid: String
 , source: String
 , type: String
@@ -15,19 +15,21 @@ var Track = new Schema({
 , strand: String
 });
 
-/**
- * Fetch data from this track between 2 positions
- */
-Track.method('fetchInInterval', function(seqid, start, stop, callback){
-  Track.findById(0, function(){
-    callback();
-  });
-});
 
-
-var createTrack = function(name, track){
-  return mongoose.model(name, Track, track);
+var Track = function(name, track){
+  this.model =  mongoose.model(name, TrackSchema, track);
 }
 
+Track.prototype.fetchInInterval = function(seqid, start, end, callback){
+  self = this;
+  self.model.find({
+    seqid: seqid
+  , start: {$lt: end}
+  , end: {$gt: start}
+  }, function(err, docs){
+    callback(err, docs);
+  });
+}
+
+
 exports.Track = Track;
-exports.createTrack = createTrack;
