@@ -1,9 +1,16 @@
+/**
+ * Module dependencies
+ */
+
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
 
 
-// Mongoose Schema.
-
+/**
+ * Mongoose schema representing the fs.files part of a GridStore
+ *
+ * @api private
+ */
 var File = new Schema({
   chunksize: Number
 , length: Number
@@ -12,11 +19,22 @@ var File = new Schema({
 , _id: String
 });
 
+/**
+ * Mongoose schema representing the fs.chunks part of a GridStore
+ *
+ * @api private
+ */
 var Chunk = new Schema({
   files_id: [File]
 , n: Number
 });
 
+/**
+ * Virtual method allowing easy access to the data
+ * contained in a GridStore object
+ *
+ * @api private
+ */
 Chunk.virtual('data')
   .get(function(){
     return this.doc.data.buffer.toString().slice(0, -256);
@@ -25,6 +43,8 @@ Chunk.virtual('data')
 
 /**
  * Class to easily access the reference genome stored in a GrifFS
+ *
+ * @api public
  */
 var Reference = function(){
   this.files = mongoose.model('File', File, 'fs.files');
@@ -33,6 +53,8 @@ var Reference = function(){
 
 /**
  * Get the sequence corresponding to the given seqid
+ *
+ * @api public
  */
 Reference.prototype.findById = function(id, callback){
   var self = this
@@ -55,5 +77,6 @@ Reference.prototype.findById = function(id, callback){
     }
   });
 }
+
 
 exports.Reference = Reference
