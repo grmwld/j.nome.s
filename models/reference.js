@@ -1,6 +1,5 @@
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
-  , dbutils = require('../lib/dbutils');
 
 
 // Mongoose Schema.
@@ -39,17 +38,21 @@ Reference.prototype.findById = function(id, callback){
   var self = this;
   var data = '';
   self.files.findById(id, function(err, file){
-    self.chunks.find({files_id: id}, [], function(err, chunks){
-      chunks.forEach(function(chunk){
-        data += chunk.data;
+    if (file){
+      self.chunks.find({files_id: id}, [], function(err, chunks){
+        chunks.forEach(function(chunk){
+          data += chunk.data;
+        });
+        callback(err, {
+          _id: file['_id']
+        , length: file['length']
+        , md5: file['md5']
+        , data: data
+        });
       });
-      callback(null, {
-        _id: file['_id']
-      , length: file['length']
-      , md5: file['md5']
-      , data: data
-      });
-    });
+    } else {
+      callback(err, {});
+    }
   });
 }
 
