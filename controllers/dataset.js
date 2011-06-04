@@ -1,3 +1,6 @@
+/**
+ * Module dependencies
+ */
 var dbutils = require('../lib/dbutils')
   , Reference = require('../models/reference').Reference
   , Track = require('../models/track').Track
@@ -56,4 +59,3 @@ var route = function(app){
 
 
 exports.route = route;
-
