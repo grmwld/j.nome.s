@@ -1,5 +1,6 @@
 var mongoose = require('mongoose')
-  , Schema = mongoose.Schema;
+  , Schema = mongoose.Schema
+  , dbutils = require('../lib/dbutils');
 
 
 // Mongoose Schema.

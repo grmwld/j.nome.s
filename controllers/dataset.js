@@ -1,19 +1,21 @@
-var mongoose = require('mongoose');
+var dbutils = require('../lib/dbutils')
+  , Reference = require('../models/reference').Reference;
 
+var route = function(app){
 
-function connectToDataset(req, res, next){
-  req.currentDataset = mongoose.createConnection(
-    'localhost'
-  , req.params.dataset
-  );
-  next();
+  app.get('/datasets/:dataset', dbutils.connectdb, function(req, res){
+    res.render('dataset', {
+      title: req.params.dataset
+    , dataset: req.currentdb.databaseName 
+    });
+  });
+
+  app.get('/datasets/:dataset/:seqid', dbutils.connectdb, function(req, res){
+    var reference = new Reference();
+    reference.findById(req.params.seqid, function(err, doc){
+      res.send('seq ' + doc.data);
+    });
+  });
 }
 
-var show = function(req, res){
-  connectToDataset(req, res, function(){
-    console.log(req.currentDataset);
-    res.send('show dataset ' + req.currentDataset.name);
-  });
-};
-
-exports.show = show;
+exports.route = route;

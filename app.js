@@ -7,9 +7,8 @@ var fs = require('fs')
   , express = require('express')
   , Resource = require('express-resource')
   , expose = require('express-expose')
-  , mongoose = require('mongoose')
-  , Reference = require('./models/reference').Reference
-  , db;
+  , mongoose = require('mongoose');
+
 
 var app = module.exports = express.createServer();
 
@@ -40,7 +39,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  //app.use(express.session({ secret: 'your secret here' }));
+  //app.use(express.session({ secret: 'topsecret' }));
   //app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -76,16 +75,8 @@ app.get('/about', function(req, res){
   });
 });
 
-//app.get('/dataset/:dataset', loadDataset, function(req, res){
-  //var reference = new Reference();
-  //reference.findById('scaffold_19000', function(err, doc){
-    //res.render('dataset', {
-      //title: req.params.dataset
-    //, seq: doc.data
-    //});
-  //});
-//});
-dataset = app.resource('dataset', require('./controllers/dataset'));
+var dataset = require('./controllers/dataset');
+dataset.route(app);
 
 // Only listen on $ node app.js
 
