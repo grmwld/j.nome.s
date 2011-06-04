@@ -1,8 +1,6 @@
-
 /**
  * Module dependencies.
  */
-
 var fs = require('fs')
   , express = require('express')
   , Resource = require('express-resource')
@@ -12,6 +10,10 @@ var fs = require('fs')
 
 var app = module.exports = express.createServer();
 
+
+/**
+ * Loads the data contained in the configuration files
+ */
 function loadUserConfig(){
   var configs = {}
     , configs_dir = process.cwd() + '/config'
@@ -28,6 +30,7 @@ function loadUserConfig(){
     config: configs
   })
 }
+
 
 // Configuration
 
@@ -55,6 +58,7 @@ app.configure('production', function(){
   console.log('Application started in production mode.');
 });
 
+
 // Routes
 
 app.get('/', function(req, res){
@@ -77,6 +81,7 @@ app.get('/about', function(req, res){
 
 var dataset = require('./controllers/dataset');
 dataset.route(app);
+
 
 // Only listen on $ node app.js
 
