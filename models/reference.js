@@ -35,8 +35,8 @@ var Reference = function(){
  * Get the sequence corresponding to the given seqid
  */
 Reference.prototype.findById = function(id, callback){
-  var self = this;
-  var data = '';
+  var self = this
+    , data = '';
   self.files.findById(id, function(err, file){
     if (file){
       self.chunks.find({files_id: id}, [], function(err, chunks){
