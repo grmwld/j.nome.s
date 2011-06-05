@@ -1,15 +1,22 @@
-
 /**
  * Module dependencies.
  */
-
 var fs = require('fs')
   , express = require('express')
   , Resource = require('express-resource')
-  , expose = require('express-expose');
+  , expose = require('express-expose')
+  , mongoose = require('mongoose');
 
+
+/**
+ * Create the main app
+ */
 var app = module.exports = express.createServer();
 
+
+/**
+ * Loads the data contained in the configuration files
+ */
 function loadUserConfig(){
   var configs = {}
     , configs_dir = process.cwd() + '/config'
@@ -27,7 +34,10 @@ function loadUserConfig(){
   })
 }
 
-// Configuration
+
+/**
+ * Configuration of the express app
+ */
 
 loadUserConfig();
 
@@ -37,7 +47,7 @@ app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  //app.use(express.session({ secret: 'your secret here' }));
+  app.use(express.session({ secret: 'topsecret' }));
   //app.use(require('stylus').middleware({ src: __dirname + '/public' }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
@@ -53,7 +63,10 @@ app.configure('production', function(){
   console.log('Application started in production mode.');
 });
 
-// Routes
+
+/**
+ * Map routes to app functions
+ */
 
 app.get('/', function(req, res){
   res.render('index', {
@@ -73,10 +86,13 @@ app.get('/about', function(req, res){
   });
 });
 
-dataset = app.resource('dataset', require('./controllers/dataset'));
+var dataset = require('./controllers/dataset');
+dataset.route(app);
 
-// Only listen on $ node app.js
 
+/**
+ * Start the express app
+ */
 if (!module.parent) {
   app.listen(3000);
   console.log("j.nome.s listening on port %d", app.address().port);
