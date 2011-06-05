@@ -58,4 +58,7 @@ var route = function(app){
 }
 
 
+/**
+ * Expose public functions, classes and methods
+ */
 exports.route = route;

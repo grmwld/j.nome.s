@@ -1,7 +1,6 @@
 /**
  * Module dependencies
  */
-
 var mongoose = require('mongoose')
   , Schema = mongoose.Schema
 
@@ -79,4 +78,7 @@ Reference.prototype.findById = function(id, callback){
 }
 
 
+/**
+ * Expose public functions, classes and methods
+ */
 exports.Reference = Reference

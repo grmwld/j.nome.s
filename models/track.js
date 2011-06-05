@@ -1,7 +1,6 @@
 /**
  * Module dependencies
  */
-
 var util = require('util')
   , mongoose = require('mongoose')
   , async = require('async')
@@ -102,5 +101,8 @@ TrackCollection.prototype.fetchInInterval = function(seqid, start, end, callback
 }
 
 
+/**
+ * Expose public functions, classes and methods
+ */
 exports.Track = Track;
 exports.TrackCollection = TrackCollection;
