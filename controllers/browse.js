@@ -24,7 +24,11 @@ var route = function(app){
   app.get('/browse/:dataset', dbutils.connect, function(req, res){
     res.render('browse', {
       title: req.params.dataset
-    , dataset: req.params.dataset 
+    , dataset: req.params.dataset
+    , seqid: ''
+    , start: ''
+    , end: ''
+    , data: {}
     });
   });
 
@@ -34,13 +38,15 @@ var route = function(app){
    * @handles {Route#POST} /browse/:dataset
    */
   app.post('/browse/:dataset', dbutils.connect, function(req, res){
-    var tracks = new TrackCollection(['gaps'])
-      , seqid = req.body.seqid
-      , start = req.body.start
-      , end = req.body.end;
-    tracks.fetchInInterval(seqid, start, end, function(err, data){
-      res.send(data);
-    });
+    var tracks = new TrackCollection(['gaps']);
+    tracks.fetchInInterval(
+      req.body.seqid
+    , req.body.start
+    , req.body.end
+    , function(err, data){
+        res.send(data);
+      }
+    );
   });
 
   /**
@@ -61,13 +67,22 @@ var route = function(app){
    * @handles {Route#GET} /browse/:dataset/:seqid/:start/:end/:tracks
    */
   app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
-    var tracks = new TrackCollection(req.params.tracks.split('&'))
-      , seqid = req.params.seqid
-      , start = req.params.start
-      , end = req.params.end;
-    tracks.fetchInInterval(seqid, start, end, function(err, data){
-      res.send(data);
-    });
+    var tracks = new TrackCollection(req.params.tracks.split('&'));
+    tracks.fetchInInterval(
+      req.params.seqid
+    , req.params.start
+    , req.params.end
+    , function(err, data){
+        res.render('browse', {
+          title: 'j.nome.s : browse'
+        , dataset: req.params.dataset
+        , seqid: req.params.seqid
+        , start: req.params.start
+        , end: req.params.end
+        , data: JSON.stringify(data)
+        });
+      }
+    );
   });
 
 }

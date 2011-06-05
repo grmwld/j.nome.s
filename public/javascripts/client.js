@@ -14,6 +14,11 @@ $(document).ready(function() {
     }, function(data) {
       $("#tracks").empty();
       $("#tracks").append(JSON.stringify(data));
+      //window.history.pushState(
+        //{ foo: bar }
+      //, 'foobar'
+      //, ['/browse/Xentr42', seqid, start, end, 'gaps'].join('/');
+      //);
     });
     return false;
   });

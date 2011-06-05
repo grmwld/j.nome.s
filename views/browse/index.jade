@@ -3,11 +3,12 @@
 
   #browse
     form(method='post')
-      !=partial('fields', {})
+      !=partial('fields', { seqid: seqid, start: start, end: end })
       div
         input(type='submit', value='Go', id='submit')
 
   #landmarks
-    !=partial('landmarks', {dataset: dataset})
+    !=partial('landmarks', { dataset: dataset })
 
   #tracks
+    #{data}
