@@ -68,7 +68,7 @@ app.configure('production', function(){
  */
 var help = require('./controllers/help')
   , about = require('./controllers/about')
-  , dataset = require('./controllers/dataset');
+  , browse = require('./controllers/browse');
 
 app.get('/', function(req, res){
   res.render('index', {
@@ -78,7 +78,7 @@ app.get('/', function(req, res){
 
 help.route(app);
 about.route(app);
-dataset.route(app);
+browse.route(app);
 
 
 /**

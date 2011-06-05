@@ -21,8 +21,8 @@ var route = function(app){
    *
    * @handles {Route#GET} /datasets/:dataset
    */
-  app.get('/datasets/:dataset', dbutils.connect, function(req, res){
-    res.render('dataset', {
+  app.get('/browse/:dataset', dbutils.connect, function(req, res){
+    res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset 
     });
@@ -33,7 +33,7 @@ var route = function(app){
    *
    * @handles {Route#GET} /datasets/:dataset/:seqid
    */
-  app.get('/datasets/:dataset/:seqid', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid', dbutils.connect, function(req, res){
     var reference = new Reference();
     reference.findById(req.params.seqid, function(err, doc){
       res.send(doc);
@@ -45,7 +45,7 @@ var route = function(app){
    *
    * @handles {Route#GET} /datasets/:dataset/:seqid/:start/:end/:tracks
    */
-  app.get('/datasets/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
     var tracks = new TrackCollection(req.params.tracks.split('&'))
       , seqid = req.params.seqid
       , start = req.params.start
