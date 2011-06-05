@@ -1,8 +1,9 @@
 .page
   h1 Browsing database #{dataset}
-  
-  form(method='post', action='/dataset/'#{dataset})
-    !=partial('fields', {})
+
+  #browse
+    form(method='post', action='/browse/')
+      !=partial('fields', {})
 
   #landmarks
     !=partial('landmarks', {dataset: dataset})
