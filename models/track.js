@@ -46,7 +46,7 @@ var Track = function(name, track){
  * @api public
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
-  self = this;
+  var self = this;
   self.model.find({
     seqid: seqid
   , start: {$lt: end}
@@ -68,9 +68,9 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
  */
 var TrackCollection = function(tracknames){
   var self = this;
-  self.tracks = {};
+  self.tracks = [];
   tracknames.forEach(function(trackname){
-    self.tracks[trackname] = new Track(trackname, trackname);
+    self.tracks.push([trackname, new Track(trackname, trackname)]);
   });
 }
 
@@ -89,11 +89,11 @@ var TrackCollection = function(tracknames){
 TrackCollection.prototype.fetchInInterval = function(seqid, start, end, callback){
   var self = this
     , data = {};
-  for(var i in self.tracks){
-    self.tracks[i].fetchInInterval(seqid, start, end, function(err, docs){
-      data[i] = docs;
+  self.tracks.forEach(function(track){
+    track[1].fetchInInterval(seqid, start, end, function(err, docs){
+      data[track[0]] = docs;
     });
-  }
+  });
   async.whilst(
     function(){ return Object.size(data) < Object.size(self.tracks); },
     function(cb){ setTimeout(cb, 100); },
