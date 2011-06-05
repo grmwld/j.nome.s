@@ -13,7 +13,8 @@ var util = require('util')
  * Corresponds to an entry from a track
  */
 var TrackSchema = new mongoose.Schema({
-  seqid: String
+  _id: Number
+, seqid: String
 , source: String
 , type: String
 , start: Number
