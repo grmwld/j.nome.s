@@ -1,6 +1,3 @@
-
-// Run $ expresso
-
 /**
  * Module dependencies.
  */

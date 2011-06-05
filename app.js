@@ -9,12 +9,6 @@ var fs = require('fs')
 
 
 /**
- * Create the main app
- */
-var app = module.exports = express.createServer();
-
-
-/**
  * Loads the data contained in the configuration files
  */
 function loadUserConfig(){
@@ -36,9 +30,14 @@ function loadUserConfig(){
 
 
 /**
+ * Create the main app
+ */
+var app = module.exports = express.createServer();
+
+
+/**
  * Configuration of the express app
  */
-
 loadUserConfig();
 
 app.configure(function(){
@@ -67,6 +66,9 @@ app.configure('production', function(){
 /**
  * Map routes to app functions
  */
+var help = require('./controllers/help')
+  , about = require('./controllers/about')
+  , dataset = require('./controllers/dataset');
 
 app.get('/', function(req, res){
   res.render('index', {
@@ -74,19 +76,8 @@ app.get('/', function(req, res){
   });
 });
 
-app.get('/help', function(req, res){
-  res.render('help', {
-    title: 'Help'
-  });
-});
-
-app.get('/about', function(req, res){
-  res.render('about', {
-    title: 'About'
-  });
-});
-
-var dataset = require('./controllers/dataset');
+help.route(app);
+about.route(app);
 dataset.route(app);
 
 
