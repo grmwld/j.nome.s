@@ -29,6 +29,21 @@ var route = function(app){
   });
 
   /**
+   * Route to a specific dataset
+   *
+   * @handles {Route#POST} /browse/:dataset
+   */
+  app.post('/browse/:dataset', dbutils.connect, function(req, res){
+    var tracks = new TrackCollection(['gaps'])
+      , seqid = req.body.seqid
+      , start = req.body.start
+      , end = req.body.end;
+    tracks.fetchInInterval(seqid, start, end, function(err, data){
+      res.partial('browse/track', { collection: data, as: 'track' });
+    });
+  });
+
+  /**
    * Route to a specific seqid
    *
    * @handles {Route#GET} /browse/:dataset/:seqid
