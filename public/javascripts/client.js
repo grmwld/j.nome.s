@@ -31,7 +31,8 @@ $(document).ready(function() {
     , start: start
     , end: end
     }, function(data) {
-      $("#tracks").replaceWith(JSON.stringify(data));
+      $("#tracks").empty();
+      $("#tracks").append(JSON.stringify(data));
       //for (var i in data){
         //console.log(data[i]);
         //$("#tracks").append(data[i]);
