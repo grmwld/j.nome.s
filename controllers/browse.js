@@ -19,21 +19,36 @@ var route = function(app){
   /**
    * Route to a specific dataset
    *
-   * @handles {Route} /datasets/:dataset
+   * @handles {Route#GET} /browse/:dataset
    */
-  app.get('/datasets/:dataset', dbutils.connect, function(req, res){
-    res.render('dataset', {
+  app.get('/browse/:dataset', dbutils.connect, function(req, res){
+    res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset 
     });
   });
 
   /**
+   * Route to a specific dataset
+   *
+   * @handles {Route#POST} /browse/:dataset
+   */
+  app.post('/browse/:dataset', dbutils.connect, function(req, res){
+    var tracks = new TrackCollection(['gaps'])
+      , seqid = req.body.seqid
+      , start = req.body.start
+      , end = req.body.end;
+    tracks.fetchInInterval(seqid, start, end, function(err, data){
+      res.send(data);
+    });
+  });
+
+  /**
    * Route to a specific seqid
    *
-   * @handles {Route} /datasets/:dataset/:seqid
+   * @handles {Route#GET} /browse/:dataset/:seqid
    */
-  app.get('/datasets/:dataset/:seqid', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid', dbutils.connect, function(req, res){
     var reference = new Reference();
     reference.findById(req.params.seqid, function(err, doc){
       res.send(doc);
@@ -43,9 +58,9 @@ var route = function(app){
   /**
    * Route to a specific range, with specified collections
    *
-   * @handles {Route} /datasets/:dataset/:seqid/:start/:end/:tracks
+   * @handles {Route#GET} /browse/:dataset/:seqid/:start/:end/:tracks
    */
-  app.get('/datasets/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
     var tracks = new TrackCollection(req.params.tracks.split('&'))
       , seqid = req.params.seqid
       , start = req.params.start

@@ -1,0 +1,13 @@
+.page
+  h1 Browsing database #{dataset}
+
+  #browse
+    form(method='post')
+      !=partial('fields', {})
+      div
+        input(type='submit', value='Go', id='submit')
+
+  #landmarks
+    !=partial('landmarks', {dataset: dataset})
+
+  #tracks
