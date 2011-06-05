@@ -1,6 +1,9 @@
 .page
   h1 Browsing database #{dataset}
 
+  #appnavigation
+    !=partial('appnavigation')
+
   #browse
     form(method='post')
       !=partial('fields', { seqid: seqid, start: start, end: end })
