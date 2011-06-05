@@ -28,7 +28,7 @@ var route = function(app){
     , seqid: ''
     , start: ''
     , end: ''
-    , data: {}
+    , data: ''
     });
   });
 

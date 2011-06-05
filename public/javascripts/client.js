@@ -6,8 +6,9 @@ $(document).ready(function() {
   $("#submit").click(function() {
     var seqid = $('#seqid').val()
       , start = $('#start').val()
-      , end = $('#end').val();
-    $.post("/browse/Xentr42", {
+      , end = $('#end').val()
+      , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+    $.post(baseURL, {
       seqid: seqid
     , start: start
     , end: end
