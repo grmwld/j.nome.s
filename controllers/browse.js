@@ -39,7 +39,7 @@ var route = function(app){
       , start = req.body.start
       , end = req.body.end;
     tracks.fetchInInterval(seqid, start, end, function(err, data){
-      res.partial('browse/track', { collection: data, as: 'track' });
+      res.send(data);
     });
   });
 
