@@ -2,8 +2,10 @@
   h1 Browsing database #{dataset}
 
   #browse
-    form(method='post', action='/browse/')
+    form(method='post', action='/browse/'+dataset)
       !=partial('fields', {})
+      div
+        input(type='submit', value='Go')
 
   #landmarks
     !=partial('landmarks', {dataset: dataset})
