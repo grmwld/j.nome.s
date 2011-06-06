@@ -3,19 +3,20 @@
  */
 var express = require('express')
   , utils = require('./lib/utils')
-  , config = require('./lib/config');
+  , Config = require('./lib/config').Config;
 
 
 /**
  * Create the main app
  */
-var app = module.exports = express.createServer();
+var app = module.exports = express.createServer(),
+    config = new Config(app);
 
 
 /**
  * Configuration of the express app
  */
-config.loadConfigDir(null, app);
+config.loadDir();
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
