@@ -10,7 +10,6 @@ p
       p Dataset :
       form
           select(name='dataset_select', onchange='OnSelect(this.form.dataset_select)')
-            option Select a dataset
+            option(value='selectdataset') Select a dataset
             - each dataset in config.global.datasets
-              option
-                #{config[dataset.name].dbname}
+              option(value=config[dataset.name].dbname) #{dataset.description}
