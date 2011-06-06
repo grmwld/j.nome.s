@@ -2,7 +2,8 @@
  * Module dependencies.
  */
 var express = require('express')
-  , utils = require('./lib/utils');
+  , utils = require('./lib/utils')
+  , config = require('./lib/config');
 
 
 /**
@@ -14,7 +15,7 @@ var app = module.exports = express.createServer();
 /**
  * Configuration of the express app
  */
-utils.loadConfig(app);
+config.loadConfigDir(null, app);
 
 app.configure(function(){
   app.set('views', __dirname + '/views');

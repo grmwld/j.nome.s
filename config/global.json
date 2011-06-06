@@ -1,6 +1,5 @@
 {
-  "datasets": [
-    "Xentr4",
-    "Xentr42"
-  ]
+  "datasets": {
+    "Xentr42": "Xentr42.json"
+  }
 }
