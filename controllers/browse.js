@@ -28,6 +28,7 @@ var route = function(app){
     , seqid: ''
     , start: ''
     , end: ''
+    , checked: {}
     , data: ''
     });
   });
@@ -67,7 +68,11 @@ var route = function(app){
    * @handles {Route#GET} /browse/:dataset/:seqid/:start/:end/:tracks
    */
   app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
-    var tracks = new TrackCollection(req.params.tracks.split('&'));
+    var tracks = new TrackCollection(req.params.tracks.split('&'))
+      , checked = {};
+    req.params.tracks.split('&').forEach(function(track){
+      checked[track] = true;
+    });
     tracks.fetchInInterval(
       req.params.seqid
     , req.params.start
@@ -79,6 +84,7 @@ var route = function(app){
         , seqid: req.params.seqid
         , start: req.params.start
         , end: req.params.end
+        , checked: checked
         , data: JSON.stringify(data)
         });
       }
