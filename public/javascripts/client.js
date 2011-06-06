@@ -1,7 +1,7 @@
 $(document).ready(function() {
 
   /**
-   * Handle browsing from main form.
+   * Handle browsing from main form via ajax post.
    */
   $("#submit").click(function() {
     var seqid = $('#seqid').val()
@@ -13,17 +13,23 @@ $(document).ready(function() {
     trackselector.each(function(i){
       tracks.push($(trackselector[i]).val());
     });
-    $.post(baseURL, {
-      seqid: seqid
-    , start: start
-    , end: end
-    , tracks: tracks
-    }, function(data) {
-      $("#tracks").empty();
-      $("#tracks").append(JSON.stringify(data));
-      window.history.pushState({}, '',
-        [baseURL, seqid, start, end, tracks.join('&')].join('/')
-      );
+    $.ajax({
+      type: "POST"
+    , url: baseURL 
+    , data: {
+        seqid: seqid
+      , start: start
+      , end: end
+      , tracks: tracks
+      }
+    , dataType: "json"
+    , success: function(data) {
+        $("#tracks").empty();
+        $("#tracks").append(JSON.stringify(data));
+        window.history.pushState({}, '',
+          [baseURL, seqid, start, end, tracks.join('&')].join('/')
+        );
+      }
     });
     return false;
   });
