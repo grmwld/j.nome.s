@@ -32,6 +32,7 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  require('express-trace')(app);
   console.log('Application started in development mode.')
 });
 
