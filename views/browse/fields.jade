@@ -1,9 +1,7 @@
-div
-  label Seqid :
-  input(type='text', name='seqid', id='seqid', value=seqid)
+#browsefields
+  #seqidfield.centered
+    input.browsefield(type='text', name='seqid', id='seqid', value=seqid)
 
-  label Start :
-  input(type='text', name='start', id='start', value=start)
-
-  label End :
-  input(type='text', name='end', id='end', value=end)
+  #positionfield.centered
+    input.browsefield(type='text', name='start', id='start', value=start)
+    input.browsefield(type='text', name='end', id='end', value=end)
