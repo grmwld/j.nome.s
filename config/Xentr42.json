@@ -1,1 +1,14 @@
-{}
+{
+  "tracks": {
+    "gaps": {
+      "name": "gaps"
+    , "collection_name": "gaps"
+    , "description": "Assembly gaps"
+    }
+  , "ucsc_genes": {
+      "name": "ucsc_genes"
+    , "collection_name": "ucsc_refgene"
+    , "description": "Reference genes from USCS"
+    }
+  }
+}
