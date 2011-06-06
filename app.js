@@ -2,6 +2,8 @@
  * Module dependencies.
  */
 var express = require('express')
+  , stylus = require('stylus')
+  , nib = require('nib')
   , utils = require('./lib/utils')
   , Config = require('./lib/config').Config;
 
@@ -25,7 +27,15 @@ app.configure(function(){
   app.use(express.methodOverride());
   app.use(express.cookieParser());
   app.use(express.session({ secret: 'topsecret' }));
-  app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+  app.use(stylus.middleware({
+    src: __dirname + '/public'
+  , compile: function(str, path){
+      return stylus(str)
+        .set('filename', path)
+        .set('compress', true)
+        .use(nib());
+    }
+  }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
