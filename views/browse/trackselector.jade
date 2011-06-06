@@ -1,3 +1,6 @@
-div
+#trackselector
   - each track in tracks
-    #{track.name}
+    input(type='checkbox', name=track.name, value=track.collection_name, checked=false)
+    label(for=track.name) #{track.name}
+    br
+    

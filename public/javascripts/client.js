@@ -7,11 +7,17 @@ $(document).ready(function() {
     var seqid = $('#seqid').val()
       , start = $('#start').val()
       , end = $('#end').val()
+      , tracks = []
+      , trackselector = $('#trackselector :checked')
       , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+    trackselector.each(function(i){
+      tracks.push($(trackselector[i]).val());
+    });
     $.post(baseURL, {
       seqid: seqid
     , start: start
     , end: end
+    , tracks: tracks
     }, function(data) {
       $("#tracks").empty();
       $("#tracks").append(JSON.stringify(data));
