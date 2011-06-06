@@ -21,7 +21,8 @@ $(document).ready(function() {
     }, function(data) {
       $("#tracks").empty();
       $("#tracks").append(JSON.stringify(data));
-      window.history.pushState({}, '', [baseURL, seqid, start, end, 'gaps'].join('/')
+      window.history.pushState({}, '',
+        [baseURL, seqid, start, end, tracks.join('&')].join('/')
       );
     });
     return false;
