@@ -5,8 +5,9 @@
     !=partial('appnavigation')
 
   #browse
-    form(method='post')
+    form(method='post', name='browse')
       !=partial('fields', { seqid: seqid, start: start, end: end })
+      !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
       div
         input(type='submit', value='Go', id='submit')
 

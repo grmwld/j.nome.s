@@ -1,44 +1,22 @@
 /**
  * Module dependencies.
  */
-var fs = require('fs')
-  , express = require('express')
-  , Resource = require('express-resource')
-  , expose = require('express-expose')
-  , mongoose = require('mongoose');
-
-
-/**
- * Loads the data contained in the configuration files
- */
-function loadUserConfig(){
-  var configs = {}
-    , configs_dir = process.cwd() + '/config'
-    , filepath = ''
-    , filenoext = '';
-  fs.readdir(configs_dir, function(err, files){
-    files.forEach(function(file){
-      filepath = configs_dir + '/' + file;
-      filenoext = file.split('.')[0];
-      configs[filenoext] = JSON.parse(fs.readFileSync(filepath));
-    });
-  });
-  app.locals({
-    config: configs
-  })
-}
+var express = require('express')
+  , utils = require('./lib/utils')
+  , Config = require('./lib/config').Config;
 
 
 /**
  * Create the main app
  */
-var app = module.exports = express.createServer();
+var app = module.exports = express.createServer(),
+    config = new Config(app);
 
 
 /**
  * Configuration of the express app
  */
-loadUserConfig();
+config.loadDir();
 
 app.configure(function(){
   app.set('views', __dirname + '/views');

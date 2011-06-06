@@ -95,7 +95,7 @@ TrackCollection.prototype.fetchInInterval = function(seqid, start, end, callback
     });
   });
   async.whilst(
-    function(){ return Object.size(data) < Object.size(self.tracks); },
+    function(){ return utils.objectSize(data) < utils.objectSize(self.tracks); },
     function(cb){ setTimeout(cb, 100); },
     function(err){ callback(err, data); }
   );

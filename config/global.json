@@ -1,6 +1,9 @@
 {
-  "datasets": [
-    "Xentr4",
-    "Xentr42"
-  ]
+  "datasets": {
+    "Xentr42": {
+      "file": "Xentr42.json"
+    , "name": "Xentr42"
+    , "description": "Xenopus tropicalis genome v4"
+    }
+  }
 }
