@@ -7,7 +7,7 @@ h1 Browsing database #{dataset}
   form(method='post', name='browse')
     !=partial('fields', { seqid: seqid, start: start, end: end })
     !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
-    div
+    .centered
       input(type='submit', value='Go', id='submit')
 
 #landmarks
