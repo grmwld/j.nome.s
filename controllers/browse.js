@@ -25,9 +25,9 @@ var route = function(app){
     res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset
-    , seqid: 'Seqid'
-    , start: 'Start'
-    , end: 'End'
+    , seqid: 'seqid'
+    , start: 'start'
+    , end: 'end'
     , checked: {}
     , data: ''
     });

@@ -1,6 +1,19 @@
 $(document).ready(function() {
 
   /**
+   * Setup dynamic prompt input text-fields.
+   * The default value corresponds to the 'name' attribute
+   * of the input field.
+   */
+  $("input[type=text]").focus(function(){
+    clearPrompt(this);
+  }).blur(function(){
+    setPrompt(this);
+  });
+  
+
+
+  /**
    * Handle browsing from main form via ajax post.
    */
   $("#submit").click(function() {
@@ -36,6 +49,30 @@ $(document).ready(function() {
 
 });
 
+
+
+/**
+ * Clear prompt from field
+ * 
+ * @param {Object} element
+ * @api private
+ */
+var clearPrompt = function(elem){
+  if ($(elem).val() == $(elem).attr("name")) {
+    $(elem).val("");
+  }
+}
+
+/**
+ * Set prompt for field
+ * @param {Object} element
+ * @api private
+ */
+setPrompt = function(elem){
+  if ($(elem).val() == "") {
+    $(elem).val($(elem).attr("name"));
+  }
+}
 
 /**
  * Function to handle a selected dataset in a dropdown menu
