@@ -89,16 +89,14 @@ var TrackCollection = function(tracknames){
 TrackCollection.prototype.fetchInInterval = function(seqid, start, end, callback){
   var self = this
     , data = {};
-  self.tracks.forEach(function(track){
+  utils.forEachWhilst(self.tracks, function(track, fn){
     track[1].fetchInInterval(seqid, start, end, function(err, docs){
       data[track[0]] = docs;
+      fn();
     });
+  }, function(err){
+    callback(err, data);
   });
-  async.whilst(
-    function(){ return utils.objectSize(data) < utils.objectSize(self.tracks); },
-    function(cb){ setTimeout(cb, 100); },
-    function(err){ callback(err, data); }
-  );
 }
 
 
