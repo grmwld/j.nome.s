@@ -6,7 +6,7 @@
 light = #a9a9a9
 lighter = #eee
 blue = #00ABFA
-dark = #222
+dark = #333
 
 // mixins
 
@@ -29,16 +29,26 @@ replace(url, width, height = width)
 
 button()
   bold-button(glow: blue)
+  bshaddow(rgba(0,0,0, 0.6), 0px, 0px, 5px)
+
+
+bshadow(color, hos, vos, blur)
+  box-shadow: color hos vos blur
+  -moz-box-shadow: color hos vos blur
+  -webkit-box-shadow: color hos vos blur
 
 // general
 
 body
   padding: 5px 40px 40px 40px
   font: 16px 'helvetica neue', helvetica, arial, sans-serif
+  color: transparent
+  text-shadow: dark 0 0 1px
   smooth()
 
 a
   color: #00B7FF
+  text-shaddow: rgba(0,183,15, 1) 0 0 1px
   text-decoration: none
   &:hover
     text-decoration: underline
@@ -65,11 +75,17 @@ input[type='text']
   margin: 5px
   padding: 5px
   outline: none
-  border-radius: 6px
-  border: 2px solid lighter
-  color: light
+  border-radius: 5px
+  border: 1px solid lighter
+  color: transparent
+  text-shadow: dark 0 0 1px
+  bshadow(rgba(0,0,0, 0.1), 0px, 0px, 8px)
+  &:hover
+    bshadow(rgba(34,34,34, 0.15), 0px, 0px, 8px)
   &:focus
-    box-shadow: 0 1px 1px 0 rgba(blue, 0.6), 0 0 3px 1px rgba(blue, 0.3)
+    //color: dark
+    border: dark
+    bshadow(rgba(0,0,0, 1), 0px, 0px, 5px)
 
 input[type='checkbox']
   margin: 5px
@@ -80,205 +96,4 @@ input[type='submit']
   button()
 
 label
-//  display: block
   padding: 5px 0
-
-.buttons
-  text-align: right
-
-
-// notifications
-
-ul#notifications
-  fixed: top 10px left 15px
-  z-index: 200
-  margin: 0
-  padding: 0
-  li
-    list-style: none
-    margin: 8px 0
-    padding: 8px 15px
-    border: 1px solid light
-    border-radius: 5px
-    font-size: 12px
-    background: white
-    box-shadow: 0 0 4px lighter
-
-// dialogs
-
-.dialog
-  position: fixed
-  padding: 5px 10px
-  background: white
-  border-radius: 5px
-  box-shadow 0 0 50px 0 rgba(black, 0.4)
-  z-index: 1000
-  text-align: left
-  .message
-    padding: 20px
-  &#confirmation
-    width: 200px
-  .actions
-    button
-      margin: 1px
-      float: right
-    
-
-// overlay
-
-#overlay
-  fixed: top 0 left 0
-  width: 100%
-  height: 100%
-  background: rgba(black, 0.8)
-  z-index: 500
-  transition: opacity 0.3s
-  opacity: 1
-  visibility: visible
-  &.hide
-    opacity: 0
-    visibility: hidden
-
-// items table
-
-table#items
-  width: 100%
-  margin-top: 50px
-  border-collapse: collapse
-  thead
-    tr th
-      padding: 10px 10px 10px 0
-      text-align: right
-      user-select: none
-      cursor: pointer
-      &.asc::before
-        content: '▲ '
-        color: light
-      &.desc::before
-        content: '▼ '
-        color: light
-
-table#items
-  tbody
-    tr
-      border-bottom: 1px solid #eee
-      &:last-child
-        border-bottom: none
-      &.totals
-        td:first-child
-          border-right: none
-      td
-        border-right: 1px solid #eee
-        padding 4px 15px
-        text-align: right
-        &:last-child
-          border-right: none
-        &.entity
-          text-align: left
-          input
-            width: 90px
-        &.amount
-          color: light
-          width: 80px
-          input
-            width: 60px
-            text-align: right
-        &.category
-        &.date
-        &.tags
-          width: 100px
-          input
-            width: 80px
-        &.action
-          width: 70px
-          a
-            button()
-
-table#items
-  tr.add-item td
-    text-align: right
-    input[type='text']
-      width: 80%
-  tr.edit-item
-    input[type='text']
-      border-color: white
-      padding: 0
-      &:focus
-        box-shadow: none
-
-table#items
-  .toggle
-    size = 10px
-    cursor: pointer
-    background: lighter
-    border-radius: size
-    width: size
-    height: size
-    display: block
-    text-align: left
-    text-indent: -999999px
-    outline: none
-    &:hover
-      background: blue
-    &.active
-      background: blue
-      &:hover
-        background: blue + 40%
-    &:active
-      background: blue - 40%
-
-table#items .totals .amount
-  text-align: left
-  ul
-    list-style: none
-    margin: 5px 0
-    padding: 0
-    li
-      display: inline-block
-      margin: 0 10px
-      padding: 4px 0
-      font-size: 12px
-      strong
-        font-weight: normal
-        padding-right: 5px
-        text-transform: lowercase
-        color: blue
-        &::after
-          content: ':'
-      em
-        font-style: normal
-        &::before
-          content: '$'
-
-// charts
-
-.dialog .chart
-  padding: 15px
-
-// month indicators
-
-#prev-month
-#next-month
-#current-month
-  position: fixed
-  display: inline-block
-  padding: 15px
-  border: 1px solid lighter
-  color: inherit
-  opacity: .2
-  transition: opacity .3s
-  &:hover
-    text-decoration: none
-    opacity: 1
-  &:active
-    background: lighter + 5%
-
-#prev-month
-  fixed: bottom left
-  border-radius: top right 25px
-#next-month
-  fixed: bottom right
-  border-radius: top left 25px
-#current-month
-  fixed: bottom 0 left 46%
-  border-radius: top 25px
