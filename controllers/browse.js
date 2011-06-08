@@ -20,6 +20,7 @@ var route = function(app){
    * Route to a specific dataset
    *
    * @handles {Route#GET} /browse/:dataset
+   * @api public
    */
   app.get('/browse/:dataset', dbutils.connect, function(req, res){
     res.render('browse', {
@@ -37,6 +38,7 @@ var route = function(app){
    * Route to a specific dataset
    *
    * @handles {Route#POST} /browse/:dataset
+   * @api public
    */
   app.post('/browse/:dataset', dbutils.connect, function(req, res){
     var tracks = new TrackCollection(req.body.tracks);
@@ -54,6 +56,7 @@ var route = function(app){
    * Route to a specific seqid
    *
    * @handles {Route#GET} /browse/:dataset/:seqid
+   * @api public
    */
   app.get('/browse/:dataset/:seqid', dbutils.connect, function(req, res){
     var reference = new Reference();
@@ -66,6 +69,7 @@ var route = function(app){
    * Route to a specific range, with specified collections
    *
    * @handles {Route#GET} /browse/:dataset/:seqid/:start/:end/:tracks
+   * @api public
    */
   app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
     var tracks = new TrackCollection(req.params.tracks.split('&'))
@@ -91,6 +95,12 @@ var route = function(app){
     );
   });
 
+  /**
+   * Redirect to base url of dataset if parameters are incomplete
+   *
+   * @handles {Route#GET} /browse/:dataset/*
+   * @api public
+   */
   app.get('/browse/:dataset/*', dbutils.connect, function(req, res){
     res.redirect('/browse/' + req.params.dataset);
   });

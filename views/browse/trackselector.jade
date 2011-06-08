@@ -1,5 +1,6 @@
 #trackselector
   - each track in tracks
     div
-      input(type='checkbox', name=track.name, value=track.collection_name, checked=checked[track.collection_name]||false)
-      label(for=track.name) #{track.name}
+      label(for=track.name)
+        input(type='checkbox', id=track.name, name=track.name, value=track.collection_name, checked=checked[track.collection_name]||false)
+        #{track.name}

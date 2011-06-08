@@ -11,8 +11,6 @@ $(document).ready(function() {
     setPrompt(this);
   });
   
-
-
   /**
    * Handle browsing from main form via ajax post.
    */
@@ -60,6 +58,7 @@ $(document).ready(function() {
  * @api private
  */
 var printTrack = function(t){
+  console.log(t);
   var track = $("<div class='track'></div>");
   track.append($([
     "<h3>"
