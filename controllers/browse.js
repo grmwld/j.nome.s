@@ -85,7 +85,7 @@ var route = function(app){
         , start: req.params.start
         , end: req.params.end
         , checked: checked
-        , data: JSON.stringify(data)
+        , data: data
         });
       }
     );

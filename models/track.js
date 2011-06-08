@@ -88,10 +88,13 @@ var TrackCollection = function(tracknames){
  */
 TrackCollection.prototype.fetchInInterval = function(seqid, start, end, callback){
   var self = this
-    , data = {};
+    , data = [];
   utils.forEachWhilst(self.tracks, function(track, fn){
     track[1].fetchInInterval(seqid, start, end, function(err, docs){
-      data[track[0]] = docs;
+      data.push({
+        name: track[0]
+      , docs: docs
+      });
       fn();
     });
   }, function(err){

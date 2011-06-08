@@ -11,5 +11,9 @@
 #landmarks
   !=partial('landmarks', { dataset: dataset })
 
+#navruler
+  "Navigation ruler."
+
 #tracks
-  #{data}
+  - each track in data
+    !=partial('track', { track: track })

@@ -38,7 +38,9 @@ $(document).ready(function() {
     , dataType: "json"
     , success: function(data) {
         $("#tracks").empty();
-        $("#tracks").append(JSON.stringify(data));
+        data.forEach(function(t){
+          printTrack(t);
+        });
         window.history.pushState({}, '',
           [baseURL, seqid, start, end, tracks.join('&')].join('/')
         );
@@ -50,6 +52,22 @@ $(document).ready(function() {
 });
 
 
+
+/**
+ * Print someinfo about a track
+ *
+ * @param {Object} track
+ * @api private
+ */
+var printTrack = function(t){
+  var track = $("<div class='track'></div>");
+  track.append($([
+    "<h3>"
+  , t.name, ":", t.docs.length, "results"
+  , "</h3>"
+  ].join(' ')));
+  $("#tracks").append(track);
+}
 
 /**
  * Clear prompt from field
