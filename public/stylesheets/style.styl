@@ -30,25 +30,28 @@ replace(url, width, height = width)
 button()
   bold-button(glow: blue)
   bshadow(rgba(0,0,0, 0.6), 0px, 0px, 5px)
+  font-size: 14px
 
+prettyfont(color)
+  color: transparent
+  text-shadow: color 0 0 1px
 
 bshadow(color, hos, vos, blur)
   box-shadow: color hos vos blur
   -moz-box-shadow: color hos vos blur
   -webkit-box-shadow: color hos vos blur
 
+
 // general
 
 body
-  padding: 5px 40px 40px 40px
+  padding: 40px
   font: 16px 'helvetica neue', helvetica, arial, sans-serif
-  color: transparent
-  text-shadow: dark 0 0 1px
+  prettyfont(dark)
   smooth()
 
 a
-  color: #00B7FF
-  text-shaddow: rgba(0,183,15, 1) 0 0 1px
+  prettyfont(blue)
   text-decoration: none
   &:hover
     text-decoration: underline
@@ -75,15 +78,13 @@ input[type='text']
   margin: 5px
   padding: 5px
   outline: none
+  prettyfont(dark)
   border-radius: 5px
   border: 1px solid lighter
-  color: transparent
-  text-shadow: dark 0 0 1px
   bshadow(rgba(0,0,0, 0.1), 0px, 0px, 8px)
   &:hover
     bshadow(rgba(34,34,34, 0.15), 0px, 0px, 8px)
   &:focus
-    //color: dark
     border: dark
     bshadow(rgba(0,0,0, 1), 0px, 0px, 5px)
 
