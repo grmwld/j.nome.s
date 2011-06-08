@@ -91,6 +91,10 @@ var route = function(app){
     );
   });
 
+  app.get('/browse/:dataset/*', dbutils.connect, function(req, res){
+    res.redirect('/browse/' + req.params.dataset);
+  });
+
 }
 
 
