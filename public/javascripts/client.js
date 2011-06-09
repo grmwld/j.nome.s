@@ -10,39 +10,20 @@ $(document).ready(function() {
   }).blur(function(){
     setPrompt(this);
   });
+
+  /**
+   * Render tracks if parameters of the form are valid.
+   */
+  validateForm(function(){
+    fetchTracksData();
+  });
   
   /**
    * Handle browsing from main form via ajax post.
    */
   $("#submit").click(function() {
-    var seqid = $('#seqid').val()
-      , start = $('#start').val()
-      , end = $('#end').val()
-      , tracks = []
-      , trackselector = $('#trackselector :checked')
-      , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-    trackselector.each(function(i){
-      tracks.push($(trackselector[i]).val());
-    });
-    $.ajax({
-      type: "POST"
-    , url: baseURL 
-    , data: {
-        seqid: seqid
-      , start: start
-      , end: end
-      , tracks: tracks
-      }
-    , dataType: "json"
-    , success: function(data) {
-        $("#tracks").empty();
-        data.forEach(function(t){
-          printTrack(t);
-        });
-        window.history.pushState({}, '',
-          [baseURL, seqid, start, end, tracks.join('&')].join('/')
-        );
-      }
+    validateForm(function(){
+      renderTracks();
     });
     return false;
   });
@@ -52,13 +33,65 @@ $(document).ready(function() {
 
 
 /**
- * Print someinfo about a track
+ * Post an AJAX request to fetch the requested data
+ * 
+ * @api private
+ */
+var fetchTracksData = function(){
+  var seqid = $('#seqid').val()
+    , start = $('#start').val()
+    , end = $('#end').val()
+    , tracks = []
+    , trackselector = $('#trackselector :checked')
+    , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  trackselector.each(function(i){
+    tracks.push($(trackselector[i]).val());
+  });
+  $.ajax({
+    type: "POST"
+  , url: baseURL 
+  , data: {
+      seqid: seqid
+    , start: start
+    , end: end
+    , tracks: tracks
+    }
+  , dataType: "json"
+  , success: function(data) {
+      $("#tracks").empty();
+      data.forEach(function(t){
+        renderTrack(t);
+      });
+      window.history.pushState({}, '',
+        [baseURL, seqid, start, end, tracks.join('&')].join('/')
+      );
+    }
+  });
+}
+
+/**
+ * Validates the values in the form.
+ * If the form is valid, the callback is triggered.
+ *
+ * @param {Function} callback
+ * @api private
+ */
+var validateForm = function(callback){
+  var okSeqid = $("#seqid").val() != 'seqid'
+    , okStart = !isNaN($("#start").val())
+    , okEnd = !isNaN($("#end").val())
+  if (okSeqid && okStart && okEnd){
+    callback();
+  }
+}
+
+/**
+ * Render a track
  *
  * @param {Object} track
  * @api private
  */
-var printTrack = function(t){
-  console.log(t);
+var renderTrack = function(t){
   var track = $("<div class='track'></div>");
   track.append($([
     "<h3>"
@@ -82,6 +115,7 @@ var clearPrompt = function(elem){
 
 /**
  * Set prompt for field
+ *
  * @param {Object} element
  * @api private
  */
@@ -98,12 +132,11 @@ setPrompt = function(elem){
  * @return {Boolean}
  * @api public
  */
-function OnSelect(dropdown)
-{
-  var myindex  = dropdown.selectedIndex
-  var SelValue = dropdown.options[myindex].value
-  if (SelValue != 'Select a dataset') {
-    var baseURL  = '/browse/'+SelValue
+function OnSelect(dropdown){
+  var index  = dropdown.selectedIndex
+    , selected = dropdown.options[myindex]
+    , baseURL = '/browse/' + selected.value;
+  if (selected.value != 'Select a dataset'){
     top.location.href = baseURL;
     return true;
   }
