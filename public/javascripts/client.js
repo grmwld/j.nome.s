@@ -33,7 +33,7 @@ $(document).ready(function() {
 
 
 /**
- * Post an AJAX request to fetch the requested data
+ * Iteratively fetches data of all selected tracks.
  * 
  * @api private
  */
@@ -50,24 +50,41 @@ var fetchTracksData = function(){
     tracks.push($(trackselector[i]).val());
   });
   tracks.forEach(function(track){
-    $.ajax({
-      type: "POST"
-    , url: baseURL
-    , data: {
-        seqid: seqid
-      , start: start
-      , end: end
-      , track: track
-      }
-    , dataType: "json"
-    , success: function(data) {
-        renderTrack(data);
-      }
+    requestTrackData(baseURL, seqid, start, end, track, function(data){
+      renderTrack(data);
     });
   });
   window.history.pushState({}, '',
     [baseURL, seqid, start, end, tracks.join('&')].join('/')
   );
+}
+
+/**
+ * Request data of a given track between 2 positions of a seqid.
+ * The callback is triggered with the collected data
+ *
+ * @param {String} baseURL
+ * @param {string} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {String} track
+ * @param {Function} callback
+ */
+var requestTrackData = function(baseURL, seqid, start, end, track, callback){
+  $.ajax({
+    type: "POST"
+  , url: baseURL
+  , data: {
+      seqid: seqid
+    , start: start
+    , end: end
+    , track: track
+    }
+  , dataType: "json"
+  , success: function(data) {
+      callback(data);
+    }
+  });
 }
 
 /**

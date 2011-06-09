@@ -34,6 +34,7 @@ var TrackSchema = new mongoose.Schema({
  */
 var Track = function(name, track){
   this.model =  mongoose.model(name, TrackSchema, track);
+  this.name = name;
 }
 
 /**
@@ -60,54 +61,8 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
 }
 
 
-/**
- * Class representing a collection of tracks.
- * It initializes a collection of Track objects
- * based on the provided list of track names.
- *
- * @param {Array} track names
- * @see {Track}
- * @api public
- */
-var TrackCollection = function(tracknames){
-  var self = this;
-  self.tracks = [];
-  tracknames.forEach(function(trackname){
-    self.tracks.push([trackname, new Track(trackname, trackname)]);
-  });
-}
-
-/**
- * Fetch all documents between 2 position on a given seqid.
- * Relies on the individual fetchInInterval method of
- * the Track objects.
- *
- * @param {String} seqid
- * @param {Number} start
- * @param {Number} end
- * @param {Function} callback
- * @see {Track#fetchInInterval}
- * @api public
- */
-TrackCollection.prototype.fetchInInterval = function(seqid, start, end, callback){
-  var self = this
-    , data = [];
-  utils.forEachWhilst(self.tracks, function(track, fn){
-    track[1].fetchInInterval(seqid, start, end, function(err, docs){
-      data.push({
-        name: track[0]
-      , docs: docs
-      });
-      fn();
-    });
-  }, function(err){
-    callback(err, data);
-  });
-}
-
 
 /**
  * Expose public functions, classes and methods
  */
 exports.Track = Track;
-exports.TrackCollection = TrackCollection;
