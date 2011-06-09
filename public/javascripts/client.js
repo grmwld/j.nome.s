@@ -10,39 +10,20 @@ $(document).ready(function() {
   }).blur(function(){
     setPrompt(this);
   });
+
+  /**
+   * Render tracks if parameters of the form are valid.
+   */
+  validateForm(function(){
+    fetchTracksData();
+  });
   
   /**
    * Handle browsing from main form via ajax post.
    */
   $("#submit").click(function() {
-    var seqid = $('#seqid').val()
-      , start = $('#start').val()
-      , end = $('#end').val()
-      , tracks = []
-      , trackselector = $('#trackselector :checked')
-      , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-    trackselector.each(function(i){
-      tracks.push($(trackselector[i]).val());
-    });
-    $.ajax({
-      type: "POST"
-    , url: baseURL 
-    , data: {
-        seqid: seqid
-      , start: start
-      , end: end
-      , tracks: tracks
-      }
-    , dataType: "json"
-    , success: function(data) {
-        $("#tracks").empty();
-        data.forEach(function(t){
-          printTrack(t);
-        });
-        window.history.pushState({}, '',
-          [baseURL, seqid, start, end, tracks.join('&')].join('/')
-        );
-      }
+    validateForm(function(){
+      fetchTracksData();
     });
     return false;
   });
@@ -52,13 +33,83 @@ $(document).ready(function() {
 
 
 /**
- * Print someinfo about a track
+ * Iteratively fetches data of all selected tracks.
+ * 
+ * @api private
+ */
+var fetchTracksData = function(){
+  var seqid = $('#seqid').val()
+    , start = $('#start').val()
+    , end = $('#end').val()
+    , tracks = []
+    , track
+    , trackselector = $('#trackselector :checked')
+    , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  $("#tracks").empty();
+  trackselector.each(function(i){
+    tracks.push($(trackselector[i]).val());
+  });
+  tracks.forEach(function(track){
+    requestTrackData(baseURL, seqid, start, end, track, function(data){
+      renderTrack(data);
+    });
+  });
+  window.history.pushState({}, '',
+    [baseURL, seqid, start, end, tracks.join('&')].join('/')
+  );
+}
+
+/**
+ * Request data of a given track between 2 positions of a seqid.
+ * The callback is triggered with the collected data
+ *
+ * @param {String} baseURL
+ * @param {string} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {String} track
+ * @param {Function} callback
+ */
+var requestTrackData = function(baseURL, seqid, start, end, track, callback){
+  $.ajax({
+    type: "POST"
+  , url: baseURL
+  , data: {
+      seqid: seqid
+    , start: start
+    , end: end
+    , track: track
+    }
+  , dataType: "json"
+  , success: function(data) {
+      callback(data);
+    }
+  });
+}
+
+/**
+ * Validates the values in the form.
+ * If the form is valid, the callback is triggered.
+ *
+ * @param {Function} callback
+ * @api private
+ */
+var validateForm = function(callback){
+  var okSeqid = $("#seqid").val() != 'seqid'
+    , okStart = !isNaN($("#start").val())
+    , okEnd = !isNaN($("#end").val())
+  if (okSeqid && okStart && okEnd){
+    callback();
+  }
+}
+
+/**
+ * Render a track
  *
  * @param {Object} track
  * @api private
  */
-var printTrack = function(t){
-  console.log(t);
+var renderTrack = function(t){
   var track = $("<div class='track'></div>");
   track.append($([
     "<h3>"
@@ -82,6 +133,7 @@ var clearPrompt = function(elem){
 
 /**
  * Set prompt for field
+ *
  * @param {Object} element
  * @api private
  */
@@ -98,12 +150,11 @@ setPrompt = function(elem){
  * @return {Boolean}
  * @api public
  */
-function OnSelect(dropdown)
-{
-  var myindex  = dropdown.selectedIndex
-  var SelValue = dropdown.options[myindex].value
-  if (SelValue != 'Select a dataset') {
-    var baseURL  = '/browse/'+SelValue
+function OnSelect(dropdown){
+  var index  = dropdown.selectedIndex
+    , selected = dropdown.options[myindex]
+    , baseURL = '/browse/' + selected.value;
+  if (selected.value != 'Select a dataset'){
     top.location.href = baseURL;
     return true;
   }

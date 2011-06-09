@@ -41,8 +41,8 @@ var route = function(app){
    * @api public
    */
   app.post('/browse/:dataset', dbutils.connect, function(req, res){
-    var tracks = new TrackCollection(req.body.tracks);
-    tracks.fetchInInterval(
+    var track = new Track(req.body.track, req.body.track);
+    track.fetchInInterval(
       req.body.seqid
     , req.body.start
     , req.body.end
@@ -72,27 +72,18 @@ var route = function(app){
    * @api public
    */
   app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
-    var tracks = new TrackCollection(req.params.tracks.split('&'))
-      , checked = {};
+    var checked = {};
     req.params.tracks.split('&').forEach(function(track){
       checked[track] = true;
     });
-    tracks.fetchInInterval(
-      req.params.seqid
-    , req.params.start
-    , req.params.end
-    , function(err, data){
-        res.render('browse', {
-          title: 'j.nome.s : browse'
-        , dataset: req.params.dataset
-        , seqid: req.params.seqid
-        , start: req.params.start
-        , end: req.params.end
-        , checked: checked
-        , data: data
-        });
-      }
-    );
+    res.render('browse', {
+      title: 'j.nome.s : browse'
+    , dataset: req.params.dataset
+    , seqid: req.params.seqid
+    , start: req.params.start
+    , end: req.params.end
+    , checked: checked
+    });
   });
 
   /**
