@@ -5,11 +5,13 @@ $(document).ready(function() {
    * The default value corresponds to the 'name' attribute
    * of the input field.
    */
-  $("input[type=text]").focus(function(){
-    clearPrompt(this);
-  }).blur(function(){
-    setPrompt(this);
-  });
+  $("input[type=text]")
+    .focus(function(){
+      clearPrompt(this);
+    })
+    .blur(function(){
+      setPrompt(this);
+    });
 
   /**
    * Render tracks if parameters of the form are valid.
@@ -28,22 +30,29 @@ $(document).ready(function() {
     return false;
   });
 
+  /**
+   * Draw the main navigation ruler
+   */
+  var mainNavigation = Raphael("mainnavruler", 1101, 50);
+  mainNavigation.drawBgRules(10, { stroke: "#eee" });
+  mainNavigation.drawMainRuler(0, 7000000, { stroke: "#000" });
+
 });
 
 
 
+// **********   Navigation Form   ************
+
 /**
  * Iteratively fetches data of all selected tracks.
- * 
- * @api private
  */
 var fetchTracksData = function(){
   var seqid = $('#seqid').val()
     , start = $('#start').val()
     , end = $('#end').val()
+    , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
-    , trackselector = $('#trackselector :checked')
     , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   $("#tracks").empty();
   trackselector.each(function(i){
@@ -91,7 +100,6 @@ var requestTrackData = function(baseURL, seqid, start, end, trackID, callback){
  * If the form is valid, the callback is triggered.
  *
  * @param {Function} callback
- * @api private
  */
 var validateForm = function(callback){
   var okSeqid = $("#seqid").val() != 'seqid'
@@ -103,26 +111,9 @@ var validateForm = function(callback){
 }
 
 /**
- * Render a track
- *
- * @param {Object} track
- * @api private
- */
-var renderTrack = function(t){
-  var track = $("<div class='track'></div>");
-  track.append($([
-    "<h3>"
-  , t.name, ":", t.docs.length, "results"
-  , "</h3>"
-  ].join(' ')));
-  $("#tracks").append(track);
-}
-
-/**
  * Clear prompt from field
  * 
  * @param {Object} element
- * @api private
  */
 var clearPrompt = function(elem){
   if ($(elem).val() == $(elem).attr("name")) {
@@ -134,22 +125,42 @@ var clearPrompt = function(elem){
  * Set prompt for field
  *
  * @param {Object} element
- * @api private
  */
-setPrompt = function(elem){
+var setPrompt = function(elem){
   if ($(elem).val() == "") {
     $(elem).val($(elem).attr("name"));
   }
 }
+
+
+
+// *********   Tracks and rulers navigation   ************
+
+/**
+ * Render a track
+ *
+ * @param {Object} track
+ */
+var renderTrack = function(t){
+  var track = $("<div class='track'></div>");
+  track.append($([
+    "<h3>"
+  , t.name, ":", t.docs.length, "results"
+  , "</h3>"
+  ].join(' ')));
+  $("#tracks").append(track);
+}
+
+
+
 
 /**
  * Function to handle a selected dataset in a dropdown menu
  *
  * @param {Object} dropdown menu
  * @return {Boolean}
- * @api public
  */
-function OnSelect(dropdown){
+var OnSelect = function(dropdown){
   var index  = dropdown.selectedIndex
     , selected = dropdown.options[myindex]
     , baseURL = '/browse/' + selected.value;
