@@ -18,6 +18,7 @@ $(document).ready(function() {
    */
   validateForm(function(){
     fetchTracksData();
+    drawOutput();
   });
   
   /**
@@ -26,22 +27,16 @@ $(document).ready(function() {
   $("#submit").click(function() {
     validateForm(function(){
       fetchTracksData();
+      refreshOutput();
     });
     return false;
   });
-
-  /**
-   * Draw the main navigation ruler
-   */
-  var mainNavigation = Raphael("mainnavruler", 1101, 50);
-  mainNavigation.drawBgRules(10, { stroke: "#eee" });
-  mainNavigation.drawMainRuler(0, 7000000, { stroke: "#000" });
 
 });
 
 
 
-// **********   Navigation Form   ************
+// **********   Form Navigation   ************
 
 /**
  * Iteratively fetches data of all selected tracks.
@@ -135,6 +130,40 @@ var setPrompt = function(elem){
 
 
 // *********   Tracks and rulers navigation   ************
+
+/**
+ * Draw the output
+ */
+var drawOutput = function(){
+  drawMainNavigation();
+}
+
+/**
+ * Refreshes the view of the output
+ */
+var refreshOutput = function(){
+  $("#overviewnavigation").empty();
+  drawMainNavigation();
+}
+
+/**
+ * Draw main navigation ruler
+ */
+var drawMainNavigation = function(){
+  var seqid = $('#seqid').val()
+    , postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
+  $.ajax({
+    type: "POST"
+  , url: postURL
+  , data: { seqid: seqid }
+  , dataType: "json"
+  , success: function(seqidMD) {
+      var mainNavigation = Raphael("overviewnavigation", 1101, 50);
+      mainNavigation.drawBgRules(10, { stroke: "#eee" });
+      mainNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
+    }
+  });
+}
 
 /**
  * Render a track

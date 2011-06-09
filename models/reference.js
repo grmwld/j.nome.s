@@ -51,8 +51,24 @@ var Reference = function(){
 }
 
 /**
+ * Gets the length of a seqid.
+ *
+ * @param {String} seqid
+ * @param {Function} callback
+ * @api public
+ */
+Reference.prototype.getMetadata = function(seqid, callback){
+  var self = this;
+  self.files.findById(seqid, function(err, doc){
+    callback(err, doc);
+  });
+};
+
+/**
  * Get the sequence corresponding to the given seqid
  *
+ * @param {String} id
+ * @param {Function} callback
  * @api public
  */
 Reference.prototype.findById = function(id, callback){

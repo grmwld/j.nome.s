@@ -54,16 +54,18 @@ var route = function(app){
   });
 
   /**
-   * Route to a specific seqid
+   * Fetches the metadata of a specific seqid
    *
-   * @handles {Route#GET} /browse/:dataset/:seqid
+   * @handles {Route#POST} /browse/:dataset/:seqid.json
    * @api public
    */
-  app.get('/browse/:dataset/:seqid', dbutils.connect, function(req, res){
-    var reference = new Reference();
-    reference.findById(req.params.seqid, function(err, doc){
-      res.send(doc);
-    });
+  app.post('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
+    if (req.params.format === 'json'){
+      var reference = new Reference();
+      reference.getMetadata(req.params.seqid, function(err, doc){
+        res.send(doc);
+      });
+    }
   });
 
   /**
