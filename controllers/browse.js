@@ -41,7 +41,8 @@ var route = function(app){
    * @api public
    */
   app.post('/browse/:dataset', dbutils.connect, function(req, res){
-    var track = new Track(req.body.track, req.body.track);
+    var trackcfg = app._locals.config[req.params.dataset].tracks[req.body.trackID]
+      , track = new Track(trackcfg.name, trackcfg.id);
     track.fetchInInterval(
       req.body.seqid
     , req.body.start

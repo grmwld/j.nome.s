@@ -41,21 +41,20 @@ var fetchTracksData = function(){
   var seqid = $('#seqid').val()
     , start = $('#start').val()
     , end = $('#end').val()
-    , tracks = []
-    , track
+    , tracksIDs = []
+    , trackID
     , trackselector = $('#trackselector :checked')
     , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   $("#tracks").empty();
   trackselector.each(function(i){
-    tracks.push($(trackselector[i]).val());
-  });
-  tracks.forEach(function(track){
-    requestTrackData(baseURL, seqid, start, end, track, function(data){
+    trackID = $(trackselector[i]).val();
+    tracksIDs.push(trackID);
+    requestTrackData(baseURL, seqid, start, end, trackID, function(data){
       renderTrack(data);
     });
   });
   window.history.pushState({}, '',
-    [baseURL, seqid, start, end, tracks.join('&')].join('/')
+    [baseURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
 }
 
@@ -70,7 +69,7 @@ var fetchTracksData = function(){
  * @param {String} track
  * @param {Function} callback
  */
-var requestTrackData = function(baseURL, seqid, start, end, track, callback){
+var requestTrackData = function(baseURL, seqid, start, end, trackID, callback){
   $.ajax({
     type: "POST"
   , url: baseURL
@@ -78,7 +77,7 @@ var requestTrackData = function(baseURL, seqid, start, end, track, callback){
       seqid: seqid
     , start: start
     , end: end
-    , track: track
+    , trackID: trackID
     }
   , dataType: "json"
   , success: function(data) {

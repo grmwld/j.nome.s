@@ -2,13 +2,13 @@
   "dbname": "Xentr42"
 , "tracks": {
     "gaps": {
-      "name": "gaps"
-    , "collection_name": "gaps"
+      "id": "gaps"
+    , "name": "gaps"
     , "description": "Assembly gaps"
     }
-  , "ucsc_genes": {
-      "name": "ucsc_genes"
-    , "collection_name": "ucsc_refgene"
+  , "ucsc_refgene": {
+      "id": "ucsc_refgene"
+    , "name": "ucsc_genes"
     , "description": "Reference genes from USCS"
     }
   }
