@@ -52,7 +52,10 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
   , start: {$lt: end}
   , end: {$gt: start}
   }, function(err, docs){
-    callback(err, docs);
+    callback(err, {
+      name: self.name
+    , docs: docs
+    });
   });
 }
 

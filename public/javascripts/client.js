@@ -42,31 +42,32 @@ var fetchTracksData = function(){
     , start = $('#start').val()
     , end = $('#end').val()
     , tracks = []
+    , track
     , trackselector = $('#trackselector :checked')
     , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  $("#tracks").empty();
   trackselector.each(function(i){
     tracks.push($(trackselector[i]).val());
   });
-  $.ajax({
-    type: "POST"
-  , url: baseURL 
-  , data: {
-      seqid: seqid
-    , start: start
-    , end: end
-    , tracks: tracks
-    }
-  , dataType: "json"
-  , success: function(data) {
-      $("#tracks").empty();
-      data.forEach(function(t){
-        renderTrack(t);
-      });
-      window.history.pushState({}, '',
-        [baseURL, seqid, start, end, tracks.join('&')].join('/')
-      );
-    }
+  tracks.forEach(function(track){
+    $.ajax({
+      type: "POST"
+    , url: baseURL
+    , data: {
+        seqid: seqid
+      , start: start
+      , end: end
+      , track: track
+      }
+    , dataType: "json"
+    , success: function(data) {
+        renderTrack(data);
+      }
+    });
   });
+  window.history.pushState({}, '',
+    [baseURL, seqid, start, end, tracks.join('&')].join('/')
+  );
 }
 
 /**
