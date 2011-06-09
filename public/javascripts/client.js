@@ -23,7 +23,7 @@ $(document).ready(function() {
    */
   $("#submit").click(function() {
     validateForm(function(){
-      renderTracks();
+      fetchTracksData();
     });
     return false;
   });
