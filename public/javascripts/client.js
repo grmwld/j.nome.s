@@ -17,8 +17,10 @@ $(document).ready(function() {
    * Render tracks if parameters of the form are valid.
    */
   validateForm(function(){
-    fetchTracksData();
-    drawOutput();
+    var start = $('#start').val()
+      , end = $('#end').val();
+    fetchTracksData(start, end);
+    drawNavigationRulers();
   });
   
   /**
@@ -26,8 +28,10 @@ $(document).ready(function() {
    */
   $("#submit").click(function() {
     validateForm(function(){
-      fetchTracksData();
-      refreshOutput();
+      var start = $('#start').val()
+        , end = $('#end').val();
+      fetchTracksData(start, end);
+      refreshNavigationRulers();
     });
     return false;
   });
@@ -41,10 +45,8 @@ $(document).ready(function() {
 /**
  * Iteratively fetches data of all selected tracks.
  */
-var fetchTracksData = function(){
-  var seqid = $('#seqid').val()
-    , start = $('#start').val()
-    , end = $('#end').val()
+var fetchTracksData = function(start, end){
+  var seqid = $("#seqid").val()
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
@@ -134,14 +136,14 @@ var setPrompt = function(elem){
 /**
  * Draw the output
  */
-var drawOutput = function(){
+var drawNavigationRulers = function(){
   drawMainNavigation();
 }
 
 /**
  * Refreshes the view of the output
  */
-var refreshOutput = function(){
+var refreshNavigationRulers = function(){
   $("#overviewnavigation").empty();
   drawMainNavigation();
 }
@@ -161,6 +163,7 @@ var drawMainNavigation = function(){
       var mainNavigation = Raphael("overviewnavigation", 1101, 50);
       mainNavigation.drawBgRules(10, { stroke: "#eee" });
       mainNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
+      mainNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
     }
   });
 }
@@ -191,7 +194,7 @@ var renderTrack = function(t){
  */
 var OnSelect = function(dropdown){
   var index  = dropdown.selectedIndex
-    , selected = dropdown.options[myindex]
+    , selected = dropdown.options[index]
     , baseURL = '/browse/' + selected.value;
   if (selected.value != 'Select a dataset'){
     top.location.href = baseURL;
