@@ -45,6 +45,17 @@ Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
 }
 
 /**
+ * Display the area currently selected
+ */
+Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
+  var view_span = view_end - view_start
+    , rel_start = (((view_start) / tot_length) * (this.width-100)) + 50
+    , rel_end = (((view_end) / tot_length) * (this.width-100)) + 50
+    , rel_doc_length = rel_end - rel_start
+  this.rect(rel_start, 0, rel_doc_length, this.height).attr(style);
+}
+
+/**
  * Add a selectable area to a Paper.
  */
 Raphael.fn.explorableArea = function(view_start, view_end, style) {
@@ -85,6 +96,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       // Span selection
       if (goto_start != goto_end) {
         fetchTracksData(goto_start, goto_end);
+        refreshNavigationRulers(goto_start, goto_end);
       }
       // Location click
       else {
