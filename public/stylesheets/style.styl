@@ -1,5 +1,101 @@
+
+@import 'nib'
+
+// colors
+
+light = #a9a9a9
+lighter = #eee
+blue = #00ABFA
+dark = #333
+
+// mixins
+
+smooth()
+  -webkit-font-smoothing: antialiased
+
+transition()
+  -webkit-transition: arguments
+
+hide-text()
+  display: block
+  text-indent: -9999999px
+  outline: none
+
+replace(url, width, height = width)
+  hide-text()
+  background: url
+  width: width
+  height: height
+
+button()
+  bold-button(glow: blue)
+  bshadow(rgba(0,0,0, 0.6), 0px, 0px, 5px)
+  font-size: 14px
+
+prettyfont(color)
+  color: transparent
+  text-shadow: color 0 0 1px
+
+bshadow(color, hos, vos, blur)
+  box-shadow: color hos vos blur
+  -moz-box-shadow: color hos vos blur
+  -webkit-box-shadow: color hos vos blur
+
+
+// general
+
 body
-  padding 50px
-  font 14px "Lucida Grande", Helvetica, Arial, sans-serif
+  padding: 40px
+  font: 16px 'helvetica neue', helvetica, arial, sans-serif
+  prettyfont(dark)
+  smooth()
+
 a
-  color #00B7FF
+  prettyfont(blue)
+  text-decoration: none
+  &:hover
+    text-decoration: underline
+
+.hide
+  display: none
+
+.centered
+  text-align: center
+
+#browsefields
+#trackselector
+  margin: 20px
+
+.browsefield
+  margin: 5px
+  font-size: 24px
+  text-align: center
+
+
+// forms
+
+input[type='text']
+  margin: 5px
+  padding: 5px
+  outline: none
+  prettyfont(dark)
+  border-radius: 5px
+  border: 1px solid lighter
+  bshadow(rgba(0,0,0, 0.1), 0px, 0px, 8px)
+  &:hover
+    bshadow(rgba(34,34,34, 0.15), 0px, 0px, 8px)
+  &:focus
+    color: dark
+    border: dark
+    bshadow(rgba(0,0,0, 1), 0px, 0px, 5px)
+
+input[type='checkbox']
+  margin: 5px
+
+button,
+input[type='button'],
+input[type='submit']
+  button()
+
+label
+  padding: 5px 0

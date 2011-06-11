@@ -1,0 +1,15 @@
+{
+  "dbname": "Xentr42"
+, "tracks": {
+    "gaps": {
+      "id": "gaps"
+    , "name": "gaps"
+    , "description": "Assembly gaps"
+    }
+  , "ucsc_refgene": {
+      "id": "ucsc_refgene"
+    , "name": "ucsc_genes"
+    , "description": "Reference genes from USCS"
+    }
+  }
+}

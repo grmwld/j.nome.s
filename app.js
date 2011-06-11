@@ -1,32 +1,48 @@
-
 /**
  * Module dependencies.
  */
+var express = require('express')
+  , stylus = require('stylus')
+  , nib = require('nib')
+  , utils = require('./lib/utils')
+  , Config = require('./lib/config').Config;
 
-var fs = require('fs')
-  , express = require('express')
-  , Resource = require('express-resource')
-  , expose = require('express-expose');
 
-var app = module.exports = express.createServer();
+/**
+ * Create the main app
+ */
+var app = module.exports = express.createServer(),
+    config = new Config(app);
 
-// Configuration
+
+/**
+ * Configuration of the express app
+ */
+config.loadDir();
 
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
-  app.set('local_config', JSON.parse(fs.readFileSync(process.cwd() + '/config.json')));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  //app.use(express.session({ secret: 'your secret here' }));
-  //app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+  app.use(express.session({ secret: 'topsecret' }));
+  app.use(stylus.middleware({
+    src: __dirname + '/public'
+  , compile: function(str, path){
+      return stylus(str)
+        .set('filename', path)
+        .set('compress', true)
+        .use(nib());
+    }
+  }));
   app.use(app.router);
   app.use(express.static(__dirname + '/public'));
 });
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
+  require('express-trace')(app);
   console.log('Application started in development mode.')
 });
 
@@ -35,17 +51,28 @@ app.configure('production', function(){
   console.log('Application started in production mode.');
 });
 
-// Routes
+
+/**
+ * Map routes to app functions
+ */
+var help = require('./controllers/help')
+  , about = require('./controllers/about')
+  , browse = require('./controllers/browse');
 
 app.get('/', function(req, res){
   res.render('index', {
-    title: 'j.nome.s',
-    datasets: app.settings.local_config['datasets']
+    title: 'j.nome.s'
   });
 });
 
-// Only listen on $ node app.js
+help.route(app);
+about.route(app);
+browse.route(app);
 
+
+/**
+ * Start the express app
+ */
 if (!module.parent) {
   app.listen(3000);
   console.log("j.nome.s listening on port %d", app.address().port);
