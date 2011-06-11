@@ -147,6 +147,8 @@ var drawNavigationRulers = function(start, end){
  */
 var refreshNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
+  $("#ratiozoom").empty();
+  $("#zoomnavigation").empty();
   drawMainNavigation(start, end);
 }
 
@@ -162,11 +164,19 @@ var drawMainNavigation = function(start, end){
   , data: { seqid: seqid }
   , dataType: "json"
   , success: function(seqidMD) {
-      var mainNavigation = Raphael("overviewnavigation", 1101, 50);
-      mainNavigation.drawBgRules(10, { stroke: "#eee" });
-      mainNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
-      mainNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-      mainNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
+      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
+        , ratiozoom = Raphael("ratiozoom", 1101, 50)
+        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+        , currentSpan;
+      overviewNavigation.drawBgRules(10, { stroke: "#eee" });
+      overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
+      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+      overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
+      ratiozoom.drawBgRules(10, { stroke: "#eee" });
+      ratiozoom.drawRatio(currentSpan);
+      zoomNavigation.drawBgRules(10, { stroke: "#eee" });
+      zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
+      zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
     }
   });
 }

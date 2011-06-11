@@ -45,6 +45,16 @@ Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
 }
 
 /**
+ * Display 2 lines going from the current selection in the overview to the local view
+ */
+Raphael.fn.drawRatio = function(cur_span, style) {
+  var sx1=cur_span.attrs.x, sy1=0, sx2=50, sy2=this.height;
+  var ex1=cur_span.attrs.x+cur_span.attrs.width, ey1=0, ex2=this.width-50, ey2=this.height;
+  this.lineTo(sx1, sy1, sx2, sy2).attr(style);
+  this.lineTo(ex1, ey1, ex2, ey2).attr(style);
+}
+
+/**
  * Display the area currently selected
  */
 Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
@@ -52,7 +62,7 @@ Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
     , rel_start = (((view_start) / tot_length) * (this.width-100)) + 50
     , rel_end = (((view_end) / tot_length) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-  this.rect(rel_start, 0, rel_doc_length, this.height).attr(style);
+  return this.rect(rel_start, 0, rel_doc_length, this.height).attr(style);
 }
 
 /**
@@ -88,11 +98,13 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
     function(e) {
       this.selector.remove();
       if (!e.offsetX) {
-        // TODO : Fix bug in Firefox
         e.offsetX = e.clientX - $(e.target).position().left;
       }
       ge = Math.floor((((e.offsetX-50)/(this.paper.width-100)) * view_span) + view_start);
-      var goto_start = Math.min(gs, ge), goto_end = Math.max(gs, ge);
+      var goto_start = Math.min(gs, ge)
+        , goto_end = Math.max(gs, ge);
+      console.log(gs);
+      console.log(ge);
       // Span selection
       if (goto_start != goto_end) {
         fetchTracksData(goto_start, goto_end);
@@ -100,8 +112,9 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       }
       // Location click
       else {
-        var i_span = Math.floor(($('#input_end').attr('value')
-                               - $('#input_start').attr('value')) / 2);
+        var i_span = Math.floor(($('#end').attr('value')
+                               - $('#start').attr('value')) / 2);
+        console.log(i_span);
         fetchTracksData(goto_start-i_span, goto_end+i_span);
       }
     }
