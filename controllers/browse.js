@@ -59,7 +59,7 @@ var route = function(app){
    * @handles {Route#POST} /browse/:dataset/:seqid.json
    * @api public
    */
-  app.post('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
     if (req.params.format === 'json'){
       var reference = new Reference();
       reference.getMetadata(req.params.seqid, function(err, doc){

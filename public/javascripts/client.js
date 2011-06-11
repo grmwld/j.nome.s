@@ -181,7 +181,7 @@ var drawMainNavigation = function(start, end){
   var seqid = $('#seqid').val()
     , postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
   $.ajax({
-    type: "POST"
+    type: "GET"
   , url: postURL
   , data: { seqid: seqid }
   , dataType: "json"
