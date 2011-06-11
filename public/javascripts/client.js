@@ -57,7 +57,7 @@ var fetchTracksData = function(start, end){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
     requestTrackData(baseURL, seqid, start, end, trackID, function(data){
-      renderTrack(data);
+      renderTrack(data, start, end);
     });
   });
   window.history.pushState({}, '',
@@ -203,15 +203,18 @@ var drawMainNavigation = function(start, end){
  * Render a track
  *
  * @param {Object} track
+ * @param {Number} start
+ * @param {Number} end
  */
-var renderTrack = function(t){
-  var track = $("<div class='track'></div>");
-  track.append($([
-    "<h3>"
-  , t.name, ":", t.docs.length, "results"
-  , "</h3>"
-  ].join(' ')));
+var renderTrack = function(t, start, end){
+  var track = $("<div class='track' id=track" + t.name + "></div>")
+    , trackCanvas;
   $("#tracks").append(track);
+  trackCanvas = Raphael("track"+t.name, 1101, 50);
+  trackCanvas.drawBgRules(10, { stroke: "#eee" });
+  t.docs.forEach(function(doc){
+    trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
+  });
 }
 
 

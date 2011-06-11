@@ -126,3 +126,33 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
     }
   );
 }
+
+/**
+ * Draw a document
+ *
+ * @param {Object} doc
+ * @param {Number} view_start
+ * @param {Number} view_end
+ * @param {Object} style
+ */
+Raphael.fn.drawDocument = function(doc, view_start, view_end, style) {
+  view_span = view_end - view_start;
+  var nf = new PHP_JS().number_format;
+  var rel_start = (((doc.start - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_end = (((doc.end - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_doc_length = rel_end - rel_start;
+  var d = this.rect(rel_start, this.height/3, rel_doc_length, this.height/3).attr(style);
+  d.attr({title:[
+    'ID : ' + doc._id,
+    'From : ' + nf(doc.start),
+    'To : ' + nf(doc.end),
+    'Spanning : ' + nf(doc.end - doc.start)
+  ].join('\n')});
+  // Click on an element
+  d.click(function() {
+    var cur_loc = document.location.pathname.split('/');
+    var db = cur_loc[3];
+    var track = cur_loc[4];
+    window.open(['/browse/show', db, track, doc.id].join('/'));
+  });
+}
