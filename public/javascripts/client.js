@@ -17,8 +17,8 @@ $(document).ready(function() {
    * Render tracks if parameters of the form are valid.
    */
   validateForm(function(){
-    var start = $('#start').val()
-      , end = $('#end').val();
+    var start = parseNum($('#start').val())
+      , end = parseNum($('#end').val());
     fetchTracksData(start, end);
     drawNavigationRulers(start, end);
   });
@@ -28,8 +28,8 @@ $(document).ready(function() {
    */
   $("#submit").click(function() {
     validateForm(function(){
-      var start = $('#start').val()
-        , end = $('#end').val();
+      var start = parseNum($('#start').val())
+        , end = parseNum($('#end').val());
       fetchTracksData(start, end);
       drawNavigationRulers(start, end);
     });
@@ -46,7 +46,8 @@ $(document).ready(function() {
  * Iteratively fetches data of all selected tracks.
  */
 var fetchTracksData = function(start, end){
-  var seqid = $("#seqid").val()
+  var nf = new PHP_JS().number_format
+    , seqid = $("#seqid").val()
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
@@ -62,8 +63,8 @@ var fetchTracksData = function(start, end){
   window.history.pushState({}, '',
     [baseURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
-  $("#start").val(start);
-  $("#end").val(end);
+  $("#start").val(nf(start));
+  $("#end").val(nf(end));
 }
 
 /**
@@ -102,8 +103,8 @@ var requestTrackData = function(baseURL, seqid, start, end, trackID, callback){
  */
 var validateForm = function(callback){
   var okSeqid = $("#seqid").val() != 'seqid'
-    , okStart = !isNaN($("#start").val())
-    , okEnd = !isNaN($("#end").val())
+    , okStart = !isNaN(parseNum($("#start").val()))
+    , okEnd = !isNaN(parseNum($("#end").val()))
   if (okSeqid && okStart && okEnd){
     callback();
   }
@@ -131,12 +132,33 @@ var setPrompt = function(elem){
   }
 }
 
+/**
+ * Convert a formated number to an integer.
+ * Returns NaN if the formated number cannot be parsed.
+ *
+ * @param {String} str_num
+ * @return {Number}
+ */
+var parseNum = function(str_num){
+  var nf = new PHP_JS().number_format;
+  parsedNum = parseInt(nf(str_num, 0, '.', ''), 10);
+  if (parseInt(str_num, 10) != 0){
+    if (parsedNum != 0){
+      return parseInt(nf(str_num, 0, '.', ''), 10);
+    }
+    return NaN
+  }
+  return 0;
+}
 
 
 // *********   Tracks and rulers navigation   ************
 
 /**
  * Draw the output
+ *
+ * @param {Number} start
+ * @param {Number} end
  */
 var drawNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
@@ -147,6 +169,9 @@ var drawNavigationRulers = function(start, end){
 
 /**
  * Draw main navigation ruler
+ *
+ * @param {Number} start
+ * @param {Number} end
  */
 var drawMainNavigation = function(start, end){
   var seqid = $('#seqid').val()
@@ -188,8 +213,6 @@ var renderTrack = function(t){
   ].join(' ')));
   $("#tracks").append(track);
 }
-
-
 
 
 /**
