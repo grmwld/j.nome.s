@@ -5,17 +5,22 @@ $(document).ready(function() {
    * The default value corresponds to the 'name' attribute
    * of the input field.
    */
-  $("input[type=text]").focus(function(){
-    clearPrompt(this);
-  }).blur(function(){
-    setPrompt(this);
-  });
+  $("input[type=text]")
+    .focus(function(){
+      clearPrompt(this);
+    })
+    .blur(function(){
+      setPrompt(this);
+    });
 
   /**
    * Render tracks if parameters of the form are valid.
    */
   validateForm(function(){
-    fetchTracksData();
+    var start = $('#start').val()
+      , end = $('#end').val();
+    fetchTracksData(start, end);
+    drawNavigationRulers(start, end);
   });
   
   /**
@@ -23,7 +28,10 @@ $(document).ready(function() {
    */
   $("#submit").click(function() {
     validateForm(function(){
-      fetchTracksData();
+      var start = $('#start').val()
+        , end = $('#end').val();
+      fetchTracksData(start, end);
+      drawNavigationRulers(start, end);
     });
     return false;
   });
@@ -32,18 +40,16 @@ $(document).ready(function() {
 
 
 
+// **********   Form Navigation   ************
+
 /**
  * Iteratively fetches data of all selected tracks.
- * 
- * @api private
  */
-var fetchTracksData = function(){
-  var seqid = $('#seqid').val()
-    , start = $('#start').val()
-    , end = $('#end').val()
+var fetchTracksData = function(start, end){
+  var seqid = $("#seqid").val()
+    , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
-    , trackselector = $('#trackselector :checked')
     , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   $("#tracks").empty();
   trackselector.each(function(i){
@@ -56,6 +62,8 @@ var fetchTracksData = function(){
   window.history.pushState({}, '',
     [baseURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
+  $("#start").val(start);
+  $("#end").val(end);
 }
 
 /**
@@ -91,7 +99,6 @@ var requestTrackData = function(baseURL, seqid, start, end, trackID, callback){
  * If the form is valid, the callback is triggered.
  *
  * @param {Function} callback
- * @api private
  */
 var validateForm = function(callback){
   var okSeqid = $("#seqid").val() != 'seqid'
@@ -103,26 +110,9 @@ var validateForm = function(callback){
 }
 
 /**
- * Render a track
- *
- * @param {Object} track
- * @api private
- */
-var renderTrack = function(t){
-  var track = $("<div class='track'></div>");
-  track.append($([
-    "<h3>"
-  , t.name, ":", t.docs.length, "results"
-  , "</h3>"
-  ].join(' ')));
-  $("#tracks").append(track);
-}
-
-/**
  * Clear prompt from field
  * 
  * @param {Object} element
- * @api private
  */
 var clearPrompt = function(elem){
   if ($(elem).val() == $(elem).attr("name")) {
@@ -134,24 +124,83 @@ var clearPrompt = function(elem){
  * Set prompt for field
  *
  * @param {Object} element
- * @api private
  */
-setPrompt = function(elem){
+var setPrompt = function(elem){
   if ($(elem).val() == "") {
     $(elem).val($(elem).attr("name"));
   }
 }
+
+
+
+// *********   Tracks and rulers navigation   ************
+
+/**
+ * Draw the output
+ */
+var drawNavigationRulers = function(start, end){
+  $("#overviewnavigation").empty();
+  $("#ratiozoom").empty();
+  $("#zoomnavigation").empty();
+  drawMainNavigation(start, end);
+}
+
+/**
+ * Draw main navigation ruler
+ */
+var drawMainNavigation = function(start, end){
+  var seqid = $('#seqid').val()
+    , postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
+  $.ajax({
+    type: "POST"
+  , url: postURL
+  , data: { seqid: seqid }
+  , dataType: "json"
+  , success: function(seqidMD) {
+      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
+        , ratiozoom = Raphael("ratiozoom", 1101, 50)
+        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+        , currentSpan;
+      overviewNavigation.drawBgRules(10, { stroke: "#eee" });
+      overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
+      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+      overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
+      ratiozoom.drawBgRules(10, { stroke: "#eee" });
+      ratiozoom.drawRatio(currentSpan);
+      zoomNavigation.drawBgRules(10, { stroke: "#eee" });
+      zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
+      zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+    }
+  });
+}
+
+/**
+ * Render a track
+ *
+ * @param {Object} track
+ */
+var renderTrack = function(t){
+  var track = $("<div class='track'></div>");
+  track.append($([
+    "<h3>"
+  , t.name, ":", t.docs.length, "results"
+  , "</h3>"
+  ].join(' ')));
+  $("#tracks").append(track);
+}
+
+
+
 
 /**
  * Function to handle a selected dataset in a dropdown menu
  *
  * @param {Object} dropdown menu
  * @return {Boolean}
- * @api public
  */
-function OnSelect(dropdown){
+var OnSelect = function(dropdown){
   var index  = dropdown.selectedIndex
-    , selected = dropdown.options[myindex]
+    , selected = dropdown.options[index]
     , baseURL = '/browse/' + selected.value;
   if (selected.value != 'Select a dataset'){
     top.location.href = baseURL;
