@@ -5,7 +5,7 @@
  * @param {Number} y1
  * @param {Number} x2
  * @param {Number} y2
- * @return {SVG} path
+ * @return {SVG}
  */
 Raphael.fn.lineTo = function(x1, y1, x2, y2){
   return this.path("M" + x1 + " " + y1 + "L" + x2 + " " + y2);
@@ -46,16 +46,31 @@ Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
 
 /**
  * Display 2 lines going from the current selection in the overview to the local view
+ *
+ * @param {Number} cur_span
+ * @param {Object} style
  */
 Raphael.fn.drawRatio = function(cur_span, style) {
-  var sx1=cur_span.attrs.x, sy1=0, sx2=50, sy2=this.height;
-  var ex1=cur_span.attrs.x+cur_span.attrs.width, ey1=0, ex2=this.width-50, ey2=this.height;
+  var sx1 = cur_span.attrs.x
+    , sy1 = 0
+    , sx2 = 50
+    , sy2 = this.height
+    , ex1 = cur_span.attrs.x + cur_span.attrs.width
+    , ey1 = 0
+    , ex2 = this.width - 50
+    , ey2 = this.height;
   this.lineTo(sx1, sy1, sx2, sy2).attr(style);
   this.lineTo(ex1, ey1, ex2, ey2).attr(style);
 }
 
 /**
  * Display the area currently selected
+ *
+ * @param {Number} view_start
+ * @param {Number} view_end
+ * @param {Number} tot_length
+ * @param {Object} style
+ * @return {SVG}
  */
 Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
   var view_span = view_end - view_start
@@ -67,6 +82,10 @@ Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
 
 /**
  * Add a selectable area to a Paper.
+ *
+ * @param {Number} view_start
+ * @param {Number} view_end
+ * @param {Object} style
  */
 Raphael.fn.explorableArea = function(view_start, view_end, style) {
   var gs, ge
@@ -147,11 +166,4 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, style) {
     'To : ' + nf(doc.end),
     'Spanning : ' + nf(doc.end - doc.start)
   ].join('\n')});
-  // Click on an element
-  d.click(function() {
-    var cur_loc = document.location.pathname.split('/');
-    var db = cur_loc[3];
-    var track = cur_loc[4];
-    window.open(['/browse/show', db, track, doc.id].join('/'));
-  });
 }

@@ -44,6 +44,10 @@ $(document).ready(function() {
 
 /**
  * Iteratively fetches data of all selected tracks.
+ * After rendering, 'start' and 'end' values are updated
+ *
+ * @param {Number} start
+ * @param {Number} end
  */
 var fetchTracksData = function(start, end){
   var nf = new PHP_JS().number_format
@@ -75,13 +79,13 @@ var fetchTracksData = function(start, end){
  * @param {string} seqid
  * @param {Number} start
  * @param {Number} end
- * @param {String} track
+ * @param {String} trackID
  * @param {Function} callback
  */
-var requestTrackData = function(baseURL, seqid, start, end, trackID, callback){
+var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
   $.ajax({
     type: "POST"
-  , url: baseURL
+  , url: postURL
   , data: {
       seqid: seqid
     , start: start
@@ -115,9 +119,9 @@ var validateForm = function(callback){
  * 
  * @param {Object} element
  */
-var clearPrompt = function(elem){
-  if ($(elem).val() == $(elem).attr("name")) {
-    $(elem).val("");
+var clearPrompt = function(element){
+  if ($(element).val() == $(element).attr("name")) {
+    $(element).val("");
   }
 }
 
@@ -126,9 +130,9 @@ var clearPrompt = function(elem){
  *
  * @param {Object} element
  */
-var setPrompt = function(elem){
-  if ($(elem).val() == "") {
-    $(elem).val($(elem).attr("name"));
+var setPrompt = function(element){
+  if ($(element).val() == "") {
+    $(element).val($(element).attr("name"));
   }
 }
 
@@ -146,7 +150,7 @@ var parseNum = function(str_num){
     if (parsedNum != 0){
       return parseInt(nf(str_num, 0, '.', ''), 10);
     }
-    return NaN
+    return NaN;
   }
   return 0;
 }
@@ -206,13 +210,13 @@ var drawMainNavigation = function(start, end){
  * @param {Number} start
  * @param {Number} end
  */
-var renderTrack = function(t, start, end){
-  var track = $("<div class='track' id=track" + t.name + "></div>")
+var renderTrack = function(track, start, end){
+  var trackdiv = $("<div class='track' id=track" + track.name + "></div>")
     , trackCanvas;
-  $("#tracks").append(track);
-  trackCanvas = Raphael("track"+t.name, 1101, 50);
+  $("#tracks").append(trackdiv);
+  trackCanvas = Raphael("track"+track.name, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  t.docs.forEach(function(doc){
+  track.docs.forEach(function(doc){
     trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
   });
 }
