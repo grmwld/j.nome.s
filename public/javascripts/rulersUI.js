@@ -69,20 +69,26 @@ Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
  * Add a selectable area to a Paper.
  */
 Raphael.fn.explorableArea = function(view_start, view_end, style) {
-  var gs, ge;
-  var view_span = view_end - view_start;
-  var a = this.rect(0, 0, this.width, this.height).attr({
-    'fill-opacity': 0,
-    'stroke-opacity': 0,
-    fill: "#eee"
-  });
+  var gs, ge
+    , view_span = view_end - view_start
+    , a = this.rect(0, 0, this.width, this.height).attr({
+        'fill-opacity': 0,
+        'stroke-opacity': 0,
+        fill: "#eee"
+      });
   a.drag(
     // Mouse move
     function(dx, dy, x, y, e) {
       if (dx > 0) { 
-        this.selector.attr({x:this.selector.ox, width:dx-1});
+        this.selector.attr({
+          x: this.selector.ox
+        , width: dx-1
+        });
       } else {
-        this.selector.attr({x:e.offsetX+1, width:-dx});
+        this.selector.attr({
+          x: e.offsetX+1
+        , width: -dx
+        });
       }
     },
     // Mouse down
@@ -96,15 +102,15 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
     },
     // Mouse up
     function(e) {
-      this.selector.remove();
+      var goto_start
+        , goto_end;
       if (!e.offsetX) {
         e.offsetX = e.clientX - $(e.target).position().left;
       }
       ge = Math.floor((((e.offsetX-50)/(this.paper.width-100)) * view_span) + view_start);
-      var goto_start = Math.min(gs, ge)
-        , goto_end = Math.max(gs, ge);
-      console.log(gs);
-      console.log(ge);
+      goto_start = Math.min(gs, ge);
+      goto_end = Math.max(gs, ge);
+      this.selector.remove();
       // Span selection
       if (goto_start != goto_end) {
         fetchTracksData(goto_start, goto_end);
@@ -114,8 +120,8 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       else {
         var i_span = Math.floor(($('#end').attr('value')
                                - $('#start').attr('value')) / 2);
-        console.log(i_span);
         fetchTracksData(goto_start-i_span, goto_end+i_span);
+        refreshNavigationRulers(goto_start-i_span, goto_end+i_span);
       }
     }
   );
