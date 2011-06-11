@@ -31,7 +31,7 @@ $(document).ready(function() {
       var start = $('#start').val()
         , end = $('#end').val();
       fetchTracksData(start, end);
-      refreshNavigationRulers(start, end);
+      drawNavigationRulers(start, end);
     });
     return false;
   });
@@ -139,13 +139,6 @@ var setPrompt = function(elem){
  * Draw the output
  */
 var drawNavigationRulers = function(start, end){
-  drawMainNavigation(start, end);
-}
-
-/**
- * Refreshes the view of the output
- */
-var refreshNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
   $("#ratiozoom").empty();
   $("#zoomnavigation").empty();

@@ -114,14 +114,14 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       // Span selection
       if (goto_start != goto_end) {
         fetchTracksData(goto_start, goto_end);
-        refreshNavigationRulers(goto_start, goto_end);
+        drawNavigationRulers(goto_start, goto_end);
       }
       // Location click
       else {
         var i_span = Math.floor(($('#end').attr('value')
                                - $('#start').attr('value')) / 2);
         fetchTracksData(goto_start-i_span, goto_end+i_span);
-        refreshNavigationRulers(goto_start-i_span, goto_end+i_span);
+        drawNavigationRulers(goto_start-i_span, goto_end+i_span);
       }
     }
   );
