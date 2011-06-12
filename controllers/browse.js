@@ -4,7 +4,7 @@
 var dbutils = require('../lib/dbutils')
   , Reference = require('../models/reference').Reference
   , Track = require('../models/track').Track
-  , TrackCollection = require('../models/track').TrackCollection;
+  , NotFound = require('./errors').NotFound;
 
 
 /**
@@ -22,7 +22,7 @@ var route = function(app){
    * @handles {Route#GET} /browse/:dataset
    * @api public
    */
-  app.get('/browse/:dataset', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset', dbutils.connect, function(req, res, next){
     res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset

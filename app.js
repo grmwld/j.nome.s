@@ -42,12 +42,15 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-  require('express-trace')(app);
   console.log('Application started in development mode.')
 });
 
+app.configure('test', function(){
+  require('express-trace')(app);
+  console.log('Application started in test mode.')
+});
+
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
   console.log('Application started in production mode.');
 });
 
@@ -72,6 +75,14 @@ app.get('/globalconfig.json', function(req, res){
 help.route(app);
 about.route(app);
 browse.route(app);
+
+
+/**
+ * Error handling
+ */
+var errors = require('./controllers/errors');
+
+errors.route(app);
 
 
 /**
