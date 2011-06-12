@@ -133,16 +133,16 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       // Span selection
       if (goto_start != goto_end) {
         sanitizeInputPos(goto_start, goto_end, function(start, end){
-          fetchTracksData(start, end);
-          drawNavigationRulers(start, end);
+            fetchTracksData(start, end);
+            drawNavigationRulers(start, end);
         });
       }
       // Location click
       else {
         var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
         sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end){
-          fetchTracksData(start, end);
-          drawNavigationRulers(start, end);
+            fetchTracksData(start, end);
+            drawNavigationRulers(start, end);
         });
       }
     }
@@ -159,11 +159,11 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, style) {
   view_span = view_end - view_start;
-  var nf = new PHP_JS().number_format;
-  var rel_start = (((doc.start - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_end = (((doc.end - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_doc_length = rel_end - rel_start;
-  var d = this.rect(rel_start, this.height/3, rel_doc_length, this.height/3).attr(style);
+  var nf = new PHP_JS().number_format
+    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
+    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
+    , rel_doc_length = rel_end - rel_start
+    , d = this.rect(rel_start, this.height/4, rel_doc_length, this.height/4).attr(style);
   d.attr({title:[
     'ID : ' + doc._id,
     'From : ' + nf(doc.start),

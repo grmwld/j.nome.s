@@ -5,11 +5,17 @@
       "id": "gaps"
     , "name": "gaps"
     , "description": "Assembly gaps"
+    , "style": {
+        "fill": "#000"
+      }
     }
   , "ucsc_refgene": {
       "id": "ucsc_refgene"
     , "name": "ucsc_genes"
     , "description": "Reference genes from USCS"
+    , "style": {
+        "fill": "#000"
+      }
     }
   }
 }

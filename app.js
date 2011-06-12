@@ -65,6 +65,10 @@ app.get('/', function(req, res){
   });
 });
 
+app.get('/globalconfig.json', function(req, res){
+  res.send(app._locals.config.global.style);
+});
+
 help.route(app);
 about.route(app);
 browse.route(app);

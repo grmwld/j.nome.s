@@ -123,6 +123,24 @@ var getSeqidMetadata = function(seqid, callback){
 }
 
 /**
+ * Get the global style
+ *
+ * @param {Function} callback
+ */
+var getGlobalStyle = function(callback){
+  var reqURL = '/globalconfig.json';
+  $.ajax({
+    type: "GET"
+  , url: reqURL
+  //, data: { seqid: seqid }
+  , dataType: "json"
+  , success: function(style) {
+      callback(style);
+    }
+  });
+}
+
+/**
  * Validates the values in the form.
  * If the form is valid, the callback is triggered.
  *
@@ -204,7 +222,7 @@ var parseNum = function(str_num){
 // *********   Tracks and rulers navigation   ************
 
 /**
- * Draw the output
+ * Draw the navigation rulers between 2 positions
  *
  * @param {Number} start
  * @param {Number} end
@@ -213,31 +231,23 @@ var drawNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
   $("#ratiozoom").empty();
   $("#zoomnavigation").empty();
-  drawMainNavigation(start, end);
-}
-
-/**
- * Draw main navigation ruler
- *
- * @param {Number} start
- * @param {Number} end
- */
-var drawMainNavigation = function(start, end){
-  var seqid = $('#seqid').val();
-  getSeqidMetadata(seqid, function(seqidMD){
-    var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
-      , ratiozoom = Raphael("ratiozoom", 1101, 50)
-      , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
-      , currentSpan;
-    overviewNavigation.drawBgRules(10, { stroke: "#eee" });
-    overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
-    currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-    overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
-    ratiozoom.drawBgRules(10, { stroke: "#eee" });
-    ratiozoom.drawRatio(currentSpan);
-    zoomNavigation.drawBgRules(10, { stroke: "#eee" });
-    zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
-    zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+  getGlobalStyle(function(style){
+    var seqid = $('#seqid').val();
+    getSeqidMetadata(seqid, function(seqidMD){
+      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
+        , ratiozoom = Raphael("ratiozoom", 1101, 50)
+        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+        , currentSpan;
+      overviewNavigation.drawBgRules(10, style.bgrules);
+      overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
+      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
+      overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
+      ratiozoom.drawBgRules(10, style.bgrules);
+      ratiozoom.drawRatio(currentSpan);
+      zoomNavigation.drawBgRules(10, style.bgrules);
+      zoomNavigation.drawMainRuler(start, end, style.ruler);
+      zoomNavigation.explorableArea(start, end, style.selectionspan);
+    });
   });
 }
 
@@ -259,7 +269,7 @@ var renderTrack = function(track, start, end){
   trackCanvas = Raphael("trackcanvas"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
   track.data.forEach(function(doc){
-    trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
+    trackCanvas.drawDocument(doc, start, end, track.metadata.style);
   });
 }
 
