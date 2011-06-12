@@ -59,17 +59,17 @@ var fetchTracksData = function(start, end){
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
-    , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   $("#tracks").empty();
   trackselector.each(function(i){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
-    requestTrackData(baseURL, seqid, start, end, trackID, function(data){
-      renderTrack(data, start, end);
+    requestTrackData(reqURL, seqid, start, end, trackID, function(track){
+      renderTrack(track, start, end);
     });
   });
   window.history.pushState({}, '',
-    [baseURL, seqid, start, end, tracksIDs.join('&')].join('/')
+    [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
   $("#start").val(nf(start));
   $("#end").val(nf(end));
@@ -79,17 +79,17 @@ var fetchTracksData = function(start, end){
  * Request data of a given track between 2 positions of a seqid.
  * The callback is triggered with the collected data
  *
- * @param {String} baseURL
+ * @param {String} reqURL
  * @param {string} seqid
  * @param {Number} start
  * @param {Number} end
  * @param {String} trackID
  * @param {Function} callback
  */
-var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
+var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
   $.ajax({
     type: "POST"
-  , url: postURL
+  , url: reqURL
   , data: {
       seqid: seqid
     , start: start
@@ -103,11 +103,17 @@ var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
   });
 }
 
+/**
+ * Get the metadata associated to the current seqid
+ *
+ * @param {String} seqid
+ * @param {Function} callback
+ */
 var getSeqidMetadata = function(seqid, callback){
-  var postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
+  var reqURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
   $.ajax({
     type: "GET"
-  , url: postURL
+  , url: reqURL
   , data: { seqid: seqid }
   , dataType: "json"
   , success: function(metadata) {
@@ -243,12 +249,12 @@ var drawMainNavigation = function(start, end){
  * @param {Number} end
  */
 var renderTrack = function(track, start, end){
-  var trackdiv = $("<div class='track' id=track" + track.name + "></div>")
+  var trackdiv = $("<div class='track' id=track" + track.metadata.id + "></div>")
     , trackCanvas;
   $("#tracks").append(trackdiv);
-  trackCanvas = Raphael("track"+track.name, 1101, 50);
+  trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  track.docs.forEach(function(doc){
+  track.data.forEach(function(doc){
     trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
   });
 }
