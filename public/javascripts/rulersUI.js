@@ -133,20 +133,16 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       // Span selection
       if (goto_start != goto_end) {
         sanitizeInputPos(goto_start, goto_end, function(start, end){
-          getGlobalStyle(function(style){
             fetchTracksData(start, end);
-            drawNavigationRulers(start, end, style);
-          });
+            drawNavigationRulers(start, end);
         });
       }
       // Location click
       else {
         var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
         sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end){
-          getGlobalStyle(function(style){
             fetchTracksData(start, end);
-            drawNavigationRulers(start, end, style);
-          });
+            drawNavigationRulers(start, end);
         });
       }
     }

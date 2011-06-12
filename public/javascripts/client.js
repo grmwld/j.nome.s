@@ -1,47 +1,43 @@
 $(document).ready(function() {
 
-  getGlobalStyle(function(globalstyle){
+  /**
+   * Setup dynamic prompt input text-fields.
+   * The default value corresponds to the 'name' attribute
+   * of the input field.
+   */
+  $("input[type=text]")
+    .focus(function(){
+      clearPrompt(this);
+    })
+    .blur(function(){
+      setPrompt(this);
+    });
 
-    /**
-     * Setup dynamic prompt input text-fields.
-     * The default value corresponds to the 'name' attribute
-     * of the input field.
-     */
-    $("input[type=text]")
-      .focus(function(){
-        clearPrompt(this);
-      })
-      .blur(function(){
-        setPrompt(this);
-      });
-
-    /**
-     * Render tracks if parameters of the form are valid.
-     */
+  /**
+   * Render tracks if parameters of the form are valid.
+   */
+  validateForm(function(){
+    var start = parseNum($('#start').val())
+      , end = parseNum($('#end').val());
+    sanitizeInputPos(start, end, function(start, end){
+      fetchTracksData(start, end);
+      drawNavigationRulers(start, end);
+    });
+  });
+  
+  /**
+   * Handle browsing from main form via ajax post.
+   */
+  $("#submit").click(function() {
     validateForm(function(){
       var start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
         fetchTracksData(start, end);
-        drawNavigationRulers(start, end, globalstyle);
+        drawNavigationRulers(start, end);
       });
     });
-    
-    /**
-     * Handle browsing from main form via ajax post.
-     */
-    $("#submit").click(function() {
-      validateForm(function(){
-        var start = parseNum($('#start').val())
-          , end = parseNum($('#end').val());
-        sanitizeInputPos(start, end, function(start, end){
-          fetchTracksData(start, end);
-          drawNavigationRulers(start, end, globalstyle);
-        });
-      });
-      return false;
-    });
-
+    return false;
   });
 
 });
@@ -231,35 +227,27 @@ var parseNum = function(str_num){
  * @param {Number} start
  * @param {Number} end
  */
-var drawNavigationRulers = function(start, end, style){
+var drawNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
   $("#ratiozoom").empty();
   $("#zoomnavigation").empty();
-  drawMainNavigation(start, end, style);
-}
-
-/**
- * Draw main navigation ruler
- *
- * @param {Number} start
- * @param {Number} end
- */
-var drawMainNavigation = function(start, end, style){
-  var seqid = $('#seqid').val();
-  getSeqidMetadata(seqid, function(seqidMD){
-    var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
-      , ratiozoom = Raphael("ratiozoom", 1101, 50)
-      , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
-      , currentSpan;
-    overviewNavigation.drawBgRules(10, style.bgrules);
-    overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
-    currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
-    overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
-    ratiozoom.drawBgRules(10, style.bgrules);
-    ratiozoom.drawRatio(currentSpan);
-    zoomNavigation.drawBgRules(10, style.bgrules);
-    zoomNavigation.drawMainRuler(start, end, style.ruler);
-    zoomNavigation.explorableArea(start, end, style.selectionspan);
+  getGlobalStyle(function(style){
+    var seqid = $('#seqid').val();
+    getSeqidMetadata(seqid, function(seqidMD){
+      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
+        , ratiozoom = Raphael("ratiozoom", 1101, 50)
+        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+        , currentSpan;
+      overviewNavigation.drawBgRules(10, style.bgrules);
+      overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
+      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
+      overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
+      ratiozoom.drawBgRules(10, style.bgrules);
+      ratiozoom.drawRatio(currentSpan);
+      zoomNavigation.drawBgRules(10, style.bgrules);
+      zoomNavigation.drawMainRuler(start, end, style.ruler);
+      zoomNavigation.explorableArea(start, end, style.selectionspan);
+    });
   });
 }
 
