@@ -222,7 +222,7 @@ var parseNum = function(str_num){
 // *********   Tracks and rulers navigation   ************
 
 /**
- * Draw the output
+ * Draw the navigation rulers between 2 positions
  *
  * @param {Number} start
  * @param {Number} end
@@ -269,7 +269,7 @@ var renderTrack = function(track, start, end){
   trackCanvas = Raphael("trackcanvas"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
   track.data.forEach(function(doc){
-    trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
+    trackCanvas.drawDocument(doc, start, end, track.metadata.style);
   });
 }
 
