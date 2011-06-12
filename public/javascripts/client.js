@@ -1,3 +1,10 @@
+/**
+ * Client side javascript
+ *
+ * Renders all client-side data when page is ready.
+ */
+
+
 $(document).ready(function() {
 
   /**
@@ -15,6 +22,9 @@ $(document).ready(function() {
 
   /**
    * Render tracks if parameters of the form are valid.
+   *
+   * The text-field inputs for positions are also sanitized for
+   * negative or too big values.
    */
   validateForm(function(){
     var start = parseNum($('#start').val())
@@ -26,7 +36,7 @@ $(document).ready(function() {
   });
   
   /**
-   * Handle browsing from main form via ajax post.
+   * Handle browsing from main form.
    */
   $("#submit").click(function() {
     validateForm(function(){
@@ -85,6 +95,7 @@ var fetchTracksData = function(start, end){
  * @param {Number} end
  * @param {String} trackID
  * @param {Function} callback
+ * @api private
  */
 var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
   $.ajax({
@@ -108,6 +119,7 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
  *
  * @param {String} seqid
  * @param {Function} callback
+ * @api private
  */
 var getSeqidMetadata = function(seqid, callback){
   var reqURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
@@ -164,7 +176,7 @@ var validateForm = function(callback){
  *
  * @param {Number} start
  * @param {Number} end
- * @param callback
+ * @param {Function} callback
  */
 var sanitizeInputPos = function(start, end, callback){
   var nf = new PHP_JS().number_format;
@@ -277,7 +289,7 @@ var renderTrack = function(track, start, end){
 /**
  * Function to handle a selected dataset in a dropdown menu
  *
- * @param {Object} dropdown menu
+ * @param {Object} dropdown
  * @return {Boolean}
  */
 var OnSelect = function(dropdown){

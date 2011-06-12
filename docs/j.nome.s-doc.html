@@ -161,12 +161,15 @@ code .this { color: #19469D; }</style>
 
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'development'</span>, <span class="keyword">function</span>(){
   <span class="variable">app</span>.<span class="variable">use</span>(<span class="variable">express</span>.<span class="variable">errorHandler</span>({ <span class="variable">dumpExceptions</span>: <span class="variable">true</span>, <span class="variable">showStack</span>: <span class="variable">true</span> })); 
-  <span class="variable">require</span>(<span class="string">'express-trace'</span>)(<span class="variable">app</span>);
   <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in development mode.'</span>)
 });
 
+<span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'test'</span>, <span class="keyword">function</span>(){
+  <span class="variable">require</span>(<span class="string">'express-trace'</span>)(<span class="variable">app</span>);
+  <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in test mode.'</span>)
+});
+
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'production'</span>, <span class="keyword">function</span>(){
-  <span class="variable">app</span>.<span class="variable">use</span>(<span class="variable">express</span>.<span class="variable">errorHandler</span>()); 
   <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in production mode.'</span>);
 });</code></pre>
 </td>
@@ -187,9 +190,24 @@ code .this { color: #19469D; }</style>
   });
 });
 
+<span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/globalconfig.json'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+  <span class="variable">res</span>.<span class="variable">send</span>(<span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>.<span class="variable">global</span>.<span class="variable">style</span>);
+});
+
 <span class="variable">help</span>.<span class="variable">route</span>(<span class="variable">app</span>);
 <span class="variable">about</span>.<span class="variable">route</span>(<span class="variable">app</span>);
 <span class="variable">browse</span>.<span class="variable">route</span>(<span class="variable">app</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Error handling
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">errors</span> = <span class="variable">require</span>(<span class="string">'./controllers/errors'</span>);
+
+<span class="variable">errors</span>.<span class="variable">route</span>(<span class="variable">app</span>);</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -252,18 +270,17 @@ the 'about' page.</p>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">dbutils</span> = <span class="variable">require</span>(<span class="string">'../lib/dbutils'</span>)
   , <span class="class">Reference</span> = <span class="variable">require</span>(<span class="string">'../models/reference'</span>).<span class="class">Reference</span>
-  , <span class="class">Track</span> = <span class="variable">require</span>(<span class="string">'../models/track'</span>).<span class="class">Track</span>
-  , <span class="class">TrackCollection</span> = <span class="variable">require</span>(<span class="string">'../models/track'</span>).<span class="class">TrackCollection</span>;</code></pre>
+  , <span class="class">Track</span> = <span class="variable">require</span>(<span class="string">'../models/track'</span>).<span class="class">Track</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
 <p>Function used to handle the routing associated to
-the dataset controller</p>
+the dataset controller.</p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>Application</em>  express app</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>param</strong>: <em>Object</em>  application</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">route</span> = <span class="keyword">function</span>(<span class="variable">app</span>){</code></pre>
@@ -273,12 +290,16 @@ the dataset controller</p>
 <td class="docs">
 <p>Route to a specific dataset</p>
 
-<h2></h2>
+<p>Handling this route triggers the dbutils.connect middleware
+in order to connect to the mongo database.
+The browse/index.jade view is rendered in case of success.</p>
 
-<ul><li><p><strong>handles</strong>: <em>Route#GET</em>  /browse/:dataset</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>see</strong>: <em>dbutils</em>
+.connect
+## </p></li><li><p><strong>handles</strong>: <em>Route#GET</em>  /browse/:dataset</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/browse/:dataset'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/browse/:dataset'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>, <span class="variable">next</span>){
     <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'browse'</span>, {
       <span class="variable">title</span>: <span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>
     , <span class="variable">dataset</span>: <span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>
@@ -293,16 +314,19 @@ the dataset controller</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Route to a specific dataset</p>
+<p>Respond to AJAX track requests.</p>
 
-<h2></h2>
+<p>Handling this route triggers the dbutils.connect middleware
+in order to connect to the mongo database.
+The track data is sent to the AJAX request event.</p>
 
-<ul><li><p><strong>handles</strong>: <em>Route#POST</em>  /browse/:dataset</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>see</strong>: <em>dbutils</em>
+.connect
+## </p></li><li><p><strong>handles</strong>: <em>Route#POST</em>  /browse/:dataset</p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="variable">app</span>.<span class="variable">post</span>(<span class="string">'/browse/:dataset'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
-    <span class="keyword">var</span> <span class="variable">trackcfg</span> = <span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>[<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>].<span class="variable">tracks</span>[<span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">trackID</span>]
-      , <span class="variable">track</span> = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">trackcfg</span>.<span class="variable">name</span>, <span class="variable">trackcfg</span>.<span class="variable">id</span>);
+    <span class="keyword">var</span> <span class="variable">track</span> = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>[<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>].<span class="variable">tracks</span>[<span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">trackID</span>]);
     <span class="variable">track</span>.<span class="variable">fetchInInterval</span>(
       <span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">seqid</span>
     , <span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">start</span>
@@ -318,12 +342,15 @@ the dataset controller</p>
 <td class="docs">
 <p>Fetches the metadata of a specific seqid</p>
 
-<h2></h2>
+<p>Handling this route triggers the dbutils.connect middleware
+in order to connect to the mongo database.</p>
 
-<ul><li><p><strong>handles</strong>: <em>Route#POST</em>  /browse/:dataset/:seqid.json</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>see</strong>: <em>dbutils</em>
+.connect
+## </p></li><li><p><strong>handles</strong>: <em>Route#POST</em>  /browse/:dataset/:seqid.json</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="variable">app</span>.<span class="variable">post</span>(<span class="string">'/browse/:dataset/:seqid.:format'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/browse/:dataset/:seqid.:format'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
     <span class="keyword">if</span> (<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">format</span> === <span class="string">'json'</span>){
       <span class="keyword">var</span> <span class="variable">reference</span> = <span class="keyword">new</span> <span class="class">Reference</span>();
       <span class="variable">reference</span>.<span class="variable">getMetadata</span>(<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">doc</span>){
@@ -337,9 +364,12 @@ the dataset controller</p>
 <td class="docs">
 <p>Route to a specific range, with specified collections</p>
 
-<h2></h2>
+<p>Handling this route triggers the dbutils.connect middleware
+in order to connect to the mongo database.</p>
 
-<ul><li><p><strong>handles</strong>: <em>Route#GET</em>  /browse/:dataset/:seqid/:start/:end/:tracks</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>see</strong>: <em>dbutils</em>
+.connect
+## </p></li><li><p><strong>handles</strong>: <em>Route#GET</em>  /browse/:dataset/:seqid/:start/:end/:tracks</p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/browse/:dataset/:seqid/:start/:end/:tracks'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
@@ -362,9 +392,12 @@ the dataset controller</p>
 <td class="docs">
 <p>Redirect to base url of dataset if parameters are incomplete</p>
 
-<h2></h2>
+<p>Handling this route triggers the dbutils.connect middleware
+in order to connect to the mongo database.</p>
 
-<ul><li><p><strong>handles</strong>: <em>Route#GET</em>  /browse/:dataset/*</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>see</strong>: <em>dbutils</em>
+.connect
+## </p></li><li><p><strong>handles</strong>: <em>Route#GET</em>  /browse/:dataset/*</p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="variable">app</span>.<span class="variable">get</span>('<span class="regexp">/browse/</span>:<span class="variable">dataset</span></code></pre>
@@ -384,6 +417,144 @@ Expose public functions, classes and methods
 </td>
 <td class="code">
 <pre><code><span class="variable">exports</span>.<span class="variable">route</span> = <span class="variable">route</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="./controllers/errors.js"><a href="#">errors</a></h2></td><td>./controllers/errors.js</td></tr><tr class="code">
+<td class="docs">
+<p>Module dependencies
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">util</span> = <span class="variable">require</span>(<span class="string">'util'</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>NotFound error</p>
+
+<p>Inherits from Error
+This is used in case of 404 errors.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  message</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">NotFound</span> = <span class="keyword">function</span>(<span class="variable">message</span>){
+  <span class="this">this</span>.<span class="variable">name</span> = <span class="string">'NotFound'</span>;
+  <span class="this">this</span>.<span class="variable">message</span> = (<span class="variable">message</span>) ? <span class="variable">message</span> : &<span class="variable">quot</span>;<span class="class">Not</span> <span class="class">Found</span>&<span class="variable">quot</span>;;
+  <span class="class">Error</span>.<span class="variable">call</span>(<span class="this">this</span>, <span class="variable">message</span>);
+  <span class="class">Error</span>.<span class="variable">captureStackTrace</span>(<span class="this">this</span>, <span class="variable">arguments</span>.<span class="variable">callee</span>);
+}
+<span class="variable">util</span>.<span class="variable">inherits</span>(<span class="class">NotFound</span>, <span class="class">Error</span>);</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Function used to handle the routing associated to
+the error controller</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  application</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">route</span> = <span class="keyword">function</span>(<span class="variable">app</span>){</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Handle 404 errors.</p>
+
+<p>If the error is not a 404 error, the callback is triggered
+so that the next matching handler can handle it.
+Otherwise, renders the 404 view.
+   </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">error</span>(<span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">req</span>, <span class="variable">res</span>, <span class="variable">next</span>){
+    <span class="keyword">if</span> (<span class="variable">err</span> <span class="variable">instanceof</span> <span class="class">NotFound</span>) {
+      <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'404.jade'</span>, {
+        <span class="variable">title</span>: <span class="string">'Not Found'</span>
+      , <span class="variable">status</span>: <span class="number integer">404</span>
+      , <span class="variable">locals</span>: { <span class="variable">error</span>: <span class="variable">err</span> }
+      });
+    } <span class="keyword">else</span> {
+      <span class="variable">next</span>(<span class="variable">err</span>);
+    }
+  });</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Handle 500 errors.</p>
+
+<p>Since this is the final exception handler,
+not callback is necessary.
+   </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">error</span>(<span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'500.jade'</span>, {
+      <span class="variable">title</span>: <span class="string">'Server Error'</span>
+    , <span class="variable">status</span>: <span class="number integer">500</span>
+    , <span class="variable">locals</span>: { <span class="variable">error</span>: <span class="variable">err</span> }
+    });
+  });</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Route to 404 error</p>
+
+<h2></h2>
+
+<ul><li><p><strong>handle</strong>: <em>Route#GET</em>  /404</p></li><li><p><strong>throws</strong>: <em>NotFound</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/404'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">NotFound</span>;
+  });</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Route to 500 error</p>
+
+<h2></h2>
+
+<ul><li><p><strong>handle</strong>: <em>Route#GET</em>  /500</p></li><li><p><strong>throws</strong>: <em>Error</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/500'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">Error</span>(<span class="string">'Server Side Error.'</span>);
+  });</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Handle any non registered URL by throwing a 404 exception.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>throws</strong>: <em>NotFound</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">use</span>(<span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="class">NotFound</span>(<span class="string">'404 - Page not found.'</span>);
+  });
+
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Expose public functions, classes and methods
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="variable">route</span> = <span class="variable">route</span>;
+<span class="variable">exports</span>.<span class="class">NotFound</span> = <span class="class">NotFound</span>;
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="./controllers/help.js"><a href="#">help</a></h2></td><td>./controllers/help.js</td></tr><tr class="code">
@@ -526,7 +697,8 @@ the 'about' page.</p>
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">mongoose</span> = <span class="variable">require</span>(<span class="string">'mongoose'</span>);</code></pre>
+<pre><code><span class="keyword">var</span> <span class="variable">mongoose</span> = <span class="variable">require</span>(<span class="string">'mongoose'</span>)
+  , <span class="class">NotFound</span> = <span class="variable">require</span>(<span class="string">'../controllers/errors'</span>).<span class="class">NotFound</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -582,6 +754,9 @@ the 'about' page.</p>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">connect</span> = <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>, <span class="variable">next</span>){
   <span class="keyword">var</span> <span class="variable">dbname</span> = <span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>;
+  <span class="keyword">if</span> (!<span class="variable">req</span>.<span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>[<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>]){
+    <span class="keyword">return</span> <span class="variable">next</span>(<span class="keyword">new</span> <span class="class">NotFound</span>(&<span class="variable">quot</span>;<span class="variable">dataset</span> <span class="string">'&quot; + req.params.dataset + &quot;'</span> <span class="variable">does</span> <span class="variable">not</span> <span class="variable">exist</span>.&<span class="variable">quot</span>;));
+  }
   <span class="keyword">if</span> (<span class="variable">req</span>.<span class="variable">session</span>.<span class="variable">dataset</span> != <span class="variable">dbname</span>){
     <span class="keyword">if</span> (!<span class="variable">req</span>.<span class="variable">session</span>.<span class="variable">dataset</span>){
       <span class="variable">connectdb</span>(<span class="variable">dbname</span>);
@@ -800,7 +975,6 @@ contained in a GridStore object</p>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">util</span> = <span class="variable">require</span>(<span class="string">'util'</span>)
   , <span class="variable">mongoose</span> = <span class="variable">require</span>(<span class="string">'mongoose'</span>)
-  , <span class="variable">async</span> = <span class="variable">require</span>(<span class="string">'async'</span>)
   , <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'../lib/utils'</span>);</code></pre>
 </td>
 </tr>
@@ -834,9 +1008,9 @@ Corresponds to an entry from a track
 <ul><li><p><strong>param</strong>: <em>String</em>  name</p></li><li><p><strong>param</strong>: <em>String</em>  collection</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Track</span> = <span class="keyword">function</span>(<span class="variable">name</span>, <span class="variable">track</span>){
-  <span class="this">this</span>.<span class="variable">model</span> =  <span class="variable">mongoose</span>.<span class="variable">model</span>(<span class="variable">name</span>, <span class="class">TrackSchema</span>, <span class="variable">track</span>);
-  <span class="this">this</span>.<span class="variable">name</span> = <span class="variable">name</span>;
+<pre><code><span class="keyword">var</span> <span class="class">Track</span> = <span class="keyword">function</span>(<span class="variable">metadata</span>){
+  <span class="this">this</span>.<span class="variable">metadata</span> = <span class="variable">metadata</span>;
+  <span class="this">this</span>.<span class="variable">model</span> =  <span class="variable">mongoose</span>.<span class="variable">model</span>(<span class="variable">metadata</span>.<span class="variable">name</span>, <span class="class">TrackSchema</span>,<span class="variable">metadata</span>.<span class="variable">id</span>);
 }</code></pre>
 </td>
 </tr>
@@ -857,8 +1031,8 @@ Corresponds to an entry from a track
   , <span class="variable">end</span>: {$<span class="variable">gt</span>: <span class="variable">start</span>}
   }, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">docs</span>){
     <span class="variable">callback</span>(<span class="variable">err</span>, {
-      <span class="variable">name</span>: <span class="variable">self</span>.<span class="variable">name</span>
-    , <span class="variable">docs</span>: <span class="variable">docs</span>
+      <span class="variable">metadata</span>: <span class="variable">self</span>.<span class="variable">metadata</span>
+    , <span class="variable">data</span>: <span class="variable">docs</span>
     });
   });
 }</code></pre>
@@ -875,310 +1049,365 @@ Corresponds to an entry from a track
 </td>
 </tr><tr class="filename"><td><h2 id="./public/javascripts/client.js"><a href="#">client</a></h2></td><td>./public/javascripts/client.js</td></tr><tr class="code">
 <td class="docs">
-<p>$(document).ready(function() {</p>
+<p>Client side javascript</p>
+
+<p>Renders all client-side data when page is ready.
+ </p>
 </td>
 <td class="code">
-<pre><code>*
-   * <span class="class">Setup</span> <span class="variable">dynamic</span> <span class="variable">prompt</span> <span class="variable">input</span> <span class="variable">text</span>-<span class="variable">fields</span>.
-   * <span class="class">The</span> <span class="keyword">default</span> <span class="variable">value</span> <span class="variable">corresponds</span> <span class="variable">to</span> <span class="variable">the</span> <span class="string">'name'</span> <span class="variable">attribute</span>
-   * <span class="variable">of</span> <span class="variable">the</span> <span class="variable">input</span> <span class="variable">field</span>.
-   </code></pre>
+<pre><code>$(<span class="variable">document</span>).<span class="variable">ready</span>(<span class="keyword">function</span>() {</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>$("input[type=text]")
-    .focus(function(){
-      clearPrompt(this);
+<p>Setup dynamic prompt input text-fields.
+The default value corresponds to the 'name' attribute
+of the input field.
+   </p>
+</td>
+<td class="code">
+<pre><code>$(&<span class="variable">quot</span>;<span class="variable">input</span>[<span class="variable">type</span>=<span class="variable">text</span>]&<span class="variable">quot</span>;)
+    .<span class="variable">focus</span>(<span class="keyword">function</span>(){
+      <span class="variable">clearPrompt</span>(<span class="this">this</span>);
     })
-    .blur(function(){
-      setPrompt(this);
-    });</p>
-</td>
-<td class="code">
-<pre><code>*
-   * <span class="class">Render</span> <span class="variable">tracks</span> <span class="keyword">if</span> <span class="variable">parameters</span> <span class="variable">of</span> <span class="variable">the</span> <span class="variable">form</span> <span class="variable">are</span> <span class="variable">valid</span>.
-   </code></pre>
+    .<span class="variable">blur</span>(<span class="keyword">function</span>(){
+      <span class="variable">setPrompt</span>(<span class="this">this</span>);
+    });</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>validateForm(function(){
-    var start = parseNum($('#start').val())
-      , end = parseNum($('#end').val());
-    fetchTracksData(start, end);
-    drawNavigationRulers(start, end);
-  });</p>
+<p>Render tracks if parameters of the form are valid.</p>
+
+<p>The text-field inputs for positions are also sanitized for
+negative or too big values.
+   </p>
 </td>
 <td class="code">
-<pre><code>*
-   * <span class="class">Handle</span> <span class="variable">browsing</span> <span class="variable">from</span> <span class="variable">main</span> <span class="variable">form</span> <span class="variable">via</span> <span class="variable">ajax</span> <span class="variable">post</span>.
-   </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>$("#submit").click(function() {
-    validateForm(function(){
-      var start = parseNum($('#start').val())
-        , end = parseNum($('#end').val());
-      fetchTracksData(start, end);
-      drawNavigationRulers(start, end);
+<pre><code><span class="variable">validateForm</span>(<span class="keyword">function</span>(){
+    <span class="keyword">var</span> <span class="variable">start</span> = <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())
+      , <span class="variable">end</span> = <span class="variable">parseNum</span>($(<span class="string">'#end'</span>).<span class="variable">val</span>());
+    <span class="variable">sanitizeInputPos</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+      <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+      <span class="variable">drawNavigationRulers</span>(<span class="variable">start</span>, <span class="variable">end</span>);
     });
-    return false;
-  });</p>
-
-<p>});</p>
-
-<p>// <strong></strong><strong></strong><strong>   Form Navigation   </strong><strong></strong><strong></strong>**</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Iteratively</span> <span class="variable">fetches</span> <span class="variable">data</span> <span class="variable">of</span> <span class="variable">all</span> <span class="variable">selected</span> <span class="variable">tracks</span>.
- * <span class="class">After</span> <span class="variable">rendering</span>, <span class="string">'start'</span> <span class="variable">and</span> <span class="string">'end'</span> <span class="variable">values</span> <span class="variable">are</span> <span class="variable">updated</span>
- *
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">start</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">end</span>
- </code></pre>
+  });</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>var fetchTracksData = function(start, end){
-  var nf = new PHP<em>JS().number</em>format
-    , seqid = $("#seqid").val()
-    , trackselector = $('#trackselector :checked')
-    , tracksIDs = []
-    , trackID
-    , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  $("#tracks").empty();
-  trackselector.each(function(i){
-    trackID = $(trackselector[i]).val();
-    tracksIDs.push(trackID);
-    requestTrackData(baseURL, seqid, start, end, trackID, function(data){
-      renderTrack(data, start, end);
+<p>Handle browsing from main form.
+   </p>
+</td>
+<td class="code">
+<pre><code>$(&<span class="variable">quot</span>;#<span class="variable">submit</span>&<span class="variable">quot</span>;).<span class="variable">click</span>(<span class="keyword">function</span>() {
+    <span class="variable">validateForm</span>(<span class="keyword">function</span>(){
+      <span class="keyword">var</span> <span class="variable">start</span> = <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())
+        , <span class="variable">end</span> = <span class="variable">parseNum</span>($(<span class="string">'#end'</span>).<span class="variable">val</span>());
+      <span class="variable">sanitizeInputPos</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+        <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+        <span class="variable">drawNavigationRulers</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+      });
+    });
+    <span class="keyword">return</span> <span class="variable">false</span>;
+  });
+
+});
+
+
+
+<span class="comment">// **********   Form Navigation   ************</span></code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Iteratively fetches data of all selected tracks.
+After rendering, 'start' and 'end' values are updated</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">fetchTracksData</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
+    , <span class="variable">seqid</span> = $(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>()
+    , <span class="variable">trackselector</span> = $(<span class="string">'#trackselector :checked'</span>)
+    , <span class="variable">tracksIDs</span> = []
+    , <span class="variable">trackID</span>
+    , <span class="variable">reqURL</span> = <span class="string">'/'</span>+ <span class="variable">window</span>.<span class="variable">location</span>.<span class="variable">href</span>.<span class="variable">split</span>(<span class="string">'/'</span>).<span class="variable">slice</span>(<span class="number integer">3</span>, <span class="number integer">5</span>).<span class="variable">join</span>(<span class="string">'/'</span>);
+  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
+  <span class="variable">trackselector</span>.<span class="variable">each</span>(<span class="keyword">function</span>(<span class="variable">i</span>){
+    <span class="variable">trackID</span> = $(<span class="variable">trackselector</span>[<span class="variable">i</span>]).<span class="variable">val</span>();
+    <span class="variable">tracksIDs</span>.<span class="variable">push</span>(<span class="variable">trackID</span>);
+    <span class="variable">requestTrackData</span>(<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">trackID</span>, <span class="keyword">function</span>(<span class="variable">track</span>){
+      <span class="variable">renderTrack</span>(<span class="variable">track</span>, <span class="variable">start</span>, <span class="variable">end</span>);
     });
   });
-  window.history.pushState({}, '',
-    [baseURL, seqid, start, end, tracksIDs.join('&amp;')].join('/')
+  <span class="variable">window</span>.<span class="variable">history</span>.<span class="variable">pushState</span>({}, <span class="string">''</span>,
+    [<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">tracksIDs</span>.<span class="variable">join</span>(<span class="string">'&amp;'</span>)].<span class="variable">join</span>(<span class="string">'/'</span>)
   );
-  $("#start").val(nf(start));
-  $("#end").val(nf(end));
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Request</span> <span class="variable">data</span> <span class="variable">of</span> <span class="variable">a</span> <span class="variable">given</span> <span class="variable">track</span> <span class="variable">between</span> <span class="number integer">2</span> <span class="variable">positions</span> <span class="variable">of</span> <span class="variable">a</span> <span class="variable">seqid</span>.
- * <span class="class">The</span> <span class="variable">callback</span> <span class="variable">is</span> <span class="variable">triggered</span> <span class="keyword">with</span> <span class="variable">the</span> <span class="variable">collected</span> <span class="variable">data</span>
- *
- * @<span class="variable">param</span> {<span class="class">String</span>} <span class="variable">baseURL</span>
- * @<span class="variable">param</span> {<span class="variable">string</span>} <span class="variable">seqid</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">start</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">end</span>
- * @<span class="variable">param</span> {<span class="class">String</span>} <span class="variable">trackID</span>
- * @<span class="variable">param</span> {<span class="class">Function</span>} <span class="variable">callback</span>
- </code></pre>
+  $(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">start</span>));
+  $(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">end</span>));
+}</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
-  $.ajax({
-    type: "POST"
-  , url: postURL
-  , data: {
-      seqid: seqid
-    , start: start
-    , end: end
-    , trackID: trackID
-    }
-  , dataType: "json"
-  , success: function(data) {
-      callback(data);
-    }
-  });
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Validates</span> <span class="variable">the</span> <span class="variable">values</span> <span class="keyword">in</span> <span class="variable">the</span> <span class="variable">form</span>.
- * <span class="class">If</span> <span class="variable">the</span> <span class="variable">form</span> <span class="variable">is</span> <span class="variable">valid</span>, <span class="variable">the</span> <span class="variable">callback</span> <span class="variable">is</span> <span class="variable">triggered</span>.
- *
- * @<span class="variable">param</span> {<span class="class">Function</span>} <span class="variable">callback</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var validateForm = function(callback){
-  var okSeqid = $("#seqid").val() != 'seqid'
-    , okStart = !isNaN(parseNum($("#start").val()))
-    , okEnd = !isNaN(parseNum($("#end").val()))
-  if (okSeqid &amp;&amp; okStart &amp;&amp; okEnd){
-    callback();
-  }
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Clear</span> <span class="variable">prompt</span> <span class="variable">from</span> <span class="variable">field</span>
- * 
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">element</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var clearPrompt = function(element){
-  if ($(element).val() == $(element).attr("name")) {
-    $(element).val("");
-  }
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Set</span> <span class="variable">prompt</span> <span class="keyword">for</span> <span class="variable">field</span>
- *
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">element</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var setPrompt = function(element){
-  if ($(element).val() == "") {
-    $(element).val($(element).attr("name"));
-  }
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Convert</span> <span class="variable">a</span> <span class="variable">formated</span> <span class="variable">number</span> <span class="variable">to</span> <span class="variable">an</span> <span class="variable">integer</span>.
- * <span class="class">Returns</span> <span class="keyword">NaN</span> <span class="keyword">if</span> <span class="variable">the</span> <span class="variable">formated</span> <span class="variable">number</span> <span class="variable">cannot</span> <span class="variable">be</span> <span class="variable">parsed</span>.
- *
- * @<span class="variable">param</span> {<span class="class">String</span>} <span class="variable">str_num</span>
- * @<span class="keyword">return</span> {<span class="class">Number</span>}
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var parseNum = function(str<em>num){
-  var nf = new PHP</em>JS().number<em>format;
-  parsedNum = parseInt(nf(str</em>num, 0, '.', ''), 10);
-  if (parseInt(str<em>num, 10) != 0){
-    if (parsedNum != 0){
-      return parseInt(nf(str</em>num, 0, '.', ''), 10);
-    }
-    return NaN;
-  }
-  return 0;
-}</p>
+<p>Request data of a given track between 2 positions of a seqid.
+The callback is triggered with the collected data</p>
 
-<p>// <strong></strong><strong></strong>*   Tracks and rulers navigation   <strong></strong><strong></strong><strong></strong></p>
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  reqURL</p></li><li><p><strong>param</strong>: <em>string</em>  seqid</p></li><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>param</strong>: <em>String</em>  trackID</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>api</strong>: <em>private</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code>*
- * <span class="class">Draw</span> <span class="variable">the</span> <span class="variable">output</span>
- *
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">start</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">end</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var drawNavigationRulers = function(start, end){
-  $("#overviewnavigation").empty();
-  $("#ratiozoom").empty();
-  $("#zoomnavigation").empty();
-  drawMainNavigation(start, end);
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Draw</span> <span class="variable">main</span> <span class="variable">navigation</span> <span class="variable">ruler</span>
- *
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">start</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">end</span>
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var drawMainNavigation = function(start, end){
-  var seqid = $('#seqid').val()
-    , postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
-  $.ajax({
-    type: "POST"
-  , url: postURL
-  , data: { seqid: seqid }
-  , dataType: "json"
-  , success: function(seqidMD) {
-      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
-        , ratiozoom = Raphael("ratiozoom", 1101, 50)
-        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
-        , currentSpan;
-      overviewNavigation.drawBgRules(10, { stroke: "#eee" });
-      overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
-      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-      overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
-      ratiozoom.drawBgRules(10, { stroke: "#eee" });
-      ratiozoom.drawRatio(currentSpan);
-      zoomNavigation.drawBgRules(10, { stroke: "#eee" });
-      zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
-      zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+<pre><code><span class="keyword">var</span> <span class="variable">requestTrackData</span> = <span class="keyword">function</span>(<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">trackID</span>, <span class="variable">callback</span>){
+  $.<span class="variable">ajax</span>({
+    <span class="variable">type</span>: &<span class="variable">quot</span>;<span class="class">POST</span>&<span class="variable">quot</span>;
+  , <span class="variable">url</span>: <span class="variable">reqURL</span>
+  , <span class="variable">data</span>: {
+      <span class="variable">seqid</span>: <span class="variable">seqid</span>
+    , <span class="variable">start</span>: <span class="variable">start</span>
+    , <span class="variable">end</span>: <span class="variable">end</span>
+    , <span class="variable">trackID</span>: <span class="variable">trackID</span>
+    }
+  , <span class="variable">dataType</span>: &<span class="variable">quot</span>;<span class="variable">json</span>&<span class="variable">quot</span>;
+  , <span class="variable">success</span>: <span class="keyword">function</span>(<span class="variable">data</span>) {
+      <span class="variable">callback</span>(<span class="variable">data</span>);
     }
   });
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Render</span> <span class="variable">a</span> <span class="variable">track</span>
- *
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">track</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">start</span>
- * @<span class="variable">param</span> {<span class="class">Number</span>} <span class="variable">end</span>
- </code></pre>
+}</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>var renderTrack = function(track, start, end){
-  var trackdiv = $("&lt;div class='track' id=track" + track.name + "&gt;&lt;/div&gt;")
-    , trackCanvas;
-  $("#tracks").append(trackdiv);
-  trackCanvas = Raphael("track"+track.name, 1101, 50);
-  trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  track.docs.forEach(function(doc){
-    trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
-  });
-}</p>
-</td>
-<td class="code">
-<pre><code>*
- * <span class="class">Function</span> <span class="variable">to</span> <span class="variable">handle</span> <span class="variable">a</span> <span class="variable">selected</span> <span class="variable">dataset</span> <span class="keyword">in</span> <span class="variable">a</span> <span class="variable">dropdown</span> <span class="variable">menu</span>
- *
- * @<span class="variable">param</span> {<span class="class">Object</span>} <span class="variable">dropdown</span> <span class="variable">menu</span>
- * @<span class="keyword">return</span> {<span class="class">Boolean</span>}
- </code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>var OnSelect = function(dropdown){
-  var index  = dropdown.selectedIndex
-    , selected = dropdown.options[index]
-    , baseURL = '/browse/' + selected.value;
-  if (selected.value != 'Select a dataset'){
-    top.location.href = baseURL;
-    return true;
-  }
-  return false;
-}</p>
-</td>
-<td class="code">
+<p>Get the metadata associated to the current seqid</p>
 
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  seqid</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>api</strong>: <em>private</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">getSeqidMetadata</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">callback</span>){
+  <span class="keyword">var</span> <span class="variable">reqURL</span> = <span class="string">'/'</span>+ <span class="variable">window</span>.<span class="variable">location</span>.<span class="variable">href</span>.<span class="variable">split</span>(<span class="string">'/'</span>).<span class="variable">slice</span>(<span class="number integer">3</span>, <span class="number integer">6</span>).<span class="variable">join</span>(<span class="string">'/'</span>) + &<span class="variable">quot</span>;.<span class="variable">json</span>&<span class="variable">quot</span>;;
+  $.<span class="variable">ajax</span>({
+    <span class="variable">type</span>: &<span class="variable">quot</span>;<span class="class">GET</span>&<span class="variable">quot</span>;
+  , <span class="variable">url</span>: <span class="variable">reqURL</span>
+  , <span class="variable">data</span>: { <span class="variable">seqid</span>: <span class="variable">seqid</span> }
+  , <span class="variable">dataType</span>: &<span class="variable">quot</span>;<span class="variable">json</span>&<span class="variable">quot</span>;
+  , <span class="variable">success</span>: <span class="keyword">function</span>(<span class="variable">metadata</span>) {
+      <span class="variable">callback</span>(<span class="variable">metadata</span>);
+    }
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Get the global style</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Function</em>  callback</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">getGlobalStyle</span> = <span class="keyword">function</span>(<span class="variable">callback</span>){
+  <span class="keyword">var</span> <span class="variable">reqURL</span> = <span class="string">'/globalconfig.json'</span>;
+  $.<span class="variable">ajax</span>({
+    <span class="variable">type</span>: &<span class="variable">quot</span>;<span class="class">GET</span>&<span class="variable">quot</span>;
+  , <span class="variable">url</span>: <span class="variable">reqURL</span>
+  <span class="comment">//, data: { seqid: seqid }</span>
+  , <span class="variable">dataType</span>: &<span class="variable">quot</span>;<span class="variable">json</span>&<span class="variable">quot</span>;
+  , <span class="variable">success</span>: <span class="keyword">function</span>(<span class="variable">style</span>) {
+      <span class="variable">callback</span>(<span class="variable">style</span>);
+    }
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Validates the values in the form.
+If the form is valid, the callback is triggered.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Function</em>  callback</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">validateForm</span> = <span class="keyword">function</span>(<span class="variable">callback</span>){
+  <span class="keyword">var</span> <span class="variable">seqid</span> = $(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>()
+    , <span class="variable">start</span> = <span class="variable">parseNum</span>($(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>())
+    , <span class="variable">end</span> = <span class="variable">parseNum</span>($(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>())
+    , <span class="variable">okSeqid</span> = <span class="variable">seqid</span> != <span class="string">'seqid'</span>
+    , <span class="variable">okStart</span> = !<span class="variable">isNaN</span>(<span class="variable">start</span>)
+    , <span class="variable">okEnd</span> = !<span class="variable">isNaN</span>(<span class="variable">end</span>);
+  <span class="keyword">if</span> (<span class="variable">okSeqid</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">okStart</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">okEnd</span>){
+    <span class="variable">callback</span>();
+  }
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Reset positions to 0 or seqid.length if it exceeds those limits.
+The call back is triggered with the new start and end positions.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">sanitizeInputPos</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">callback</span>){
+  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>;
+  <span class="variable">getSeqidMetadata</span>($(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(), <span class="keyword">function</span>(<span class="variable">seqidMD</span>){
+    <span class="variable">start</span> = <span class="class">Math</span>.<span class="variable">max</span>(<span class="number integer">0</span>, <span class="variable">start</span>)
+    <span class="variable">end</span> = <span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">seqidMD</span>.<span class="variable">length</span>, <span class="variable">end</span>);
+    $(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">start</span>));
+    $(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">end</span>));
+    <span class="variable">callback</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Clear prompt from field</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  element</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">clearPrompt</span> = <span class="keyword">function</span>(<span class="variable">element</span>){
+  <span class="keyword">if</span> ($(<span class="variable">element</span>).<span class="variable">val</span>() == $(<span class="variable">element</span>).<span class="variable">attr</span>(&<span class="variable">quot</span>;<span class="variable">name</span>&<span class="variable">quot</span>;)) {
+    $(<span class="variable">element</span>).<span class="variable">val</span>(&<span class="variable">quot</span>;&<span class="variable">quot</span>;);
+  }
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Set prompt for field</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  element</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">setPrompt</span> = <span class="keyword">function</span>(<span class="variable">element</span>){
+  <span class="keyword">if</span> ($(<span class="variable">element</span>).<span class="variable">val</span>() == &<span class="variable">quot</span>;&<span class="variable">quot</span>;) {
+    $(<span class="variable">element</span>).<span class="variable">val</span>($(<span class="variable">element</span>).<span class="variable">attr</span>(&<span class="variable">quot</span>;<span class="variable">name</span>&<span class="variable">quot</span>;));
+  }
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Convert a formated number to an integer.
+Returns NaN if the formated number cannot be parsed.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>String</em>  str_num</p></li><li><p><strong>return</strong>: <em>Number</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">parseNum</span> = <span class="keyword">function</span>(<span class="variable">str_num</span>){
+  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>;
+  <span class="variable">parsedNum</span> = <span class="variable">parseInt</span>(<span class="variable">nf</span>(<span class="variable">str_num</span>, <span class="number integer">0</span>, <span class="string">'.'</span>, <span class="string">''</span>), <span class="number integer">10</span>);
+  <span class="keyword">if</span> (<span class="variable">parseInt</span>(<span class="variable">str_num</span>, <span class="number integer">10</span>) != <span class="number integer">0</span>){
+    <span class="keyword">if</span> (<span class="variable">parsedNum</span> != <span class="number integer">0</span>){
+      <span class="keyword">return</span> <span class="variable">parseInt</span>(<span class="variable">nf</span>(<span class="variable">str_num</span>, <span class="number integer">0</span>, <span class="string">'.'</span>, <span class="string">''</span>), <span class="number integer">10</span>);
+    }
+    <span class="keyword">return</span> <span class="keyword">NaN</span>;
+  }
+  <span class="keyword">return</span> <span class="number integer">0</span>;
+}
+
+
+<span class="comment">// *********   Tracks and rulers navigation   ************</span></code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the navigation rulers between 2 positions</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">drawNavigationRulers</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+  $(&<span class="variable">quot</span>;#<span class="variable">overviewnavigation</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
+  $(&<span class="variable">quot</span>;#<span class="variable">ratiozoom</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
+  $(&<span class="variable">quot</span>;#<span class="variable">zoomnavigation</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
+  <span class="variable">getGlobalStyle</span>(<span class="keyword">function</span>(<span class="variable">style</span>){
+    <span class="keyword">var</span> <span class="variable">seqid</span> = $(<span class="string">'#seqid'</span>).<span class="variable">val</span>();
+    <span class="variable">getSeqidMetadata</span>(<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">seqidMD</span>){
+      <span class="keyword">var</span> <span class="variable">overviewNavigation</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">overviewnavigation</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">50</span>)
+        , <span class="variable">ratiozoom</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">ratiozoom</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">50</span>)
+        , <span class="variable">zoomNavigation</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">zoomnavigation</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">50</span>)
+        , <span class="variable">currentSpan</span>;
+      <span class="variable">overviewNavigation</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, <span class="variable">style</span>.<span class="variable">bgrules</span>);
+      <span class="variable">overviewNavigation</span>.<span class="variable">drawMainRuler</span>(<span class="number integer">0</span>, <span class="variable">seqidMD</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">ruler</span>);
+      <span class="variable">currentSpan</span> = <span class="variable">overviewNavigation</span>.<span class="variable">currentSpan</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">seqidMD</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">selectedspan</span>);
+      <span class="variable">overviewNavigation</span>.<span class="variable">explorableArea</span>(<span class="number integer">0</span>, <span class="variable">seqidMD</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">selectionspan</span>);
+      <span class="variable">ratiozoom</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, <span class="variable">style</span>.<span class="variable">bgrules</span>);
+      <span class="variable">ratiozoom</span>.<span class="variable">drawRatio</span>(<span class="variable">currentSpan</span>);
+      <span class="variable">zoomNavigation</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, <span class="variable">style</span>.<span class="variable">bgrules</span>);
+      <span class="variable">zoomNavigation</span>.<span class="variable">drawMainRuler</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">style</span>.<span class="variable">ruler</span>);
+      <span class="variable">zoomNavigation</span>.<span class="variable">explorableArea</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">style</span>.<span class="variable">selectionspan</span>);
+    });
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Render a track</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  track</p></li><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">renderTrack</span> = <span class="keyword">function</span>(<span class="variable">track</span>, <span class="variable">start</span>, <span class="variable">end</span>){
+  <span class="keyword">var</span> <span class="variable">trackdiv</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="variable">div</span> <span class="keyword">class</span>=<span class="string">'track'</span> <span class="variable">id</span>=<span class="variable">track</span>&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +&<span class="variable">quot</span>;&<span class="variable">gt</span>;&<span class="variable">lt</span>;/<span class="variable">div</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
+    , <span class="variable">trackcanvasdiv</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="variable">div</span> <span class="keyword">class</span>=<span class="string">'trackcanvas'</span> <span class="variable">id</span>=<span class="variable">trackcanvas</span>&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +&<span class="variable">quot</span>;&<span class="variable">gt</span>;&<span class="variable">lt</span>;/<span class="variable">div</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
+    , <span class="variable">tracklabel</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="keyword">label</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">name</span> +&<span class="variable">quot</span>;&<span class="variable">lt</span>;/<span class="keyword">label</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
+    , <span class="variable">trackCanvas</span>;
+  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">append</span>(<span class="variable">trackdiv</span>);
+  $(<span class="variable">trackdiv</span>).<span class="variable">append</span>(<span class="variable">tracklabel</span>);
+  $(<span class="variable">trackdiv</span>).<span class="variable">append</span>(<span class="variable">trackcanvasdiv</span>);
+  <span class="variable">trackCanvas</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">trackcanvas</span>&<span class="variable">quot</span>;+<span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="number integer">1101</span>, <span class="number integer">50</span>);
+  <span class="variable">trackCanvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
+  <span class="variable">track</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
+    <span class="variable">trackCanvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">style</span>);
+  });
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Function to handle a selected dataset in a dropdown menu</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  dropdown</p></li><li><p><strong>return</strong>: <em>Boolean</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">OnSelect</span> = <span class="keyword">function</span>(<span class="variable">dropdown</span>){
+  <span class="keyword">var</span> <span class="variable">index</span>  = <span class="variable">dropdown</span>.<span class="variable">selectedIndex</span>
+    , <span class="variable">selected</span> = <span class="variable">dropdown</span>.<span class="variable">options</span>[<span class="variable">index</span>]
+    , <span class="variable">baseURL</span> = <span class="string">'/browse/'</span> + <span class="variable">selected</span>.<span class="variable">value</span>;
+  <span class="keyword">if</span> (<span class="variable">selected</span>.<span class="variable">value</span> != <span class="string">'Select a dataset'</span>){
+    <span class="variable">top</span>.<span class="variable">location</span>.<span class="variable">href</span> = <span class="variable">baseURL</span>;
+    <span class="keyword">return</span> <span class="variable">true</span>;
+  }
+  <span class="keyword">return</span> <span class="variable">false</span>;
+}
+</code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="./public/javascripts/rulersUI.js"><a href="#">rulersUI</a></h2></td><td>./public/javascripts/rulersUI.js</td></tr><tr class="code">
 <td class="docs">
@@ -1329,14 +1558,18 @@ Corresponds to an entry from a track
       <span class="this">this</span>.<span class="variable">selector</span>.<span class="variable">remove</span>();
       <span class="comment">// Span selection</span>
       <span class="keyword">if</span> (<span class="variable">goto_start</span> != <span class="variable">goto_end</span>) {
-        <span class="variable">fetchTracksData</span>(<span class="variable">goto_start</span>, <span class="variable">goto_end</span>);
-        <span class="variable">drawNavigationRulers</span>(<span class="variable">goto_start</span>, <span class="variable">goto_end</span>);
+        <span class="variable">sanitizeInputPos</span>(<span class="variable">goto_start</span>, <span class="variable">goto_end</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+            <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+            <span class="variable">drawNavigationRulers</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+        });
       }
       <span class="comment">// Location click</span>
       <span class="keyword">else</span> {
         <span class="keyword">var</span> <span class="variable">i_span</span> = <span class="class">Math</span>.<span class="variable">floor</span>((<span class="variable">parseNum</span>($(<span class="string">'#end'</span>).<span class="variable">val</span>()) - <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())) / <span class="number integer">2</span>);
-        <span class="variable">fetchTracksData</span>(<span class="variable">goto_start</span>-<span class="variable">i_span</span>, <span class="variable">goto_end</span>+<span class="variable">i_span</span>);
-        <span class="variable">drawNavigationRulers</span>(<span class="variable">goto_start</span>-<span class="variable">i_span</span>, <span class="variable">goto_end</span>+<span class="variable">i_span</span>);
+        <span class="variable">sanitizeInputPos</span>(<span class="variable">goto_start</span>-<span class="variable">i_span</span>, <span class="variable">goto_end</span>+<span class="variable">i_span</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+            <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+            <span class="variable">drawNavigationRulers</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+        });
       }
     }
   );
@@ -1354,11 +1587,11 @@ Corresponds to an entry from a track
 <td class="code">
 <pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawDocument</span> = <span class="keyword">function</span>(<span class="variable">doc</span>, <span class="variable">view_start</span>, <span class="variable">view_end</span>, <span class="variable">style</span>) {
   <span class="variable">view_span</span> = <span class="variable">view_end</span> - <span class="variable">view_start</span>;
-  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>;
-  <span class="keyword">var</span> <span class="variable">rel_start</span> = (((<span class="variable">doc</span>.<span class="variable">start</span> - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
-  <span class="keyword">var</span> <span class="variable">rel_end</span> = (((<span class="variable">doc</span>.<span class="variable">end</span> - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
-  <span class="keyword">var</span> <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>;
-  <span class="keyword">var</span> <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="this">this</span>.<span class="regexp">/3, rel_doc_length, this.height/</span><span class="number integer">3</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
+    , <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
+    , <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
+    , <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>
+    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="this">this</span>.<span class="regexp">/4, rel_doc_length, this.height/</span><span class="number integer">4</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
   <span class="variable">d</span>.<span class="variable">attr</span>({<span class="variable">title</span>:[
     <span class="string">'ID : '</span> + <span class="variable">doc</span>.<span class="variable">_id</span>,
     <span class="string">'From : '</span> + <span class="variable">nf</span>(<span class="variable">doc</span>.<span class="variable">start</span>),
