@@ -3,15 +3,14 @@
  */
 var dbutils = require('../lib/dbutils')
   , Reference = require('../models/reference').Reference
-  , Track = require('../models/track').Track
-  , NotFound = require('./errors').NotFound;
+  , Track = require('../models/track').Track;
 
 
 /**
  * Function used to handle the routing associated to
- * the dataset controller
+ * the dataset controller.
  *
- * @param {Application} express app
+ * @param {Object} application
  * @api public
  */
 var route = function(app){
@@ -19,8 +18,12 @@ var route = function(app){
   /**
    * Route to a specific dataset
    *
+   * Handling this route triggers the dbutils.connect middleware
+   * in order to connect to the mongo database.
+   * The browse/index.jade view is rendered in case of success.
+   *
+   * @see dbutils.connect
    * @handles {Route#GET} /browse/:dataset
-   * @api public
    */
   app.get('/browse/:dataset', dbutils.connect, function(req, res, next){
     res.render('browse', {
@@ -35,10 +38,14 @@ var route = function(app){
   });
 
   /**
-   * Route to a specific dataset
+   * Respond to AJAX track requests.
    *
+   * Handling this route triggers the dbutils.connect middleware
+   * in order to connect to the mongo database.
+   * The track data is sent to the AJAX request event.
+   *
+   * @see dbutils.connect
    * @handles {Route#POST} /browse/:dataset
-   * @api public
    */
   app.post('/browse/:dataset', dbutils.connect, function(req, res){
     var track = new Track(app._locals.config[req.params.dataset].tracks[req.body.trackID]);
@@ -55,8 +62,11 @@ var route = function(app){
   /**
    * Fetches the metadata of a specific seqid
    *
+   * Handling this route triggers the dbutils.connect middleware
+   * in order to connect to the mongo database.
+   *
+   * @see dbutils.connect
    * @handles {Route#POST} /browse/:dataset/:seqid.json
-   * @api public
    */
   app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
     if (req.params.format === 'json'){
@@ -70,8 +80,11 @@ var route = function(app){
   /**
    * Route to a specific range, with specified collections
    *
+   * Handling this route triggers the dbutils.connect middleware
+   * in order to connect to the mongo database.
+   *
+   * @see dbutils.connect
    * @handles {Route#GET} /browse/:dataset/:seqid/:start/:end/:tracks
-   * @api public
    */
   app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
     var checked = {};
@@ -91,8 +104,11 @@ var route = function(app){
   /**
    * Redirect to base url of dataset if parameters are incomplete
    *
+   * Handling this route triggers the dbutils.connect middleware
+   * in order to connect to the mongo database.
+   *
+   * @see dbutils.connect
    * @handles {Route#GET} /browse/:dataset/*
-   * @api public
    */
   app.get('/browse/:dataset/*', dbutils.connect, function(req, res){
     res.redirect('/browse/' + req.params.dataset);
