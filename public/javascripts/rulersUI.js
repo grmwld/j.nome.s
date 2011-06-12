@@ -143,9 +143,9 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       else {
         var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
         sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end){
-          getGlobalStyle(function(){
+          getGlobalStyle(function(style){
             fetchTracksData(start, end);
-            drawNavigationRulers(start, end);
+            drawNavigationRulers(start, end, style);
           });
         });
       }
