@@ -56,6 +56,28 @@ app.configure('production', function(){
 
 
 /**
+ * Map routes to app functions
+ */
+var help = require('./controllers/help')
+  , about = require('./controllers/about')
+  , browse = require('./controllers/browse');
+
+app.get('/', function(req, res){
+  res.render('index', {
+    title: 'j.nome.s'
+  });
+});
+
+app.get('/globalconfig.json', function(req, res){
+  res.send(app._locals.config.global.style);
+});
+
+help.route(app);
+about.route(app);
+browse.route(app);
+
+
+/**
  * Error handling
  */
 var errors = require('./controllers/errors');
@@ -83,28 +105,6 @@ if (app.settings.env == 'production' || app.settings.env == 'test'){
 }
 
 errors.route(app);
-
-
-/**
- * Map routes to app functions
- */
-var help = require('./controllers/help')
-  , about = require('./controllers/about')
-  , browse = require('./controllers/browse');
-
-app.get('/', function(req, res){
-  res.render('index', {
-    title: 'j.nome.s'
-  });
-});
-
-app.get('/globalconfig.json', function(req, res){
-  res.send(app._locals.config.global.style);
-});
-
-help.route(app);
-about.route(app);
-browse.route(app);
 
 
 /**
