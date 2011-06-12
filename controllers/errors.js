@@ -24,6 +24,28 @@ util.inherits(NotFound, Error);
  */
 var route = function(app){
 
+  app.error(function(err, req, res, next){
+    if (err instanceof NotFound) {
+      res.render('404.jade', {
+        title: 'Not Found'
+      , status: 404
+      , locals: { error: err }
+      });
+    } else {
+      next(err);
+    }
+  });
+
+  if (app.settings.env == 'production' || app.settings.env == 'test'){
+    app.error(function(err, req, res){
+      res.render('500.jade', {
+        title: 'Server Error'
+      , status: 500
+      , locals: { error: err }
+      });
+    });
+  }
+
   app.get('/404', function(req, res){
     throw new NotFound;
   });

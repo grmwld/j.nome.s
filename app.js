@@ -82,28 +82,6 @@ browse.route(app);
  */
 var errors = require('./controllers/errors');
 
-app.error(function(err, req, res, next){
-  if (err instanceof errors.NotFound) {
-    res.render('404.jade', {
-      title: 'Not Found'
-    , status: 404
-    , locals: { error: err }
-    });
-  } else {
-    next(err);
-  }
-});
-
-if (app.settings.env == 'production' || app.settings.env == 'test'){
-  app.error(function(err, req, res){
-    res.render('500.jade', {
-      title: 'Server Error'
-    , status: 500
-    , locals: { error: err }
-    });
-  });
-}
-
 errors.route(app);
 
 
