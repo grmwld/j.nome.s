@@ -42,14 +42,47 @@ app.configure(function(){
 
 app.configure('development', function(){
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-  require('express-trace')(app);
   console.log('Application started in development mode.')
 });
 
+app.configure('test', function(){
+  require('express-trace')(app);
+  console.log('Application started in test mode.')
+});
+
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
   console.log('Application started in production mode.');
 });
+
+
+/**
+ * Error handling
+ */
+var errors = require('./controllers/errors');
+
+app.error(function(err, req, res, next){
+  if (err instanceof errors.NotFound) {
+    res.render('404.jade', {
+      title: 'Not Found'
+    , status: 404
+    , locals: { error: err }
+    });
+  } else {
+    next(err);
+  }
+});
+
+if (app.settings.env == 'production' || app.settings.env == 'test'){
+  app.error(function(err, req, res){
+    res.render('500.jade', {
+      title: 'Server Error'
+    , status: 500
+    , locals: { error: err }
+    });
+  });
+}
+
+errors.route(app);
 
 
 /**

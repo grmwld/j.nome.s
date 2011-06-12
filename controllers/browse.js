@@ -4,7 +4,7 @@
 var dbutils = require('../lib/dbutils')
   , Reference = require('../models/reference').Reference
   , Track = require('../models/track').Track
-  , TrackCollection = require('../models/track').TrackCollection;
+  , NotFound = require('./errors').NotFound;
 
 
 /**
@@ -22,7 +22,10 @@ var route = function(app){
    * @handles {Route#GET} /browse/:dataset
    * @api public
    */
-  app.get('/browse/:dataset', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset', dbutils.connect, function(req, res, next){
+    if (!app._locals.config[req.params.dataset]){
+      return next(new NotFound("dataset '" + req.params.dataset + "' does not exist."));
+    }
     res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset
@@ -40,7 +43,10 @@ var route = function(app){
    * @handles {Route#POST} /browse/:dataset
    * @api public
    */
-  app.post('/browse/:dataset', dbutils.connect, function(req, res){
+  app.post('/browse/:dataset', dbutils.connect, function(req, res, next){
+    if (!app._locals.config[req.params.dataset]){
+      return next(new NotFound('Cannot find dataset : '));
+    }
     var track = new Track(app._locals.config[req.params.dataset].tracks[req.body.trackID]);
     track.fetchInInterval(
       req.body.seqid
@@ -58,7 +64,10 @@ var route = function(app){
    * @handles {Route#POST} /browse/:dataset/:seqid.json
    * @api public
    */
-  app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res, next){
+    if (!req.app._locals.config[req.params.dataset]){
+      return next(new errors.NotFound('Cannot find dataset : ' + req.params.dataset));
+    }
     if (req.params.format === 'json'){
       var reference = new Reference();
       reference.getMetadata(req.params.seqid, function(err, doc){
@@ -74,6 +83,9 @@ var route = function(app){
    * @api public
    */
   app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
+    if (!req.app._locals.config[req.params.dataset]){
+      return next(new errors.NotFound('Cannot find dataset : ' + req.params.dataset));
+    }
     var checked = {};
     req.params.tracks.split('&').forEach(function(track){
       checked[track] = true;
@@ -95,6 +107,9 @@ var route = function(app){
    * @api public
    */
   app.get('/browse/:dataset/*', dbutils.connect, function(req, res){
+    if (!req.app._locals.config[req.params.dataset]){
+      return next(new errors.NotFound('Cannot find dataset : ' + req.params.dataset));
+    }
     res.redirect('/browse/' + req.params.dataset);
   });
 
