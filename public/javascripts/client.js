@@ -19,8 +19,10 @@ $(document).ready(function() {
   validateForm(function(){
     var start = parseNum($('#start').val())
       , end = parseNum($('#end').val());
-    fetchTracksData(start, end);
-    drawNavigationRulers(start, end);
+    sanitizeInputPos(start, end, function(start, end){
+      fetchTracksData(start, end);
+      drawNavigationRulers(start, end);
+    });
   });
   
   /**
@@ -30,8 +32,10 @@ $(document).ready(function() {
     validateForm(function(){
       var start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
-      fetchTracksData(start, end);
-      drawNavigationRulers(start, end);
+      sanitizeInputPos(start, end, function(start, end){
+        fetchTracksData(start, end);
+        drawNavigationRulers(start, end);
+      });
     });
     return false;
   });
@@ -99,6 +103,19 @@ var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
   });
 }
 
+var getSeqidMetadata = function(seqid, callback){
+  var postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
+  $.ajax({
+    type: "GET"
+  , url: postURL
+  , data: { seqid: seqid }
+  , dataType: "json"
+  , success: function(metadata) {
+      callback(metadata);
+    }
+  });
+}
+
 /**
  * Validates the values in the form.
  * If the form is valid, the callback is triggered.
@@ -106,12 +123,34 @@ var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
  * @param {Function} callback
  */
 var validateForm = function(callback){
-  var okSeqid = $("#seqid").val() != 'seqid'
-    , okStart = !isNaN(parseNum($("#start").val()))
-    , okEnd = !isNaN(parseNum($("#end").val()))
+  var seqid = $("#seqid").val()
+    , start = parseNum($("#start").val())
+    , end = parseNum($("#end").val())
+    , okSeqid = seqid != 'seqid'
+    , okStart = !isNaN(start)
+    , okEnd = !isNaN(end);
   if (okSeqid && okStart && okEnd){
     callback();
   }
+}
+
+/**
+ * Reset positions to 0 or seqid.length if it exceeds those limits.
+ * The call back is triggered with the new start and end positions.
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param callback
+ */
+var sanitizeInputPos = function(start, end, callback){
+  var nf = new PHP_JS().number_format;
+  getSeqidMetadata($("#seqid").val(), function(seqidMD){
+    start = Math.max(0, start)
+    end = Math.min(seqidMD.length, end);
+    $("#start").val(nf(start));
+    $("#end").val(nf(end));
+    callback(start, end);
+  });
 }
 
 /**
@@ -178,28 +217,21 @@ var drawNavigationRulers = function(start, end){
  * @param {Number} end
  */
 var drawMainNavigation = function(start, end){
-  var seqid = $('#seqid').val()
-    , postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
-  $.ajax({
-    type: "GET"
-  , url: postURL
-  , data: { seqid: seqid }
-  , dataType: "json"
-  , success: function(seqidMD) {
-      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
-        , ratiozoom = Raphael("ratiozoom", 1101, 50)
-        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
-        , currentSpan;
-      overviewNavigation.drawBgRules(10, { stroke: "#eee" });
-      overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
-      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-      overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
-      ratiozoom.drawBgRules(10, { stroke: "#eee" });
-      ratiozoom.drawRatio(currentSpan);
-      zoomNavigation.drawBgRules(10, { stroke: "#eee" });
-      zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
-      zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-    }
+  var seqid = $('#seqid').val();
+  getSeqidMetadata(seqid, function(seqidMD){
+    var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
+      , ratiozoom = Raphael("ratiozoom", 1101, 50)
+      , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+      , currentSpan;
+    overviewNavigation.drawBgRules(10, { stroke: "#eee" });
+    overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
+    currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+    overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
+    ratiozoom.drawBgRules(10, { stroke: "#eee" });
+    ratiozoom.drawRatio(currentSpan);
+    zoomNavigation.drawBgRules(10, { stroke: "#eee" });
+    zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
+    zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
   });
 }
 

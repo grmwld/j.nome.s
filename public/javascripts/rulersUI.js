@@ -132,14 +132,18 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       this.selector.remove();
       // Span selection
       if (goto_start != goto_end) {
-        fetchTracksData(goto_start, goto_end);
-        drawNavigationRulers(goto_start, goto_end);
+        sanitizeInputPos(goto_start, goto_end, function(start, end){
+          fetchTracksData(start, end);
+          drawNavigationRulers(start, end);
+        });
       }
       // Location click
       else {
         var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
-        fetchTracksData(goto_start-i_span, goto_end+i_span);
-        drawNavigationRulers(goto_start-i_span, goto_end+i_span);
+        sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end){
+          fetchTracksData(start, end);
+          drawNavigationRulers(start, end);
+        });
       }
     }
   );
