@@ -164,9 +164,11 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
 Raphael.fn.drawDocument = function(doc, view_start, view_end, style) {
   view_span = view_end - view_start;
   var nf = new PHP_JS().number_format;
-  var rel_start = (((doc.start - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_end = (((doc.end - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50;
   var rel_doc_length = rel_end - rel_start;
+  console.log(rel_start);
+  console.log(rel_doc_length);
   var d = this.rect(rel_start, this.height/3, rel_doc_length, this.height/3).attr(style);
   d.attr({title:[
     'ID : ' + doc._id,
