@@ -12,9 +12,9 @@ var route = function(app){
    *
    * @handles {Route} /help
    */
-  app.get('/help', function(req, res){
-    res.render('help', {
-      title: 'Help'
+  app.get('/doc', function(req, res){
+    res.render('doc', {
+      title: 'Documentation'
     });
   });
 

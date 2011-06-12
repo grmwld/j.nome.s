@@ -58,7 +58,7 @@ app.configure('production', function(){
 /**
  * Map routes to app functions
  */
-var help = require('./controllers/help')
+var doc = require('./controllers/doc')
   , about = require('./controllers/about')
   , browse = require('./controllers/browse');
 
@@ -68,11 +68,15 @@ app.get('/', function(req, res){
   });
 });
 
+app.get('/api', function(req, res){
+  res.sendfile('./docs/j.nome.s-doc.html');
+});
+
 app.get('/globalconfig.json', function(req, res){
   res.send(app._locals.config.global.style);
 });
 
-help.route(app);
+doc.route(app);
 about.route(app);
 browse.route(app);
 
