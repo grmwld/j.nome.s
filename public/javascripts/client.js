@@ -249,10 +249,14 @@ var drawMainNavigation = function(start, end){
  * @param {Number} end
  */
 var renderTrack = function(track, start, end){
-  var trackdiv = $("<div class='track' id=track" + track.metadata.id + "></div>")
+  var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
+    , trackcanvasdiv = $("<div class='trackcanvas' id=trackcanvas"+ track.metadata.id +"></div>")
+    , tracklabel = $("<label>"+ track.metadata.name +"</label>")
     , trackCanvas;
   $("#tracks").append(trackdiv);
-  trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
+  $(trackdiv).append(tracklabel);
+  $(trackdiv).append(trackcanvasdiv);
+  trackCanvas = Raphael("trackcanvas"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
   track.data.forEach(function(doc){
     trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
