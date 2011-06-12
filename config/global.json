@@ -6,4 +6,20 @@
     , "description": "Xenopus tropicalis genome v4"
     }
   }
+, "style": {
+    "bgrules": {
+      "stroke": "#eee"
+    }
+  , "ruler": {
+      "stroke": "#000"
+    }
+  , "selectedspan": {
+      "fill": "#00ABFA"
+    , "fill-opacity": 0.2
+    }
+  , "selectionspan": {
+      "fill": "#00ABFA"
+    , "fill-opacity": 0.3
+    }
+  }
 }

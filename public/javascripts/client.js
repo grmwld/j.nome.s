@@ -1,43 +1,47 @@
 $(document).ready(function() {
 
-  /**
-   * Setup dynamic prompt input text-fields.
-   * The default value corresponds to the 'name' attribute
-   * of the input field.
-   */
-  $("input[type=text]")
-    .focus(function(){
-      clearPrompt(this);
-    })
-    .blur(function(){
-      setPrompt(this);
-    });
+  getGlobalStyle(function(globalstyle){
 
-  /**
-   * Render tracks if parameters of the form are valid.
-   */
-  validateForm(function(){
-    var start = parseNum($('#start').val())
-      , end = parseNum($('#end').val());
-    sanitizeInputPos(start, end, function(start, end){
-      fetchTracksData(start, end);
-      drawNavigationRulers(start, end);
-    });
-  });
-  
-  /**
-   * Handle browsing from main form via ajax post.
-   */
-  $("#submit").click(function() {
+    /**
+     * Setup dynamic prompt input text-fields.
+     * The default value corresponds to the 'name' attribute
+     * of the input field.
+     */
+    $("input[type=text]")
+      .focus(function(){
+        clearPrompt(this);
+      })
+      .blur(function(){
+        setPrompt(this);
+      });
+
+    /**
+     * Render tracks if parameters of the form are valid.
+     */
     validateForm(function(){
       var start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
         fetchTracksData(start, end);
-        drawNavigationRulers(start, end);
+        drawNavigationRulers(start, end, globalstyle);
       });
     });
-    return false;
+    
+    /**
+     * Handle browsing from main form via ajax post.
+     */
+    $("#submit").click(function() {
+      validateForm(function(){
+        var start = parseNum($('#start').val())
+          , end = parseNum($('#end').val());
+        sanitizeInputPos(start, end, function(start, end){
+          fetchTracksData(start, end);
+          drawNavigationRulers(start, end, globalstyle);
+        });
+      });
+      return false;
+    });
+
   });
 
 });
@@ -118,6 +122,24 @@ var getSeqidMetadata = function(seqid, callback){
   , dataType: "json"
   , success: function(metadata) {
       callback(metadata);
+    }
+  });
+}
+
+/**
+ * Get the global style
+ *
+ * @param {Function} callback
+ */
+var getGlobalStyle = function(callback){
+  var reqURL = '/globalconfig.json';
+  $.ajax({
+    type: "GET"
+  , url: reqURL
+  //, data: { seqid: seqid }
+  , dataType: "json"
+  , success: function(style) {
+      callback(style);
     }
   });
 }
@@ -209,11 +231,11 @@ var parseNum = function(str_num){
  * @param {Number} start
  * @param {Number} end
  */
-var drawNavigationRulers = function(start, end){
+var drawNavigationRulers = function(start, end, style){
   $("#overviewnavigation").empty();
   $("#ratiozoom").empty();
   $("#zoomnavigation").empty();
-  drawMainNavigation(start, end);
+  drawMainNavigation(start, end, style);
 }
 
 /**
@@ -222,22 +244,22 @@ var drawNavigationRulers = function(start, end){
  * @param {Number} start
  * @param {Number} end
  */
-var drawMainNavigation = function(start, end){
+var drawMainNavigation = function(start, end, style){
   var seqid = $('#seqid').val();
   getSeqidMetadata(seqid, function(seqidMD){
     var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
       , ratiozoom = Raphael("ratiozoom", 1101, 50)
       , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
       , currentSpan;
-    overviewNavigation.drawBgRules(10, { stroke: "#eee" });
-    overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
-    currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-    overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
-    ratiozoom.drawBgRules(10, { stroke: "#eee" });
+    overviewNavigation.drawBgRules(10, style.bgrules);
+    overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
+    currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
+    overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
+    ratiozoom.drawBgRules(10, style.bgrules);
     ratiozoom.drawRatio(currentSpan);
-    zoomNavigation.drawBgRules(10, { stroke: "#eee" });
-    zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
-    zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
+    zoomNavigation.drawBgRules(10, style.bgrules);
+    zoomNavigation.drawMainRuler(start, end, style.ruler);
+    zoomNavigation.explorableArea(start, end, style.selectionspan);
   });
 }
 
