@@ -6,6 +6,11 @@ var util = require('util');
 
 /**
  * NotFound error
+ *
+ * Inherits from Error
+ * This is used in case of 404 errors.
+ *
+ * @param {String} message
  */
 var NotFound = function(message){
   this.name = 'NotFound';
@@ -19,11 +24,18 @@ util.inherits(NotFound, Error);
  * Function used to handle the routing associated to
  * the error controller
  *
- * @param {Application} express app
+ * @param {Object} application
  * @api public
  */
 var route = function(app){
 
+  /**
+   * Handle 404 errors.
+   *
+   * If the error is not a 404 error, the callback is triggered
+   * so that the next matching handler can handle it.
+   * Otherwise, renders the 404 view.
+   */
   app.error(function(err, req, res, next){
     if (err instanceof NotFound) {
       res.render('404.jade', {
@@ -36,28 +48,45 @@ var route = function(app){
     }
   });
 
-  if (app.settings.env == 'production' || app.settings.env == 'test'){
-    app.error(function(err, req, res){
-      res.render('500.jade', {
-        title: 'Server Error'
-      , status: 500
-      , locals: { error: err }
-      });
+  /**
+   * Handle 500 errors.
+   *
+   * Since this is the final exception handler,
+   * not callback is necessary.
+   */
+  app.error(function(err, req, res){
+    res.render('500.jade', {
+      title: 'Server Error'
+    , status: 500
+    , locals: { error: err }
     });
-  }
+  });
 
+  /**
+   * Route to 404 error
+   *
+   * @handle {Route#GET} /404
+   * @throws {NotFound}
+   */
   app.get('/404', function(req, res){
     throw new NotFound;
   });
 
+  /**
+   * Route to 500 error
+   *
+   * @handle {Route#GET} /500
+   * @throws {Error}
+   */
   app.get('/500', function(req, res){
-    throw new Error('Server side Error.');
+    throw new Error('Server Side Error.');
   });
 
-  app.get('/bad', function(req, res){
-    unknownMethod();
-  });
-
+  /**
+   * Handle any non registered URL by throwing a 404 exception.
+   *
+   * @throws {NotFound}
+   */
   app.use(function(req, res){
     throw new NotFound('404 - Page not found.');
   });
