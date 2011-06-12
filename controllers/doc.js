@@ -1,16 +1,15 @@
 /**
  * Function used to handle the routing associated to
- * the 'about' page.
+ * the documentation page.
  *
- * @param {Application} express app
- * @api public
+ * @param {Object} application
  */
 var route = function(app){
   
   /**
-   * Route to base 'help' page
+   * Route to base 'doc' page.
    *
-   * @handles {Route} /help
+   * @handle {Route#GET} /doc
    */
   app.get('/doc', function(req, res){
     res.render('doc', {

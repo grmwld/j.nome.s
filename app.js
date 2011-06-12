@@ -58,24 +58,18 @@ app.configure('production', function(){
 /**
  * Map routes to app functions
  */
-var doc = require('./controllers/doc')
+var home = require('./controllers/home')
+  , doc = require('./controllers/doc')
+  , api = require('./controllers/api')
   , about = require('./controllers/about')
   , browse = require('./controllers/browse');
-
-app.get('/', function(req, res){
-  res.render('index', {
-    title: 'j.nome.s'
-  });
-});
-
-app.get('/api', function(req, res){
-  res.sendfile('./docs/j.nome.s-doc.html');
-});
 
 app.get('/globalconfig.json', function(req, res){
   res.send(app._locals.config.global.style);
 });
 
+home.route(app);
+api.route(app);
 doc.route(app);
 about.route(app);
 browse.route(app);
