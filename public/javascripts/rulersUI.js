@@ -163,7 +163,7 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, style) {
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, this.height/4, rel_doc_length, this.height/4).attr(style):
+    , d = this.rect(rel_start, this.height/4, rel_doc_length, this.height/4).attr(style);
   d.attr({title:[
     'ID : ' + doc._id,
     'From : ' + nf(doc.start),
