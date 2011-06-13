@@ -122,7 +122,9 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
  * @api private
  */
 var getSeqidMetadata = function(seqid, callback){
-  var reqURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
+  var reqURL = '/'
+    + window.location.href.split('/').slice(3, 5).join('/')
+    + '/' + seqid + ".json";
   $.ajax({
     type: "GET"
   , url: reqURL
