@@ -77,7 +77,7 @@ Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
     , rel_start = (((view_start) / tot_length) * (this.width-100)) + 50
     , rel_end = (((view_end) / tot_length) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-  return this.rect(rel_start, 0, rel_doc_length, this.height).attr(style);
+  return this.rect(rel_start, 0, rel_doc_length, this.height, 5).attr(style);
 }
 
 /**
@@ -116,7 +116,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
         e.offsetX = e.clientX - $(e.target).position().left;
       }
       gs = Math.floor((((e.offsetX-50)/(this.paper.width-100)) * view_span) + view_start);
-      this.selector = this.paper.rect(e.offsetX, 0, 1, this.attr("height")).attr(style); 
+      this.selector = this.paper.rect(e.offsetX, 0, 1, this.attr("height"), 5).attr(style); 
       this.selector.ox = this.selector.attr("x");
     },
     // Mouse up

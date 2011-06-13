@@ -49,14 +49,14 @@ centeron(width)
 // general
 
 body
-  padding: 40px
+  margin: 30px
   centeron(600px)
   font: 16px 'helvetica neue', helvetica, arial, sans-serif
-  prettyfont(dark)
+  color dark
   smooth()
 
 a
-  prettyfont(blue)
+  color blue
   text-decoration: none
   &:hover
     text-decoration: underline
@@ -87,14 +87,13 @@ input[type='text']
   margin: 5px
   padding: 5px
   outline: none
-  prettyfont(dark)
+  color dark
   border-radius: 5px
   border: 1px solid lighter
   bshadow(rgba(0,0,0, 0.1), 0px, 0px, 8px)
   &:hover
     bshadow(rgba(34,34,34, 0.15), 0px, 0px, 8px)
   &:focus
-    color: dark
     border: dark
     bshadow(rgba(0,0,0, 1), 0px, 0px, 5px)
 
