@@ -244,12 +244,14 @@ var drawNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
   $("#ratiozoom").empty();
   $("#zoomnavigation").empty();
+  $("#separator").empty();
   getGlobalStyle(function(style){
     var seqid = $('#seqid').val();
     getSeqidMetadata(seqid, function(seqidMD){
       var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
         , ratiozoom = Raphael("ratiozoom", 1101, 50)
         , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+        , separator = Raphael("separator", 1101, 10)
         , currentSpan;
       overviewNavigation.drawBgRules(10, style.bgrules);
       overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
@@ -260,6 +262,7 @@ var drawNavigationRulers = function(start, end){
       zoomNavigation.drawBgRules(10, style.bgrules);
       zoomNavigation.drawMainRuler(start, end, style.ruler);
       zoomNavigation.explorableArea(start, end, style.selectionspan);
+      separator.drawBgRules(10, style.bgrules);
     });
   });
 }
@@ -273,10 +276,8 @@ var drawNavigationRulers = function(start, end){
  */
 var renderTrack = function(track, start, end){
   var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
-    //, tracklabel = $("<label for="+trackdiv.attr("id")+" class='tracklabel'>"+track.metadata.name+"</label>")
     , trackCanvas;
   $("#tracks").append(trackdiv);
-  //$(trackdiv).append(tracklabel);
   trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
   trackCanvas.text(2, 2, track.metadata.name).attr({'font-size': 12, 'font-weight': "bold", 'text-anchor': "start"});
