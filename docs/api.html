@@ -108,7 +108,29 @@ code .this { color: #19469D; }</style>
 		</script>
 	</head>
 	<body>
-<table id="source"><tbody><tr><td><h1>j.nome.s</h1></td><td></td></tr><tr class="filename"><td><h2 id="./app.js"><a href="#">app</a></h2></td><td>./app.js</td></tr><tr class="code">
+<table id="source"><tbody><tr><td><h1>j.nome.s</h1><h3>What is j.nome.s</h3>
+
+<p>j.nome.s is a fast, simple, lightweight genome browser.
+It is built on top of <a href="http://expressjs.com/">expressjs</a> and <a href="http://nodejs.org/">Node.JS</a>,
+and uses <a href="http://www.mongodb.org/">MongoDB</a> for storing the data.</p>
+
+<h3>Why j.nome.s</h3>
+
+<p>Current genome browsers include <a href="http://www.gbrowse.org/index.html">GBrowse</a>, the <a href="http://genome.ucsc.edu/">UCSC genomebrowser</a>
+or <a href="http://jbrowse.org/">Jbrowse</a>. The main problem with those project, is that they
+heavily rely on <a href="http://www.perl.org/">perl</a> and <a href="http://www.bioperl.org/">BioPerl</a> scripts in order to both crunch data
+and render the output.
+Although <a href="http://www.perl.org/">perl</a> is widely used by bioinformaticians, it is a very inelegant
+language, very often leading to bloatware.
+Representing genomes is not an easy task considering the huge amout of data
+that has to be handled and shown in an intelligible way.</p>
+
+<p>j.nome.s aims to provide a simple genome browser environment, convenient to
+both the user, and the developer.
+It is based on <a href="http://nodejs.org/">Node.JS</a>, which allowed to build a custom non
+IO-blocking server application. The data is stored in a 
+<a href="http://www.mongodb.org/">MongoDB</a> database, providing a scallable and
+efficient way to respectively store and access huge amount of data.</p></td><td></td></tr><tr class="filename"><td><h2 id="./app.js"><a href="#">app</a></h2></td><td>./app.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
@@ -160,12 +182,12 @@ code .this { color: #19469D; }</style>
 });
 
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'development'</span>, <span class="keyword">function</span>(){
+  <span class="variable">require</span>(<span class="string">'express-trace'</span>)(<span class="variable">app</span>);
   <span class="variable">app</span>.<span class="variable">use</span>(<span class="variable">express</span>.<span class="variable">errorHandler</span>({ <span class="variable">dumpExceptions</span>: <span class="variable">true</span>, <span class="variable">showStack</span>: <span class="variable">true</span> })); 
   <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in development mode.'</span>)
 });
 
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'test'</span>, <span class="keyword">function</span>(){
-  <span class="variable">require</span>(<span class="string">'express-trace'</span>)(<span class="variable">app</span>);
   <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in test mode.'</span>)
 });
 
@@ -180,21 +202,19 @@ code .this { color: #19469D; }</style>
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">help</span> = <span class="variable">require</span>(<span class="string">'./controllers/help'</span>)
+<pre><code><span class="keyword">var</span> <span class="variable">home</span> = <span class="variable">require</span>(<span class="string">'./controllers/home'</span>)
+  , <span class="variable">doc</span> = <span class="variable">require</span>(<span class="string">'./controllers/doc'</span>)
+  , <span class="variable">api</span> = <span class="variable">require</span>(<span class="string">'./controllers/api'</span>)
   , <span class="variable">about</span> = <span class="variable">require</span>(<span class="string">'./controllers/about'</span>)
   , <span class="variable">browse</span> = <span class="variable">require</span>(<span class="string">'./controllers/browse'</span>);
-
-<span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
-  <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'index'</span>, {
-    <span class="variable">title</span>: <span class="string">'j.nome.s'</span>
-  });
-});
 
 <span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/globalconfig.json'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
   <span class="variable">res</span>.<span class="variable">send</span>(<span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>.<span class="variable">global</span>.<span class="variable">style</span>);
 });
 
-<span class="variable">help</span>.<span class="variable">route</span>(<span class="variable">app</span>);
+<span class="variable">home</span>.<span class="variable">route</span>(<span class="variable">app</span>);
+<span class="variable">api</span>.<span class="variable">route</span>(<span class="variable">app</span>);
+<span class="variable">doc</span>.<span class="variable">route</span>(<span class="variable">app</span>);
 <span class="variable">about</span>.<span class="variable">route</span>(<span class="variable">app</span>);
 <span class="variable">browse</span>.<span class="variable">route</span>(<span class="variable">app</span>);</code></pre>
 </td>
@@ -248,6 +268,44 @@ the 'about' page.</p>
     <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'about'</span>, {
       <span class="variable">title</span>: <span class="string">'About'</span>
     });
+  });
+
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Expose public functions, classes and methods
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="variable">route</span> = <span class="variable">route</span>;
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="./controllers/api.js"><a href="#">api</a></h2></td><td>./controllers/api.js</td></tr><tr class="code">
+<td class="docs">
+<p>Function used to handle the routing associated to
+the API page.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  application</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">route</span> = <span class="keyword">function</span>(<span class="variable">app</span>){</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Route to base API page</p>
+
+<h2></h2>
+
+<ul><li><p><strong>handle</strong>: <em>Route#GET</em>  /api</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/api'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="variable">res</span>.<span class="variable">sendfile</span>(<span class="string">'./docs/j.nome.s-doc.html'</span>);
   });
 
 }</code></pre>
@@ -419,6 +477,46 @@ Expose public functions, classes and methods
 <pre><code><span class="variable">exports</span>.<span class="variable">route</span> = <span class="variable">route</span>;
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="./controllers/doc.js"><a href="#">doc</a></h2></td><td>./controllers/doc.js</td></tr><tr class="code">
+<td class="docs">
+<p>Function used to handle the routing associated to
+the documentation page.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  application</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">route</span> = <span class="keyword">function</span>(<span class="variable">app</span>){</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Route to base 'doc' page.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>handle</strong>: <em>Route#GET</em>  /doc</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/doc'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'doc'</span>, {
+      <span class="variable">title</span>: <span class="string">'Documentation'</span>
+    });
+  });
+
+}</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Expose public functions, classes and methods
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">exports</span>.<span class="variable">route</span> = <span class="variable">route</span>;
+</code></pre>
+</td>
 </tr><tr class="filename"><td><h2 id="./controllers/errors.js"><a href="#">errors</a></h2></td><td>./controllers/errors.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies
@@ -557,14 +655,14 @@ not callback is necessary.
 <span class="variable">exports</span>.<span class="class">NotFound</span> = <span class="class">NotFound</span>;
 </code></pre>
 </td>
-</tr><tr class="filename"><td><h2 id="./controllers/help.js"><a href="#">help</a></h2></td><td>./controllers/help.js</td></tr><tr class="code">
+</tr><tr class="filename"><td><h2 id="./controllers/home.js"><a href="#">home</a></h2></td><td>./controllers/home.js</td></tr><tr class="code">
 <td class="docs">
 <p>Function used to handle the routing associated to
-the 'about' page.</p>
+the homepage '/'</p>
 
 <h2></h2>
 
-<ul><li><p><strong>param</strong>: <em>Application</em>  express app</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
+<ul><li><p><strong>param</strong>: <em>Object</em>  application</p></li></ul>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">route</span> = <span class="keyword">function</span>(<span class="variable">app</span>){</code></pre>
@@ -572,16 +670,16 @@ the 'about' page.</p>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Route to base 'help' page</p>
+<p>Route to homepage</p>
 
 <h2></h2>
 
-<ul><li><p><strong>handles</strong>: <em>Route</em>  /help</p></li></ul>
+<ul><li><p><strong>handle</strong>: <em>Route#GET</em>  /</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/help'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
-    <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'help'</span>, {
-      <span class="variable">title</span>: <span class="string">'Help'</span>
+<pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
+    <span class="variable">res</span>.<span class="variable">render</span>(<span class="string">'index'</span>, {
+      <span class="variable">title</span>: <span class="string">'j.nome.s'</span>
     });
   });
 

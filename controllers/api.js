@@ -13,7 +13,7 @@ var route = function(app){
    * @handle {Route#GET} /api
    */
   app.get('/api', function(req, res){
-    res.sendfile('./docs/j.nome.s-doc.html');
+    res.sendfile('./docs/api.html');
   });
 
 }
