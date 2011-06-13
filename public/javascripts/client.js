@@ -126,7 +126,6 @@ var getSeqidMetadata = function(seqid, callback){
   $.ajax({
     type: "GET"
   , url: reqURL
-  , data: { seqid: seqid }
   , dataType: "json"
   , success: function(metadata) {
       callback(metadata);
