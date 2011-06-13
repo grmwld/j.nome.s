@@ -273,14 +273,13 @@ var drawNavigationRulers = function(start, end){
  */
 var renderTrack = function(track, start, end){
   var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
-    , trackcanvasdiv = $("<div class='trackcanvas' id=trackcanvas"+ track.metadata.id +"></div>")
-    , tracklabel = $("<label>"+ track.metadata.name +"</label>")
+    //, tracklabel = $("<label for="+trackdiv.attr("id")+" class='tracklabel'>"+track.metadata.name+"</label>")
     , trackCanvas;
   $("#tracks").append(trackdiv);
-  $(trackdiv).append(tracklabel);
-  $(trackdiv).append(trackcanvasdiv);
-  trackCanvas = Raphael("trackcanvas"+track.metadata.id, 1101, 50);
+  //$(trackdiv).append(tracklabel);
+  trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
+  trackCanvas.text(2, 2, track.metadata.name).attr({'font-size': 12, 'font-weight': "bold", 'text-anchor': "start"});
   track.data.forEach(function(doc){
     trackCanvas.drawDocument(doc, start, end, track.metadata.style);
   });
