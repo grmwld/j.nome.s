@@ -22,6 +22,16 @@ IO-blocking server application. The data is stored in a
 [MongoDB][mongodb] database, providing a scallable and
 efficient way to respectively store and access huge amount of data.
 
+### Who
+
+j.nome.is is an ongoing project initiated by Alexis GRIMALDI and Avetis
+KAZARIAN.
+
+### Change log
+
+##### v0.1 : 2011-06-11
+* Navigation via rulers
+
 
 [gbrowse]: http://www.gbrowse.org/index.html
 [ucsc_browser]: http://genome.ucsc.edu/
