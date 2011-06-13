@@ -40,16 +40,19 @@ bshadow(color, hos, vos, blur)
   -moz-box-shadow: color hos vos blur
   -webkit-box-shadow: color hos vos blur
 
+centeron(width)
+  margin-right: auto
+  margin-left: auto
+  width: width
+
 
 // general
 
 body
   padding: 40px
+  centeron(600px)
   font: 16px 'helvetica neue', helvetica, arial, sans-serif
   prettyfont(dark)
-  margin-right: auto
-  margin-left: auto
-  width: 1200px
   smooth()
 
 a
@@ -76,6 +79,7 @@ a
 label
   text-align: left
   padding: 5px 0
+
 
 // forms
 
