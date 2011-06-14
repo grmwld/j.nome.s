@@ -14,22 +14,38 @@ h1 Documentation
 
     Once the prerequisites are installed, in the j.nome.s' root directory, run :
 
-      $ npm install
+    >     $ npm install
 
     This will fetch all module dependencies.
 
-    ### Data loading
 
-    All the data is stored in a [MongoDB][mongodb] instance, with the following schema :
+    ### Data persistence
 
-      + **database** : dataset name
-          + **collections**
-              + **fs.files**/**fs.chunks** : The reference sequence
-              + **myTrack** : Track data with id myTrack
+    All the data is stored in a [MongoDB][mongodb] instance, with a precise schema :
+
+    1. The name of the database is the ID of the corresponding dataset.
+    2. Inside the database, the reference genome sequence is stored in a GridFS, resulting in the `fs.files` and `fs.chunks` collections.
+    3. The data of your tracks must be contained in a collection in JFF format (a JSON equivalent of the [GFF][gff] format).
+
+    The JFF format follows the [GFF specifications][gff] with the only required field being `_id`, which must be a unique integer in the collection.
+
+    >     {
+    >         "end" : 960,
+    >         "score" : null,
+    >         "start" : 910,
+    >         "source" : "assembly",
+    >         "seqid" : "scaffold_1",
+    >         "phase" : null,
+    >         "_id" : 0,
+    >         "type" : "gap",
+    >         "strand" : null
+    >     }
+
 
     #### Reference genome loading
 
     To load a new reference genome …
+
 
     #### Data loading
 
@@ -39,9 +55,10 @@ h1 Documentation
     Then use the [mongoimport][mongoimport] command to load it in the dataset of your choice.
     Typically, it would be something like :
       
-      mongoimport -d myDataset -c myTrack --file myTrackData.json
+    >     $ mongoimport -d myDataset -c myTrack --file myTrackData.json
 
     Check the [MongoDB documentation][mongodoc] for more details.
+
 
     ### Configuration
 
@@ -51,6 +68,34 @@ h1 Documentation
     can then add as many configuration files as you need, one per dataset.
 
     The **global.json** config file provides the following information :
+
+    >     {
+    >         "datasets": {
+    >             "Xentr42": {
+    >                 "file": "Xentr42.json"
+    >               , "name": "Xentr42"
+    >               , "description": "Xenopus tropicalis genome v4"
+    >             }
+    >         }
+    >       , "style": {
+    >             "bgrules": {
+    >                 "stroke": "#eee"
+    >             }
+    >           , "ruler": {
+    >                 "stroke": "#000"
+    >             }
+    >           , "selectedspan": {
+    >                 "fill": "#00ABFA"
+    >               , "fill-opacity": 0.2
+    >               , "stroke-width": 2
+    >             }
+    >           , "selectionspan": {
+    >                 "fill": "#00ABFA"
+    >               , "fill-opacity": 0.3
+    >               , "stroke-width": 2
+    >             }
+    >         }
+    >     }
 
       + **datasets** : Each entry contains metadata of a dataset. The key must be the id of the dataset, that is the same name that the mongodb database.
           + **file** : The name of the configuration file associated to the dataset. The scope is config/
@@ -63,6 +108,30 @@ h1 Documentation
               + **selectionspan** : The rectangle showing the region being selected via mouse dragging.
 
     Your dataset configuration files have the following layout :
+
+    >     {
+    >         "dbname": "Xentr42"
+    >       , "tracks": {
+    >             "gaps": {
+    >                 "id": "gaps"
+    >               , "name": "gaps"
+    >               , "description": "Assembly gaps"
+    >               , "style": {
+    >                     "fill": "purple"
+    >                   , "stroke": "purple"
+    >                 }
+    >             }
+    >           , "ucsc_refgene": {
+    >                 "id": "ucsc_refgene"
+    >               , "name": "ucsc_genes"
+    >               , "description": "Reference genes from UCSC"
+    >               , "style": {
+    >                     "fill": "green"
+    >                   , "stroke": "green"
+    >                 }
+    >             }
+    >         }
+    >     }
 
       + **dbname** : The name of the mongo database associated to this dataset.
       + **tracks** : One entry per track. The key must be the name of the corresponding mongodb collection.
