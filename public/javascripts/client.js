@@ -1,3 +1,10 @@
+/**
+ * Client side javascript
+ *
+ * Renders all client-side data when page is ready.
+ */
+
+
 $(document).ready(function() {
 
   /**
@@ -15,23 +22,30 @@ $(document).ready(function() {
 
   /**
    * Render tracks if parameters of the form are valid.
+   *
+   * The text-field inputs for positions are also sanitized for
+   * negative or too big values.
    */
   validateForm(function(){
     var start = parseNum($('#start').val())
       , end = parseNum($('#end').val());
-    fetchTracksData(start, end);
-    drawNavigationRulers(start, end);
+    sanitizeInputPos(start, end, function(start, end){
+      fetchTracksData(start, end);
+      drawNavigationRulers(start, end);
+    });
   });
   
   /**
-   * Handle browsing from main form via ajax post.
+   * Handle browsing from main form.
    */
   $("#submit").click(function() {
     validateForm(function(){
       var start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
-      fetchTracksData(start, end);
-      drawNavigationRulers(start, end);
+      sanitizeInputPos(start, end, function(start, end){
+        fetchTracksData(start, end);
+        drawNavigationRulers(start, end);
+      });
     });
     return false;
   });
@@ -55,17 +69,17 @@ var fetchTracksData = function(start, end){
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
-    , baseURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   $("#tracks").empty();
   trackselector.each(function(i){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
-    requestTrackData(baseURL, seqid, start, end, trackID, function(data){
-      renderTrack(data, start, end);
+    requestTrackData(reqURL, seqid, start, end, trackID, function(track){
+      renderTrack(track, start, end);
     });
   });
   window.history.pushState({}, '',
-    [baseURL, seqid, start, end, tracksIDs.join('&')].join('/')
+    [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
   $("#start").val(nf(start));
   $("#end").val(nf(end));
@@ -75,17 +89,18 @@ var fetchTracksData = function(start, end){
  * Request data of a given track between 2 positions of a seqid.
  * The callback is triggered with the collected data
  *
- * @param {String} baseURL
+ * @param {String} reqURL
  * @param {string} seqid
  * @param {Number} start
  * @param {Number} end
  * @param {String} trackID
  * @param {Function} callback
+ * @api private
  */
-var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
+var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
   $.ajax({
     type: "POST"
-  , url: postURL
+  , url: reqURL
   , data: {
       seqid: seqid
     , start: start
@@ -100,18 +115,79 @@ var requestTrackData = function(postURL, seqid, start, end, trackID, callback){
 }
 
 /**
+ * Get the metadata associated to the current seqid
+ *
+ * @param {String} seqid
+ * @param {Function} callback
+ * @api private
+ */
+var getSeqidMetadata = function(seqid, callback){
+  var reqURL = '/'
+    + window.location.href.split('/').slice(3, 5).join('/')
+    + '/' + seqid + ".json";
+  $.ajax({
+    type: "GET"
+  , url: reqURL
+  , dataType: "json"
+  , success: function(metadata) {
+      callback(metadata);
+    }
+  });
+}
+
+/**
+ * Get the global style
+ *
+ * @param {Function} callback
+ */
+var getGlobalStyle = function(callback){
+  var reqURL = '/globalconfig.json';
+  $.ajax({
+    type: "GET"
+  , url: reqURL
+  //, data: { seqid: seqid }
+  , dataType: "json"
+  , success: function(style) {
+      callback(style);
+    }
+  });
+}
+
+/**
  * Validates the values in the form.
  * If the form is valid, the callback is triggered.
  *
  * @param {Function} callback
  */
 var validateForm = function(callback){
-  var okSeqid = $("#seqid").val() != 'seqid'
-    , okStart = !isNaN(parseNum($("#start").val()))
-    , okEnd = !isNaN(parseNum($("#end").val()))
+  var seqid = $("#seqid").val()
+    , start = parseNum($("#start").val())
+    , end = parseNum($("#end").val())
+    , okSeqid = seqid != 'seqid'
+    , okStart = !isNaN(start)
+    , okEnd = !isNaN(end);
   if (okSeqid && okStart && okEnd){
     callback();
   }
+}
+
+/**
+ * Reset positions to 0 or seqid.length if it exceeds those limits.
+ * The call back is triggered with the new start and end positions.
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Function} callback
+ */
+var sanitizeInputPos = function(start, end, callback){
+  var nf = new PHP_JS().number_format;
+  getSeqidMetadata($("#seqid").val(), function(seqidMD){
+    start = Math.max(0, start)
+    end = Math.min(seqidMD.length, end);
+    $("#start").val(nf(start));
+    $("#end").val(nf(end));
+    callback(start, end);
+  });
 }
 
 /**
@@ -159,7 +235,7 @@ var parseNum = function(str_num){
 // *********   Tracks and rulers navigation   ************
 
 /**
- * Draw the output
+ * Draw the navigation rulers between 2 positions
  *
  * @param {Number} start
  * @param {Number} end
@@ -168,38 +244,26 @@ var drawNavigationRulers = function(start, end){
   $("#overviewnavigation").empty();
   $("#ratiozoom").empty();
   $("#zoomnavigation").empty();
-  drawMainNavigation(start, end);
-}
-
-/**
- * Draw main navigation ruler
- *
- * @param {Number} start
- * @param {Number} end
- */
-var drawMainNavigation = function(start, end){
-  var seqid = $('#seqid').val()
-    , postURL = '/'+ window.location.href.split('/').slice(3, 6).join('/') + ".json";
-  $.ajax({
-    type: "POST"
-  , url: postURL
-  , data: { seqid: seqid }
-  , dataType: "json"
-  , success: function(seqidMD) {
+  $("#separator").empty();
+  getGlobalStyle(function(style){
+    var seqid = $('#seqid').val();
+    getSeqidMetadata(seqid, function(seqidMD){
       var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
         , ratiozoom = Raphael("ratiozoom", 1101, 50)
         , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
+        , separator = Raphael("separator", 1101, 10)
         , currentSpan;
-      overviewNavigation.drawBgRules(10, { stroke: "#eee" });
-      overviewNavigation.drawMainRuler(0, seqidMD.length, { stroke: "#000" });
-      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-      overviewNavigation.explorableArea(0, seqidMD.length, { fill: "#00ABFA", 'fill-opacity': 0.3 });
-      ratiozoom.drawBgRules(10, { stroke: "#eee" });
+      overviewNavigation.drawBgRules(10, style.bgrules);
+      overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
+      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
+      overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
+      ratiozoom.drawBgRules(10, style.bgrules);
       ratiozoom.drawRatio(currentSpan);
-      zoomNavigation.drawBgRules(10, { stroke: "#eee" });
-      zoomNavigation.drawMainRuler(start, end, { stroke: "#000" });
-      zoomNavigation.explorableArea(start, end, { fill: "#00ABFA", 'fill-opacity': 0.2 });
-    }
+      zoomNavigation.drawBgRules(10, style.bgrules);
+      zoomNavigation.drawMainRuler(start, end, style.ruler);
+      zoomNavigation.explorableArea(start, end, style.selectionspan);
+      separator.drawBgRules(10, style.bgrules);
+    });
   });
 }
 
@@ -211,13 +275,14 @@ var drawMainNavigation = function(start, end){
  * @param {Number} end
  */
 var renderTrack = function(track, start, end){
-  var trackdiv = $("<div class='track' id=track" + track.name + "></div>")
+  var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
     , trackCanvas;
   $("#tracks").append(trackdiv);
-  trackCanvas = Raphael("track"+track.name, 1101, 50);
+  trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  track.docs.forEach(function(doc){
-    trackCanvas.drawDocument(doc, start, end, {fill: "#000"});
+  trackCanvas.text(2, 2, track.metadata.name).attr({'font-size': 12, 'font-weight': "bold", 'text-anchor': "start"});
+  track.data.forEach(function(doc){
+    trackCanvas.drawDocument(doc, start, end, track.metadata.style);
   });
 }
 
@@ -225,7 +290,7 @@ var renderTrack = function(track, start, end){
 /**
  * Function to handle a selected dataset in a dropdown menu
  *
- * @param {Object} dropdown menu
+ * @param {Object} dropdown
  * @return {Boolean}
  */
 var OnSelect = function(dropdown){

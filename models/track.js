@@ -3,7 +3,6 @@
  */
 var util = require('util')
   , mongoose = require('mongoose')
-  , async = require('async')
   , utils = require('../lib/utils');
 
 
@@ -32,9 +31,9 @@ var TrackSchema = new mongoose.Schema({
  * @param {String} collection
  * @api public
  */
-var Track = function(name, track){
-  this.model =  mongoose.model(name, TrackSchema, track);
-  this.name = name;
+var Track = function(metadata){
+  this.metadata = metadata;
+  this.model =  mongoose.model(metadata.name, TrackSchema,metadata.id);
 }
 
 /**
@@ -54,8 +53,8 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
   , end: {$gt: start}
   }, function(err, docs){
     callback(err, {
-      name: self.name
-    , docs: docs
+      metadata: self.metadata
+    , data: docs
     });
   });
 }

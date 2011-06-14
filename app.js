@@ -41,13 +41,16 @@ app.configure(function(){
 });
 
 app.configure('development', function(){
-  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
   require('express-trace')(app);
+  app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
   console.log('Application started in development mode.')
 });
 
+app.configure('test', function(){
+  console.log('Application started in test mode.')
+});
+
 app.configure('production', function(){
-  app.use(express.errorHandler()); 
   console.log('Application started in production mode.');
 });
 
@@ -55,19 +58,29 @@ app.configure('production', function(){
 /**
  * Map routes to app functions
  */
-var help = require('./controllers/help')
+var home = require('./controllers/home')
+  , doc = require('./controllers/doc')
+  , api = require('./controllers/api')
   , about = require('./controllers/about')
   , browse = require('./controllers/browse');
 
-app.get('/', function(req, res){
-  res.render('index', {
-    title: 'j.nome.s'
-  });
+app.get('/globalconfig.json', function(req, res){
+  res.send(app._locals.config.global.style);
 });
 
-help.route(app);
+home.route(app);
+api.route(app);
+doc.route(app);
 about.route(app);
 browse.route(app);
+
+
+/**
+ * Error handling
+ */
+var errors = require('./controllers/errors');
+
+errors.route(app);
 
 
 /**
