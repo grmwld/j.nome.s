@@ -44,7 +44,22 @@ h1 Documentation
 
     #### Reference genome loading
 
-    To load a new reference genome …
+    To load a new reference genome, use the `loadFastaRef.py` script provided in the bin/ folder.
+
+    >     ./loadFastaRef.py -h
+    >     usage: loadFastaRef.py [-h] [-i [FILE]] [-d DATABASE] [-D]
+    >
+    >     Load in MongoDB a FASTA file containing a reference genome.
+    >
+    >     optional arguments:
+    >       -h, --help            show this help message and exit
+    >       -i [FILE], --infile [FILE]
+    >                             Input file.
+    >       -d DATABASE, --database DATABASE
+    >                             MongoDB database where the data is stored.
+    >       -D, --debug           Debug mode.
+
+    Just specify the name of the mongo database to use for the new dataset and the FASTA file containing the reference genome, and you are good to go.
 
 
     #### Data loading
