@@ -1,1 +1,165 @@
 h1 Documentation
+  :markdown
+    ## Installation.
+
+    ### Pre-requisite
+
+    Before installation, please ensure that you installed [Node.JS][nodejs] and [MongoDB][mongodb].
+    Check their web pages for more information.
+
+    In order to get the node module dependencies required to run j.nome.s, you will also
+    need [NPM][npm], the node package manager.
+    
+    Please follow the instructions provided on the [NPM website][npm] to install npm alongside node.
+
+    Once the prerequisites are installed, in the j.nome.s' root directory, run :
+
+    >     $ npm install
+
+    This will fetch all module dependencies.
+
+
+    ### Data persistence
+
+    All the data is stored in a [MongoDB][mongodb] instance, with a precise schema :
+
+    1. The name of the database is the ID of the corresponding dataset.
+    2. Inside the database, the reference genome sequence is stored in a GridFS, resulting in the `fs.files` and `fs.chunks` collections.
+    3. The data of your tracks must be contained in a collection in JFF format (a JSON equivalent of the [GFF][gff] format).
+
+    The JFF format follows the [GFF specifications][gff] with the only required field being `_id`, which must be a unique integer in the collection.
+
+    >     {
+    >         "end" : 960,
+    >         "score" : null,
+    >         "start" : 910,
+    >         "source" : "assembly",
+    >         "seqid" : "scaffold_1",
+    >         "phase" : null,
+    >         "_id" : 0,
+    >         "type" : "gap",
+    >         "strand" : null
+    >     }
+
+
+    #### Reference genome loading
+
+    To load a new reference genome, use the `loadFastaRef.py` script provided in the bin/ folder.
+
+    >     ./loadFastaRef.py -h
+    >     usage: loadFastaRef.py [-h] [-i [FILE]] [-d DATABASE] [-D]
+    >
+    >     Load in MongoDB a FASTA file containing a reference genome.
+    >
+    >     optional arguments:
+    >       -h, --help            show this help message and exit
+    >       -i [FILE], --infile [FILE]
+    >                             Input file.
+    >       -d DATABASE, --database DATABASE
+    >                             MongoDB database where the data is stored.
+    >       -D, --debug           Debug mode.
+
+    Just specify the name of the mongo database to use for the new dataset and the FASTA file containing the reference genome, and you are good to go.
+
+
+    #### Data loading
+
+    ##### Non-quantitative data
+
+    To load non-quantitative data (such as a gene annotation), your raw data must be in JFF format, which is a JSON equivalent of the [GFF][gff] format.
+    Then use the [mongoimport][mongoimport] command to load it in the dataset of your choice.
+    Typically, it would be something like :
+      
+    >     $ mongoimport -d myDataset -c myTrack --file myTrackData.json
+
+    Check the [MongoDB documentation][mongodoc] for more details.
+
+
+    ### Configuration
+
+    Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
+    These configuration files can be found in j.nome.s/config
+
+    The only required file is **global.json** which contains general settings. You
+    can then add as many configuration files as you need, one per dataset.
+
+    The **global.json** config file provides the following information :
+
+    >     {
+    >         "datasets": {
+    >             "Xentr42": {
+    >                 "file": "Xentr42.json"
+    >               , "name": "Xentr42"
+    >               , "description": "Xenopus tropicalis genome v4"
+    >             }
+    >         }
+    >       , "style": {
+    >             "bgrules": {
+    >                 "stroke": "#eee"
+    >             }
+    >           , "ruler": {
+    >                 "stroke": "#000"
+    >             }
+    >           , "selectedspan": {
+    >                 "fill": "#00ABFA"
+    >               , "fill-opacity": 0.2
+    >               , "stroke-width": 2
+    >             }
+    >           , "selectionspan": {
+    >                 "fill": "#00ABFA"
+    >               , "fill-opacity": 0.3
+    >               , "stroke-width": 2
+    >             }
+    >         }
+    >     }
+
+      + **datasets** : Each entry contains metadata of a dataset. The key must be the name of the corresponding mongo database.
+          + **file** : The name of the configuration file associated to the dataset. The scope is config/
+          + **name** : the name of the dataset, which can be used for display.
+          + **description** : A short description of the dataset.
+          + **style** : Each entry maps a style name to raphael style-attributes. This is where you can customize the look of j.nome.s
+              + **bgrules** : The rules used for the background.
+              + **ruler** : The ruler with precise graduations.
+              + **selectedspan** : The rectangle showing the currently selected region.
+              + **selectionspan** : The rectangle showing the region being selected via mouse dragging.
+
+    Your dataset configuration files have the following layout :
+
+    >     {
+    >         "dbname": "Xentr42"
+    >       , "tracks": {
+    >             "gaps": {
+    >                 "id": "gaps"
+    >               , "name": "gaps"
+    >               , "description": "Assembly gaps"
+    >               , "style": {
+    >                     "fill": "purple"
+    >                   , "stroke": "purple"
+    >                 }
+    >             }
+    >           , "ucsc_refgene": {
+    >                 "id": "ucsc_refgene"
+    >               , "name": "ucsc_genes"
+    >               , "description": "Reference genes from UCSC"
+    >               , "style": {
+    >                     "fill": "green"
+    >                   , "stroke": "green"
+    >                 }
+    >             }
+    >         }
+    >     }
+
+      + **dbname** : The name of the mongo database associated to this dataset.
+      + **tracks** : One entry per track. The key must be the name of the corresponding mongodb collection.
+          + **id** : The name of the collection.
+          + **name** : The name of the track, which can be used for display.
+          + **description** : A description of the data contained in the track.
+          + **style** : Define the style of each elements of the track.
+
+
+    [nodejs]: http://nodejs.org/
+    [mongodb]: http://www.mongodb.org/
+    [mongodoc]: http://www.mongodb.org/display/DOCS/Home
+    [mongoimport]: http://www.mongodb.org/display/DOCS/Import+Export+Tools
+    [npm]: http://npmjs.org/
+    [gff]: http://www.sanger.ac.uk/resources/software/gff/spec.html
