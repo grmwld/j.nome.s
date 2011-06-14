@@ -130,7 +130,22 @@ both the user, and the developer.
 It is based on <a href="http://nodejs.org/">Node.JS</a>, which allowed to build a custom non
 IO-blocking server application. The data is stored in a 
 <a href="http://www.mongodb.org/">MongoDB</a> database, providing a scallable and
-efficient way to respectively store and access huge amount of data.</p></td><td></td></tr><tr class="filename"><td><h2 id="./app.js"><a href="#">app</a></h2></td><td>./app.js</td></tr><tr class="code">
+efficient way to respectively store and access huge amount of data.</p>
+
+<h3>Who</h3>
+
+<p>j.nome.is is an ongoing project initiated by Alexis GRIMALDI and Avetis
+KAZARIAN.</p>
+
+<h3>Change log</h3>
+
+<h4>v0.2.0 : 2011-06-14</h4>
+
+<ul><li>Fixed selection going beyond boundaries</li><li>Fixed non-existing SEQID</li><li>Fixed SEQID position overflow</li><li>Use ID instead of name in track rendering</li><li>Display the track name in the SVG canvas</li><li>Use configuration files for styles</li><li>Handle 500 and 404 errors</li><li>Link to generated API documentation</li><li>Wrote 'about' section</li><li>Wrote 'documentation' section</li><li>Wrote package.json to keep track of dependencies</li></ul>
+
+<h4>v0.1 : 2011-06-11</h4>
+
+<ul><li>Navigation via rulers</li></ul></td><td></td></tr><tr class="filename"><td><h2 id="./app.js"><a href="#">app</a></h2></td><td>./app.js</td></tr><tr class="code">
 <td class="docs">
 <p>Module dependencies.
  </p>
@@ -305,7 +320,7 @@ the API page.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/api'</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
-    <span class="variable">res</span>.<span class="variable">sendfile</span>(<span class="string">'./docs/j.nome.s-doc.html'</span>);
+    <span class="variable">res</span>.<span class="variable">sendfile</span>(<span class="string">'./docs/api.html'</span>);
   });
 
 }</code></pre>
@@ -1288,11 +1303,12 @@ The callback is triggered with the collected data</p>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">getSeqidMetadata</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">callback</span>){
-  <span class="keyword">var</span> <span class="variable">reqURL</span> = <span class="string">'/'</span>+ <span class="variable">window</span>.<span class="variable">location</span>.<span class="variable">href</span>.<span class="variable">split</span>(<span class="string">'/'</span>).<span class="variable">slice</span>(<span class="number integer">3</span>, <span class="number integer">6</span>).<span class="variable">join</span>(<span class="string">'/'</span>) + &<span class="variable">quot</span>;.<span class="variable">json</span>&<span class="variable">quot</span>;;
+  <span class="keyword">var</span> <span class="variable">reqURL</span> = <span class="string">'/'</span>
+    + <span class="variable">window</span>.<span class="variable">location</span>.<span class="variable">href</span>.<span class="variable">split</span>(<span class="string">'/'</span>).<span class="variable">slice</span>(<span class="number integer">3</span>, <span class="number integer">5</span>).<span class="variable">join</span>(<span class="string">'/'</span>)
+    + <span class="string">'/'</span> + <span class="variable">seqid</span> + &<span class="variable">quot</span>;.<span class="variable">json</span>&<span class="variable">quot</span>;;
   $.<span class="variable">ajax</span>({
     <span class="variable">type</span>: &<span class="variable">quot</span>;<span class="class">GET</span>&<span class="variable">quot</span>;
   , <span class="variable">url</span>: <span class="variable">reqURL</span>
-  , <span class="variable">data</span>: { <span class="variable">seqid</span>: <span class="variable">seqid</span> }
   , <span class="variable">dataType</span>: &<span class="variable">quot</span>;<span class="variable">json</span>&<span class="variable">quot</span>;
   , <span class="variable">success</span>: <span class="keyword">function</span>(<span class="variable">metadata</span>) {
       <span class="variable">callback</span>(<span class="variable">metadata</span>);
@@ -1440,12 +1456,14 @@ Returns NaN if the formated number cannot be parsed.</p>
   $(&<span class="variable">quot</span>;#<span class="variable">overviewnavigation</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
   $(&<span class="variable">quot</span>;#<span class="variable">ratiozoom</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
   $(&<span class="variable">quot</span>;#<span class="variable">zoomnavigation</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
+  $(&<span class="variable">quot</span>;#<span class="variable">separator</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
   <span class="variable">getGlobalStyle</span>(<span class="keyword">function</span>(<span class="variable">style</span>){
     <span class="keyword">var</span> <span class="variable">seqid</span> = $(<span class="string">'#seqid'</span>).<span class="variable">val</span>();
     <span class="variable">getSeqidMetadata</span>(<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">seqidMD</span>){
       <span class="keyword">var</span> <span class="variable">overviewNavigation</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">overviewnavigation</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">50</span>)
         , <span class="variable">ratiozoom</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">ratiozoom</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">50</span>)
         , <span class="variable">zoomNavigation</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">zoomnavigation</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">50</span>)
+        , <span class="variable">separator</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">separator</span>&<span class="variable">quot</span>;, <span class="number integer">1101</span>, <span class="number integer">10</span>)
         , <span class="variable">currentSpan</span>;
       <span class="variable">overviewNavigation</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, <span class="variable">style</span>.<span class="variable">bgrules</span>);
       <span class="variable">overviewNavigation</span>.<span class="variable">drawMainRuler</span>(<span class="number integer">0</span>, <span class="variable">seqidMD</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">ruler</span>);
@@ -1456,6 +1474,7 @@ Returns NaN if the formated number cannot be parsed.</p>
       <span class="variable">zoomNavigation</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, <span class="variable">style</span>.<span class="variable">bgrules</span>);
       <span class="variable">zoomNavigation</span>.<span class="variable">drawMainRuler</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">style</span>.<span class="variable">ruler</span>);
       <span class="variable">zoomNavigation</span>.<span class="variable">explorableArea</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">style</span>.<span class="variable">selectionspan</span>);
+      <span class="variable">separator</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, <span class="variable">style</span>.<span class="variable">bgrules</span>);
     });
   });
 }</code></pre>
@@ -1472,14 +1491,11 @@ Returns NaN if the formated number cannot be parsed.</p>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">renderTrack</span> = <span class="keyword">function</span>(<span class="variable">track</span>, <span class="variable">start</span>, <span class="variable">end</span>){
   <span class="keyword">var</span> <span class="variable">trackdiv</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="variable">div</span> <span class="keyword">class</span>=<span class="string">'track'</span> <span class="variable">id</span>=<span class="variable">track</span>&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +&<span class="variable">quot</span>;&<span class="variable">gt</span>;&<span class="variable">lt</span>;/<span class="variable">div</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
-    , <span class="variable">trackcanvasdiv</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="variable">div</span> <span class="keyword">class</span>=<span class="string">'trackcanvas'</span> <span class="variable">id</span>=<span class="variable">trackcanvas</span>&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +&<span class="variable">quot</span>;&<span class="variable">gt</span>;&<span class="variable">lt</span>;/<span class="variable">div</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
-    , <span class="variable">tracklabel</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="keyword">label</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">name</span> +&<span class="variable">quot</span>;&<span class="variable">lt</span>;/<span class="keyword">label</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
     , <span class="variable">trackCanvas</span>;
   $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">append</span>(<span class="variable">trackdiv</span>);
-  $(<span class="variable">trackdiv</span>).<span class="variable">append</span>(<span class="variable">tracklabel</span>);
-  $(<span class="variable">trackdiv</span>).<span class="variable">append</span>(<span class="variable">trackcanvasdiv</span>);
-  <span class="variable">trackCanvas</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">trackcanvas</span>&<span class="variable">quot</span>;+<span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="number integer">1101</span>, <span class="number integer">50</span>);
+  <span class="variable">trackCanvas</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="number integer">1101</span>, <span class="number integer">50</span>);
   <span class="variable">trackCanvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
+  <span class="variable">trackCanvas</span>.<span class="variable">text</span>(<span class="number integer">2</span>, <span class="number integer">2</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({<span class="string">'font-size'</span>: <span class="number integer">12</span>, <span class="string">'font-weight'</span>: &<span class="variable">quot</span>;<span class="variable">bold</span>&<span class="variable">quot</span>;, <span class="string">'text-anchor'</span>: &<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;});
   <span class="variable">track</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
     <span class="variable">trackCanvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">style</span>);
   });
@@ -1598,7 +1614,7 @@ Returns NaN if the formated number cannot be parsed.</p>
     , <span class="variable">rel_start</span> = (((<span class="variable">view_start</span>) / <span class="variable">tot_length</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_end</span> = (((<span class="variable">view_end</span>) / <span class="variable">tot_length</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>
-  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">0</span>, <span class="variable">rel_doc_length</span>, <span class="this">this</span>.<span class="variable">height</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">0</span>, <span class="variable">rel_doc_length</span>, <span class="this">this</span>.<span class="variable">height</span>, <span class="number integer">5</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
 }</code></pre>
 </td>
 </tr>
@@ -1640,7 +1656,7 @@ Returns NaN if the formated number cannot be parsed.</p>
         <span class="variable">e</span>.<span class="variable">offsetX</span> = <span class="variable">e</span>.<span class="variable">clientX</span> - $(<span class="variable">e</span>.<span class="variable">target</span>).<span class="variable">position</span>().<span class="variable">left</span>;
       }
       <span class="variable">gs</span> = <span class="class">Math</span>.<span class="variable">floor</span>((((<span class="variable">e</span>.<span class="variable">offsetX</span>-<span class="number integer">50</span>)/(<span class="this">this</span>.<span class="variable">paper</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) * <span class="variable">view_span</span>) + <span class="variable">view_start</span>);
-      <span class="this">this</span>.<span class="variable">selector</span> = <span class="this">this</span>.<span class="variable">paper</span>.<span class="variable">rect</span>(<span class="variable">e</span>.<span class="variable">offsetX</span>, <span class="number integer">0</span>, <span class="number integer">1</span>, <span class="this">this</span>.<span class="variable">attr</span>(&<span class="variable">quot</span>;<span class="variable">height</span>&<span class="variable">quot</span>;)).<span class="variable">attr</span>(<span class="variable">style</span>); 
+      <span class="this">this</span>.<span class="variable">selector</span> = <span class="this">this</span>.<span class="variable">paper</span>.<span class="variable">rect</span>(<span class="variable">e</span>.<span class="variable">offsetX</span>, <span class="number integer">0</span>, <span class="number integer">1</span>, <span class="this">this</span>.<span class="variable">attr</span>(&<span class="variable">quot</span>;<span class="variable">height</span>&<span class="variable">quot</span>;), <span class="number integer">5</span>).<span class="variable">attr</span>(<span class="variable">style</span>); 
       <span class="this">this</span>.<span class="variable">selector</span>.<span class="variable">ox</span> = <span class="this">this</span>.<span class="variable">selector</span>.<span class="variable">attr</span>(&<span class="variable">quot</span>;<span class="variable">x</span>&<span class="variable">quot</span>;);
     },
     <span class="comment">// Mouse up</span>
@@ -1689,7 +1705,7 @@ Returns NaN if the formated number cannot be parsed.</p>
     , <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>
-    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="this">this</span>.<span class="regexp">/4, rel_doc_length, this.height/</span><span class="number integer">4</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="this">this</span>.<span class="variable">height</span>*<span class="regexp">/5, rel_doc_length, this.height/</span><span class="number integer">5</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
   <span class="variable">d</span>.<span class="variable">attr</span>({<span class="variable">title</span>:[
     <span class="string">'ID : '</span> + <span class="variable">doc</span>.<span class="variable">_id</span>,
     <span class="string">'From : '</span> + <span class="variable">nf</span>(<span class="variable">doc</span>.<span class="variable">start</span>),

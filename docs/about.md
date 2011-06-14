@@ -28,8 +28,21 @@ j.nome.is is an ongoing project initiated by Alexis GRIMALDI and Avetis
 KAZARIAN.
 
 ### Change log
+  
+#### v0.2.0 : 2011-06-14
+* Fixed selection going beyond boundaries
+* Fixed non-existing SEQID
+* Fixed SEQID position overflow
+* Use ID instead of name in track rendering
+* Display the track name in the SVG canvas
+* Use configuration files for styles
+* Handle 500 and 404 errors
+* Link to generated API documentation
+* Wrote 'about' section
+* Wrote 'documentation' section
+* Wrote package.json to keep track of dependencies
 
-##### v0.1 : 2011-06-11
+#### v0.1 : 2011-06-11
 * Navigation via rulers
 
 
