@@ -79,6 +79,7 @@ h1 Documentation
 
     Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
     These configuration files can be found in j.nome.s/config
+
     The only required file is **global.json** which contains general settings. You
     can then add as many configuration files as you need, one per dataset.
 
@@ -112,12 +113,12 @@ h1 Documentation
     >         }
     >     }
 
-      + **datasets** : Each entry contains metadata of a dataset. The key must be the id of the dataset, that is the same name that the mongodb database.
+      + **datasets** : Each entry contains metadata of a dataset. The key must be the name of the corresponding mongo database.
           + **file** : The name of the configuration file associated to the dataset. The scope is config/
-          + **name** : the name of the dataset that can be used for display.
+          + **name** : the name of the dataset, which can be used for display.
           + **description** : A short description of the dataset.
           + **style** : Each entry maps a style name to raphael style-attributes. This is where you can customize the look of j.nome.s
-              + **bgrules** : The faint rules that are used for the background.
+              + **bgrules** : The rules used for the background.
               + **ruler** : The ruler with precise graduations.
               + **selectedspan** : The rectangle showing the currently selected region.
               + **selectionspan** : The rectangle showing the region being selected via mouse dragging.
