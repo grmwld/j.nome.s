@@ -1,1 +1,80 @@
 h1 Documentation
+  :markdown
+    ## Installation.
+
+    ### Pre-requisite
+
+    Before installation, please ensure that you installed [Node.JS][nodejs] and [MongoDB][mongodb].
+    Check their web pages for more information.
+
+    In order to get the node module dependencies required to run j.nome.s, you will also
+    need [NPM][npm], the node package manager.
+
+    For a quick way to install [NPM][npm] along side your node installation, check these instructions.
+
+    Once the prerequisites are installed, in the j.nome.s' root directory, run :
+
+      $ npm install
+
+    This will fetch all module dependencies.
+
+    ### Data loading
+
+    All the data is stored in a [MongoDB][mongodb] instance, with the following schema :
+
+      + **database** : dataset name
+          + **collections**
+              + **fs.files**/**fs.chunks** : The reference sequence
+              + **myTrack** : Track data with id myTrack
+
+    #### Reference genome loading
+
+    To load a new reference genome …
+
+    #### Data loading
+
+    ##### Non-quantitative data
+
+    To load non-quantitative data (such as a gene annotation), your raw data must be in JFF format, which is a JSON equivalent of the [GFF][gff] format.
+    Then use the [mongoimport][mongoimport] command to load it in the dataset of your choice.
+    Typically, it would be something like :
+      
+      mongoimport -d myDataset -c myTrack --file myTrackData.json
+
+    Check the [MongoDB documentation][mongodoc] for more details.
+
+    ### Configuration
+
+    Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
+    These configuration files can be found in j.nome.s/config
+    The only required file is **global.json** which contains general settings. You
+    can then add as many configuration files as you need, one per dataset.
+
+    The **global.json** config file provides the following information :
+
+      + **datasets** : Each entry contains metadata of a dataset. The key must be the id of the dataset, that is the same name that the mongodb database.
+          + **file** : The name of the configuration file associated to the dataset. The scope is config/
+          + **name** : the name of the dataset that can be used for display.
+          + **description** : A short description of the dataset.
+          + **style** : Each entry maps a style name to raphael style-attributes. This is where you can customize the look of j.nome.s
+              + **bgrules** : The faint rules that are used for the background.
+              + **ruler** : The ruler with precise graduations.
+              + **selectedspan** : The rectangle showing the currently selected region.
+              + **selectionspan** : The rectangle showing the region being selected via mouse dragging.
+
+    Your dataset configuration files have the following layout :
+
+      + **dbname** : The name of the mongo database associated to this dataset.
+      + **tracks** : One entry per track. The key must be the name of the corresponding mongodb collection.
+          + **id** : The name of the collection.
+          + **name** : The name of the track, which can be used for display.
+          + **description** : A description of the data contained in the track.
+          + **style** : Define the style of each elements of the track.
+
+
+    [nodejs]: http://nodejs.org/
+    [mongodb]: http://www.mongodb.org/
+    [mongodoc]: http://www.mongodb.org/display/DOCS/Home
+    [mongoimport]: http://www.mongodb.org/display/DOCS/Import+Export+Tools
+    [npm]: http://npmjs.org/
+    [gff]: http://www.sanger.ac.uk/resources/software/gff/spec.html
