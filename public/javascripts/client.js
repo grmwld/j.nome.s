@@ -50,7 +50,11 @@ $(document).ready(function() {
     return false;
   });
 
-  $("#tracks").sortable({ revert: 200 });
+  $("#tracks").sortable({
+    revert: 200
+  , placeholder: "ui-state-highlight"
+  , forcePlaceholderSize: true
+  });
   $("#tracks").disableSelection();
 
 });
