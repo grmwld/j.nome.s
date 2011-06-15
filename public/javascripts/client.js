@@ -50,6 +50,9 @@ $(document).ready(function() {
     return false;
   });
 
+  $("#tracks").sortable();
+  $("#tracks").disableSelection();
+
 });
 
 
