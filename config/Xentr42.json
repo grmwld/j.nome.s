@@ -15,8 +15,8 @@
     , "name": "ucsc_genes"
     , "description": "Reference genes from UCSC"
     , "style": {
-        "fill": "green"
-      , "stroke": "green"
+        "fill": "#00afba"
+      , "stroke": "#00afba"
       }
     }
   }

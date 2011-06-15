@@ -54,6 +54,7 @@ $(document).ready(function() {
     revert: 200
   , placeholder: "ui-state-highlight"
   , forcePlaceholderSize: true
+  , opacity: 0.8
   });
   $("#tracks").disableSelection();
 
@@ -286,8 +287,9 @@ var renderTrack = function(track, start, end){
     , trackCanvas;
   $("#tracks").append(trackdiv);
   trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
+  trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
   trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  trackCanvas.text(2, 2, track.metadata.name).attr({'font-size': 12, 'font-weight': "bold", 'text-anchor': "start"});
+  trackCanvas.text(3, 5, track.metadata.name).attr({'font-size': 12, 'font-weight': "bold", 'text-anchor': "start"});
   track.data.forEach(function(doc){
     trackCanvas.drawDocument(doc, start, end, track.metadata.style);
   });
