@@ -50,7 +50,7 @@ $(document).ready(function() {
     return false;
   });
 
-  $("#tracks").sortable();
+  $("#tracks").sortable({ revert: 200 });
   $("#tracks").disableSelection();
 
 });
