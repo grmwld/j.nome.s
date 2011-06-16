@@ -57,6 +57,9 @@ $(document).ready(function() {
   });
   $("#tracks").disableSelection();
 
+  localStorage["prevTracks"] = JSON.stringify([]);
+  localStorage["prevPos"] = 0;
+
 });
 
 
@@ -76,18 +79,31 @@ var fetchTracksData = function(start, end){
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
+    , prevTracks = JSON.parse(localStorage["prevTracks"])
+    , prevPos = parseInt(localStorage["prevPos"], 10)
     , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  $("#tracks").empty();
   trackselector.each(function(i){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
-    requestTrackData(reqURL, seqid, start, end, trackID, function(track){
-      renderTrack(track, start, end);
-    });
+    if (   prevTracks === []
+        || prevPos === 0
+        || prevTracks.indexOf(trackID) === -1
+        || prevPos !== start*end) {
+      requestTrackData(reqURL, seqid, start, end, trackID, function(track){
+        renderTrack(track, start, end);
+      });
+    }
+  });
+  prevTracks.forEach(function(ptrack){
+    if (tracksIDs.indexOf(ptrack) === -1){
+      $("#track"+ptrack).empty();
+    }
   });
   window.history.pushState({}, '',
     [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
+  localStorage["prevTracks"] = JSON.stringify(tracksIDs);
+  localStorage["prevPos"] = start*end
   $("#start").val(nf(start));
   $("#end").val(nf(end));
 }
@@ -284,6 +300,7 @@ var drawNavigationRulers = function(start, end){
 var renderTrack = function(track, start, end){
   var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
     , trackCanvas;
+  $("#track"+track.metadata.id).empty();
   $("#tracks").append(trackdiv);
   trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
   trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
