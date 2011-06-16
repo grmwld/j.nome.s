@@ -51,10 +51,9 @@ $(document).ready(function() {
   });
 
   $("#tracks").sortable({
-    revert: 200
-  , placeholder: "ui-state-highlight"
+    placeholder: "ui-state-highlight"
   , forcePlaceholderSize: true
-  , opacity: 0.8
+  , opacity: 0.9
   });
   $("#tracks").disableSelection();
 
