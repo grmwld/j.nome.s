@@ -116,7 +116,7 @@ and uses <a href="http://www.mongodb.org/">MongoDB</a> for storing the data.</p>
 
 <h3>Why j.nome.s</h3>
 
-<p>Current genome browsers include <a href="http://www.gbrowse.org/index.html">GBrowse</a>, the <a href="http://genome.ucsc.edu/">UCSC genomebrowser</a>
+<p>Current genome browsers include <a href="http://www.gbrowse.org/index.html">GBrowse</a>, the <a href="http://genome.ucsc.edu/">UCSC genome browser</a>
 or <a href="http://jbrowse.org/">Jbrowse</a>. The main problem with those project, is that they
 heavily rely on <a href="http://www.perl.org/">perl</a> and <a href="http://www.bioperl.org/">BioPerl</a> scripts in order to both crunch data
 and render the output.
@@ -138,6 +138,10 @@ efficient way to respectively store and access huge amount of data.</p>
 KAZARIAN.</p>
 
 <h3>Change log</h3>
+
+<h4>v0.3.0 : 2011-06-18</h4>
+
+<ul><li>Possibility to reorder tracks by drag &amp; drop</li><li>The order of tracks is remembered</li><li>query and render only new selected tracks is view does not change</li><li>Favicon redesigned</li><li>Display overlapping elements of a track on different Y-axis.</li></ul>
 
 <h4>v0.2.0 : 2011-06-14</h4>
 
@@ -1225,6 +1229,16 @@ negative or too big values.
     <span class="keyword">return</span> <span class="variable">false</span>;
   });
 
+  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">sortable</span>({
+    <span class="variable">placeholder</span>: &<span class="variable">quot</span>;<span class="variable">ui</span>-<span class="variable">state</span>-<span class="variable">highlight</span>&<span class="variable">quot</span>;
+  , <span class="variable">forcePlaceholderSize</span>: <span class="variable">true</span>
+  , <span class="variable">opacity</span>: <span class="number float">0.9</span>
+  });
+  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">disableSelection</span>();
+
+  <span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">prevTracks</span>&<span class="variable">quot</span>;] = <span class="class">JSON</span>.<span class="variable">stringify</span>([]);
+  <span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">prevPos</span>&<span class="variable">quot</span>;] = <span class="number integer">0</span>;
+
 });
 
 
@@ -1248,18 +1262,31 @@ After rendering, 'start' and 'end' values are updated</p>
     , <span class="variable">trackselector</span> = $(<span class="string">'#trackselector :checked'</span>)
     , <span class="variable">tracksIDs</span> = []
     , <span class="variable">trackID</span>
+    , <span class="variable">prevTracks</span> = <span class="class">JSON</span>.<span class="variable">parse</span>(<span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">prevTracks</span>&<span class="variable">quot</span>;])
+    , <span class="variable">prevPos</span> = <span class="variable">parseInt</span>(<span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">prevPos</span>&<span class="variable">quot</span>;], <span class="number integer">10</span>)
     , <span class="variable">reqURL</span> = <span class="string">'/'</span>+ <span class="variable">window</span>.<span class="variable">location</span>.<span class="variable">href</span>.<span class="variable">split</span>(<span class="string">'/'</span>).<span class="variable">slice</span>(<span class="number integer">3</span>, <span class="number integer">5</span>).<span class="variable">join</span>(<span class="string">'/'</span>);
-  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">empty</span>();
   <span class="variable">trackselector</span>.<span class="variable">each</span>(<span class="keyword">function</span>(<span class="variable">i</span>){
     <span class="variable">trackID</span> = $(<span class="variable">trackselector</span>[<span class="variable">i</span>]).<span class="variable">val</span>();
     <span class="variable">tracksIDs</span>.<span class="variable">push</span>(<span class="variable">trackID</span>);
-    <span class="variable">requestTrackData</span>(<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">trackID</span>, <span class="keyword">function</span>(<span class="variable">track</span>){
-      <span class="variable">renderTrack</span>(<span class="variable">track</span>, <span class="variable">start</span>, <span class="variable">end</span>);
-    });
+    <span class="keyword">if</span> (   <span class="variable">prevTracks</span> === []
+        || <span class="variable">prevPos</span> === <span class="number integer">0</span>
+        || <span class="variable">prevTracks</span>.<span class="variable">indexOf</span>(<span class="variable">trackID</span>) === -<span class="number integer">1</span>
+        || <span class="variable">prevPos</span> !== <span class="variable">start</span>*<span class="variable">end</span>) {
+      <span class="variable">requestTrackData</span>(<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">trackID</span>, <span class="keyword">function</span>(<span class="variable">track</span>){
+        <span class="variable">renderTrack</span>(<span class="variable">track</span>, <span class="variable">start</span>, <span class="variable">end</span>);
+      });
+    }
+  });
+  <span class="variable">prevTracks</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">ptrack</span>){
+    <span class="keyword">if</span> (<span class="variable">tracksIDs</span>.<span class="variable">indexOf</span>(<span class="variable">ptrack</span>) === -<span class="number integer">1</span>){
+      $(&<span class="variable">quot</span>;#<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">ptrack</span>).<span class="variable">empty</span>();
+    }
   });
   <span class="variable">window</span>.<span class="variable">history</span>.<span class="variable">pushState</span>({}, <span class="string">''</span>,
     [<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">tracksIDs</span>.<span class="variable">join</span>(<span class="string">'&amp;'</span>)].<span class="variable">join</span>(<span class="string">'/'</span>)
   );
+  <span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">prevTracks</span>&<span class="variable">quot</span>;] = <span class="class">JSON</span>.<span class="variable">stringify</span>(<span class="variable">tracksIDs</span>);
+  <span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">prevPos</span>&<span class="variable">quot</span>;] = <span class="variable">start</span>*<span class="variable">end</span>
   $(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">start</span>));
   $(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">end</span>));
 }</code></pre>
@@ -1491,13 +1518,46 @@ Returns NaN if the formated number cannot be parsed.</p>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">renderTrack</span> = <span class="keyword">function</span>(<span class="variable">track</span>, <span class="variable">start</span>, <span class="variable">end</span>){
   <span class="keyword">var</span> <span class="variable">trackdiv</span> = $(&<span class="variable">quot</span>;&<span class="variable">lt</span>;<span class="variable">div</span> <span class="keyword">class</span>=<span class="string">'track'</span> <span class="variable">id</span>=<span class="variable">track</span>&<span class="variable">quot</span>;+ <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +&<span class="variable">quot</span>;&<span class="variable">gt</span>;&<span class="variable">lt</span>;/<span class="variable">div</span>&<span class="variable">gt</span>;&<span class="variable">quot</span>;)
-    , <span class="variable">trackCanvas</span>;
+    , <span class="variable">trackCanvas</span>
+    , <span class="variable">bgrules</span>
+    , <span class="variable">bground</span>
+    , <span class="variable">layers</span> = []
+    , <span class="variable">next</span> = <span class="variable">false</span>
+    , <span class="variable">laidout</span> = <span class="variable">false</span>;
+  $(&<span class="variable">quot</span>;#<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span>).<span class="variable">empty</span>();
   $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">append</span>(<span class="variable">trackdiv</span>);
   <span class="variable">trackCanvas</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="number integer">1101</span>, <span class="number integer">50</span>);
-  <span class="variable">trackCanvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
-  <span class="variable">trackCanvas</span>.<span class="variable">text</span>(<span class="number integer">2</span>, <span class="number integer">2</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({<span class="string">'font-size'</span>: <span class="number integer">12</span>, <span class="string">'font-weight'</span>: &<span class="variable">quot</span>;<span class="variable">bold</span>&<span class="variable">quot</span>;, <span class="string">'text-anchor'</span>: &<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;});
+  <span class="variable">bground</span> = <span class="variable">trackCanvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">trackCanvas</span>.<span class="variable">width</span>, <span class="variable">trackCanvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
+  <span class="variable">bgrules</span> = <span class="variable">trackCanvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
+  <span class="variable">trackCanvas</span>.<span class="variable">text</span>(<span class="number integer">3</span>, <span class="number integer">5</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({<span class="string">'font-size'</span>: <span class="number integer">14</span>, <span class="string">'font-weight'</span>: &<span class="variable">quot</span>;<span class="variable">bold</span>&<span class="variable">quot</span>;, <span class="string">'text-anchor'</span>: &<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;});
   <span class="variable">track</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
-    <span class="variable">trackCanvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">style</span>);
+    <span class="variable">laidout</span> = <span class="variable">false</span>;
+    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">layers</span>.<span class="variable">length</span>; ++<span class="variable">i</span>){
+      <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">j</span> = <span class="number integer">0</span>; <span class="variable">j</span> &<span class="variable">lt</span>; <span class="variable">layers</span>[<span class="variable">i</span>].<span class="variable">length</span>; ++<span class="variable">j</span>){
+        <span class="keyword">if</span> (    <span class="variable">doc</span>.<span class="variable">start</span> &<span class="variable">gt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">0</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">start</span> &<span class="variable">lt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">1</span>]
+            ||  <span class="variable">doc</span>.<span class="variable">end</span> &<span class="variable">gt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">0</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">end</span> &<span class="variable">lt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">1</span>]){
+          <span class="variable">next</span> = <span class="variable">true</span>;
+          <span class="keyword">break</span>;
+        }
+      }
+      <span class="keyword">if</span> (!<span class="variable">next</span>){
+        <span class="variable">trackCanvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">style</span>);
+        <span class="variable">layers</span>[<span class="variable">i</span>].<span class="variable">push</span>([<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]);
+        <span class="variable">laidout</span> = <span class="variable">true</span>;
+        <span class="keyword">break</span>;
+      }
+      <span class="variable">next</span> = <span class="variable">false</span>;
+    }
+    <span class="keyword">if</span> (!<span class="variable">laidout</span>){
+      <span class="variable">bgrules</span>.<span class="variable">remove</span>();
+      <span class="variable">trackCanvas</span>.<span class="variable">setSize</span>(<span class="variable">trackCanvas</span>.<span class="variable">width</span>, <span class="variable">trackCanvas</span>.<span class="variable">height</span>+<span class="number integer">35</span>);
+      <span class="variable">bgrules</span> = <span class="variable">trackCanvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
+      <span class="variable">bground</span>.<span class="variable">remove</span>();
+      <span class="variable">bground</span> = <span class="variable">trackCanvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">trackCanvas</span>.<span class="variable">width</span>, <span class="variable">trackCanvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
+      <span class="variable">bground</span>.<span class="variable">toBack</span>();
+      <span class="variable">trackCanvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">track</span>.<span class="variable">metadata</span>.<span class="variable">style</span>);
+      <span class="variable">layers</span>.<span class="variable">push</span>([[<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]]);
+    }
   });
 }</code></pre>
 </td>
@@ -1547,9 +1607,11 @@ Returns NaN if the formated number cannot be parsed.</p>
 </td>
 <td class="code">
 <pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawBgRules</span> = <span class="keyword">function</span>(<span class="variable">step</span>, <span class="variable">style</span>){
+  <span class="keyword">var</span> <span class="variable">rules</span> = <span class="this">this</span>.<span class="variable">set</span>();
   <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">x</span> = <span class="number float">0.5</span>; <span class="variable">x</span> &<span class="variable">lt</span>;= <span class="this">this</span>.<span class="variable">width</span>; <span class="variable">x</span> += <span class="variable">step</span>){
-    <span class="this">this</span>.<span class="variable">lineTo</span>(<span class="variable">x</span>, <span class="number integer">0</span>, <span class="variable">x</span>, <span class="this">this</span>.<span class="variable">height</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+    <span class="variable">rules</span>.<span class="variable">push</span>(<span class="this">this</span>.<span class="variable">lineTo</span>(<span class="variable">x</span>, <span class="number integer">0</span>, <span class="variable">x</span>, <span class="this">this</span>.<span class="variable">height</span>).<span class="variable">attr</span>(<span class="variable">style</span>).<span class="variable">toBack</span>());
   }
+  <span class="keyword">return</span> <span class="variable">rules</span>;
 }</code></pre>
 </td>
 </tr>
@@ -1699,13 +1761,13 @@ Returns NaN if the formated number cannot be parsed.</p>
 <ul><li><p><strong>param</strong>: <em>Object</em>  doc</p></li><li><p><strong>param</strong>: <em>Number</em>  view_start</p></li><li><p><strong>param</strong>: <em>Number</em>  view_end</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawDocument</span> = <span class="keyword">function</span>(<span class="variable">doc</span>, <span class="variable">view_start</span>, <span class="variable">view_end</span>, <span class="variable">style</span>) {
+<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawDocument</span> = <span class="keyword">function</span>(<span class="variable">doc</span>, <span class="variable">view_start</span>, <span class="variable">view_end</span>, <span class="variable">layer</span>, <span class="variable">style</span>) {
   <span class="variable">view_span</span> = <span class="variable">view_end</span> - <span class="variable">view_start</span>;
   <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
     , <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>
-    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="this">this</span>.<span class="variable">height</span>*<span class="regexp">/5, rel_doc_length, this.height/</span><span class="number integer">5</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">35</span>+<span class="number integer">35</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">10</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
   <span class="variable">d</span>.<span class="variable">attr</span>({<span class="variable">title</span>:[
     <span class="string">'ID : '</span> + <span class="variable">doc</span>.<span class="variable">_id</span>,
     <span class="string">'From : '</span> + <span class="variable">nf</span>(<span class="variable">doc</span>.<span class="variable">start</span>),
