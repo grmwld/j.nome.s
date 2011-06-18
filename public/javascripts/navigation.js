@@ -5,6 +5,7 @@ var Navigation = function(){
   this.overviewNavigation = new OverviewNavigation(this, "overviewnavigation", 1101, 50);
   this.ratioZoom = new RatioZoom(this, "ratiozoom", 1101, 50);
   this.zoomNavigation = new ZoomNavigation(this, "zoomnavigation", 1101, 50);
+  this.separator = new Separator(this,  "separator", 1101, 15);
 };
 
 /**
@@ -20,6 +21,7 @@ Navigation.prototype.display = function(start, end, meta, style) {
   self.overviewNavigation.display(start, end, meta, style);
   self.ratioZoom.display(self.overviewNavigation.selected, style);
   self.zoomNavigation.display(start, end, meta, style);
+  self.separator.display(style);
 };
 
 /**
@@ -287,6 +289,37 @@ RatioZoom.prototype.refresh = function(cur_span, style){
   self.clear();
   self.draw(cur_span, style);
 }
+
+
+
+/**
+ * Separator
+ *
+ * @param {Function} container
+ * @param {String} anchor
+ * @param {Number} width
+ * @param {Number} height
+ */
+var Separator = function(container, anchor, width, height){
+  this.container = container;
+  this.anchor = anchor;
+  this.width = width;
+  this.height = height;
+  this.canvas = undefined;
+  this.bgrules = undefined;
+};
+
+/**
+ * Display the separator.
+ *
+ * @param {Object} style
+ */
+Separator.prototype.display = function(style){
+  var self = this;
+  self.canvas = Raphael(self.anchor, self.width, self.height);
+  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
+  self.draw(style);
+};
 
 
 

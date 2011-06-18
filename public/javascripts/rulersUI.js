@@ -39,7 +39,7 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, 35+35*layer, rel_doc_length, 10).attr(style);
+    , d = this.rect(rel_start, 40+35*layer, rel_doc_length, 10).attr(style);
   d.attr({title:[
     'ID : ' + doc._id,
     'From : ' + nf(doc.start),
