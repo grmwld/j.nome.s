@@ -19,7 +19,7 @@ Navigation.prototype.display = function(start, end, meta, style) {
   var self = this;
   self.overviewNavigation.display(start, end, meta, style);
   self.ratioZoom.display(self.overviewNavigation.selected, style);
-  self.zoomNavigation.display(start, end, style);
+  self.zoomNavigation.display(start, end, meta, style);
 };
 
 /**
@@ -34,7 +34,7 @@ Navigation.prototype.refresh = function(start, end, meta, style){
   var self = this;
   self.overviewNavigation.refresh(start, end, meta, style);
   self.ratioZoom.refresh(self.overviewNavigation.selected, style);
-  self.zoomNavigation.refresh(start, end, style);
+  self.zoomNavigation.refresh(start, end, meta, style);
 };
 
 
@@ -159,16 +159,11 @@ var ZoomNavigation = function(container, anchor, width, height){
  * @param {Object} style
  * @see ZoomNavigation.draw()
  */
-ZoomNavigation.prototype.display = function(start, end, style) {
+ZoomNavigation.prototype.display = function(start, end, meta, style) {
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
   self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
-  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan);
-  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
-    fetchTracksData(start, end);
-    self.container.refresh(start, end, meta, style);
-  });
-  self.draw(start, end, style);
+  self.draw(start, end, meta, style);
 };
 
 /**
@@ -179,9 +174,13 @@ ZoomNavigation.prototype.display = function(start, end, style) {
  * @param {Number} end
  * @param {Object} style
  */
-ZoomNavigation.prototype.draw = function(start, end, style){
+ZoomNavigation.prototype.draw = function(start, end, meta, style){
   var self = this;
   self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
+  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
+    fetchTracksData(start, end);
+    self.container.refresh(start, end, meta, style);
+  });
   self.selectableArea.toBack();
   self.ruler.toBack();
   self.bgrules.toBack();
@@ -190,11 +189,12 @@ ZoomNavigation.prototype.draw = function(start, end, style){
 /**
  * Clear the element.
  * This only removes the potentially modified elements,
- * that is the ruler.
+ * that is the ruler and the selectable area.
  */
 ZoomNavigation.prototype.clear = function(){
   var self = this;
   self.ruler.remove();
+  self.selectableArea.remove();
 };
 
 /**
@@ -207,10 +207,10 @@ ZoomNavigation.prototype.clear = function(){
  * @see ZoomNavigation.clear()
  * @see ZoomNavigation.draw()
  */
-ZoomNavigation.prototype.refresh = function(start, end, style){
+ZoomNavigation.prototype.refresh = function(start, end, meta, style){
   var self = this;
   self.clear();
-  self.draw(start, end, style);
+  self.draw(start, end, meta, style);
 }
 
 
