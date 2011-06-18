@@ -299,15 +299,46 @@ var drawNavigationRulers = function(start, end){
  */
 var renderTrack = function(track, start, end){
   var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
-    , trackCanvas;
+    , trackCanvas
+    , bgrules
+    , bground
+    , layers = []
+    , next = false
+    , laidout = false;
   $("#track"+track.metadata.id).empty();
   $("#tracks").append(trackdiv);
   trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
-  trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
-  trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  trackCanvas.text(3, 5, track.metadata.name).attr({'font-size': 12, 'font-weight': "bold", 'text-anchor': "start"});
+  bground = trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
+  bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
+  trackCanvas.text(3, 5, track.metadata.name).attr({'font-size': 14, 'font-weight': "bold", 'text-anchor': "start"});
   track.data.forEach(function(doc){
-    trackCanvas.drawDocument(doc, start, end, track.metadata.style);
+    laidout = false;
+    for (var i = 0; i < layers.length; ++i){
+      for (var j = 0; j < layers[i].length; ++j){
+        if (    doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1]
+            ||  doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1]){
+          next = true;
+          break;
+        }
+      }
+      if (!next){
+        trackCanvas.drawDocument(doc, start, end, i, track.metadata.style);
+        layers[i].push([doc.start, doc.end]);
+        laidout = true;
+        break;
+      }
+      next = false;
+    }
+    if (!laidout){
+      bgrules.forEach(function(e){ e.remove() });
+      trackCanvas.setSize(trackCanvas.width, trackCanvas.height+35);
+      bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
+      bground.remove();
+      bground = trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
+      bground.toBack();
+      trackCanvas.drawDocument(doc, start, end, i, track.metadata.style);
+      layers.push([[doc.start, doc.end]]);
+    }
   });
 }
 
