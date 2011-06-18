@@ -59,6 +59,7 @@ $(document).ready(function() {
 
   localStorage["prevTracks"] = JSON.stringify([]);
   localStorage["prevPos"] = 0;
+  localStorage["prevSeqID"] = "";
 
 });
 
@@ -81,11 +82,13 @@ var fetchTracksData = function(start, end){
     , trackID
     , prevTracks = JSON.parse(localStorage["prevTracks"])
     , prevPos = parseInt(localStorage["prevPos"], 10)
+    , prevSeqID = localStorage["prevSeqID"]
     , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   trackselector.each(function(i){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
-    if (   prevTracks === []
+    if (   seqid !== prevSeqID
+        || prevTracks === []
         || prevPos === 0
         || prevTracks.indexOf(trackID) === -1
         || prevPos !== start*end) {
