@@ -18,7 +18,7 @@ Raphael.fn.lineTo = function(x1, y1, x2, y2){
  * @param {Object} style
  */
 Raphael.fn.drawBgRules = function(step, style){
-  var rules = [];
+  var rules = this.set();
   for (var x = 0.5; x <= this.width; x += step){
     rules.push(this.lineTo(x, 0, x, this.height).attr(style).toBack());
   }

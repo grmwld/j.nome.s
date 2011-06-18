@@ -330,7 +330,7 @@ var renderTrack = function(track, start, end){
       next = false;
     }
     if (!laidout){
-      bgrules.forEach(function(e){ e.remove() });
+      bgrules.remove();
       trackCanvas.setSize(trackCanvas.width, trackCanvas.height+35);
       bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
       bground.remove();
