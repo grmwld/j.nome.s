@@ -6,7 +6,7 @@ and uses [MongoDB][mongodb] for storing the data.
 
 ### Why j.nome.s
 
-Current genome browsers include [GBrowse][gbrowse], the [UCSC genomebrowser][ucsc_browser]
+Current genome browsers include [GBrowse][gbrowse], the [UCSC genome browser][ucsc_browser]
 or [Jbrowse][jbrowse]. The main problem with those project, is that they
 heavily rely on [perl][perl] and [BioPerl][bioperl] scripts in order to both crunch data
 and render the output.
