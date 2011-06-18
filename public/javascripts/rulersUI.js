@@ -66,7 +66,7 @@ Raphael.fn.drawRatio = function(cur_span, style) {
     ratio = this.set();
   ratio.push(this.lineTo(sx1, sy1, sx2, sy2).attr(style));
   ratio.push(this.lineTo(ex1, ey1, ex2, ey2).attr(style));
-  return ratio();
+  return ratio;
 }
 
 /**
@@ -93,7 +93,7 @@ Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
  * @param {Number} view_end
  * @param {Object} style
  */
-Raphael.fn.explorableArea = function(view_start, view_end, style) {
+Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
   var gs, ge
     , view_span = view_end - view_start
     , a = this.rect(0, 0, this.width, this.height).attr({
@@ -139,16 +139,14 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       // Span selection
       if (goto_start != goto_end) {
         sanitizeInputPos(goto_start, goto_end, function(start, end){
-            fetchTracksData(start, end);
-            drawNavigationRulers(start, end);
+          callback(start, end);
         });
       }
       // Location click
       else {
         var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
         sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end){
-            fetchTracksData(start, end);
-            drawNavigationRulers(start, end);
+          callback(start, end);
         });
       }
     }

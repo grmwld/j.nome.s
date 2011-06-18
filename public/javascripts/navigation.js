@@ -1,27 +1,26 @@
 var Navigation = function(){
-  this.overviewnavigation = new OverviewNavigation("overviewnavigation", 1101, 50);
+  this.overviewNavigation = new OverviewNavigation(this, "overviewnavigation", 1101, 50);
+  this.ratioZoom = new RatioZoom(this, "ratiozoom", 1101, 50);
+  this.zoomNavigation = new ZoomNavigation(this, "zoomnavigation", 1101, 50);
 };
 
-Navigation.prototype.draw = function(start, end, style) {
-  this.overviewNavigation = Raphael("overviewnavigation", 1101, 50);
-  this.ratiozoom = Raphael("ratiozoom", 1101, 50);
-  this.zoomNavigation = Raphael("zoomnavigation", 1101, 50);
-  this.separator = Raphael("separator", 1101, 10);
-  this.currentSpan = null;
-  this.overviewNavigation.drawBgRules(10, style.bgrules);
-  overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
-  currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
-  overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
-  ratiozoom.drawBgRules(10, style.bgrules);
-  ratiozoom.drawRatio(currentSpan);
-  zoomNavigation.drawBgRules(10, style.bgrules);
-  zoomNavigation.drawMainRuler(start, end, style.ruler);
-  zoomNavigation.explorableArea(start, end, style.selectionspan);
-  separator.drawBgRules(10, style.bgrules);
+Navigation.prototype.display = function(start, end, meta, style) {
+  var self = this;
+  self.overviewNavigation.display(start, end, meta, style);
+  self.ratioZoom.display(self.overviewNavigation.selected, style);
+  self.zoomNavigation.display(start, end, style);
+};
+
+Navigation.prototype.refresh = function(start, end, meta, style){
+  var self = this;
+  self.overviewNavigation.refresh(start, end, meta, style);
+  self.ratioZoom.refresh(self.overviewNavigation.selected, style);
+  self.zoomNavigation.refresh(start, end, style);
 };
 
 
-var OverviewNavigation = function(anchor, width, height){
+var OverviewNavigation = function(container, anchor, width, height){
+  this.container = container;
   this.anchor = anchor;
   this.width = width;
   this.height = height;
@@ -33,33 +32,41 @@ var OverviewNavigation = function(anchor, width, height){
 };
 
 OverviewNavigation.prototype.display = function(start, end, meta, style){
-  this.canvas = Raphael(this.anchor, this.width, this.height);
-  this.bgrules = this.canvas.drawBgRules(10, style.bgrules);
-  this.selectableArea = this.canvas.explorableArea(0, meta.length, style.selectionspan);
-  this.draw(start, end, meta, style);
+  var self = this;
+  self.canvas = Raphael(self.anchor, self.width, self.height);
+  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
+  self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end){
+    fetchTracksData(start, end);
+    self.container.refresh(start, end, meta, style);
+  });
+  self.draw(start, end, meta, style);
 };
 
 OverviewNavigation.prototype.draw = function(start, end, meta, style){
-  this.ruler = this.canvas.drawMainRuler(0, meta.length, style.ruler);
-  this.selected = this.canvas.currentSpan(start, end, meta.length, style.selectedspan);
-  this.selectableArea.toBack();
-  this.selected.toBack();
-  this.ruler.toBack();
-  this.bgrules.toBack();
+  var self = this;
+  self.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
+  self.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
+  self.selectableArea.toBack();
+  self.selected.toBack();
+  self.ruler.toBack();
+  self.bgrules.toBack();
 };
 
 OverviewNavigation.prototype.clear = function(){
-  this.ruler.remove();
-  this.selected.remove();
+  var self = this;
+  self.ruler.remove();
+  self.selected.remove();
 };
 
 OverviewNavigation.prototype.refresh = function(start, end, meta, style){
-  this.clear();
-  this.draw(start, end, meta, style);
+  var self = this;
+  self.clear();
+  self.draw(start, end, meta, style);
 };
 
 
-var RatioZoom = function(anchor, width, height){
+var RatioZoom = function(container, anchor, width, height){
+  this.container = container;
   this.anchor = anchor;
   this.width = width;
   this.height = height;
@@ -69,31 +76,70 @@ var RatioZoom = function(anchor, width, height){
 };
 
 RatioZoom.prototype.display = function(cur_span, style){
-  this.canvas = Raphael(this.anchor, this.width, this.height);
-  this.ratio = this.canvas.set();
-  this.bgrules = this.canvas.drawBgRules(10, style.bgrules);
-  this.draw(cur_span, style);
+  var self = this;
+  self.canvas = Raphael(self.anchor, self.width, self.height);
+  self.ratio = self.canvas.set();
+  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
+  self.draw(cur_span, style);
 };
 
 RatioZoom.prototype.draw = function(cur_span, style){
-  this.ratio = this.canvas.drawRatio(cur_span, style);
-  //var sx1 = cur_span.attrs.x
-    //, sy1 = 0
-    //, sx2 = 50
-    //, sy2 = this.height
-    //, ex1 = cur_span.attrs.x + cur_span.attrs.width
-    //, ey1 = 0
-    //, ex2 = this.width - 50
-    //, ey2 = this.height;
-  //this.ratio.push(this.canvas.lineTo(sx1, sy1, sx2, sy2).attr(style));
-  //this.ratio.push(this.canvas.lineTo(ex1, ey1, ex2, ey2).attr(style));
+  var self = this;
+  self.ratio = self.canvas.drawRatio(cur_span, style);
+  self.bgrules.toBack();
 };
 
 RatioZoom.prototype.clear = function(){
-  this.ratio.remove();
+  var self = this;
+  self.ratio.remove();
 };
 
 RatioZoom.prototype.refresh = function(cur_span, style){
-  this.clear();
-  this.draw(cur_span, style);
+  var self = this;
+  self.clear();
+  self.draw(cur_span, style);
 }
+
+
+var ZoomNavigation = function(container, anchor, width, height){
+  this.container = container;
+  this.anchor = anchor;
+  this.width = width;
+  this.height = height;
+  this.canvas = undefined;
+  this.bgrules = undefined;
+  this.ruler = undefined;
+  this.selectableArea = undefined;
+};
+
+ZoomNavigation.prototype.display = function(start, end, style) {
+  var self = this;
+  self.canvas = Raphael(self.anchor, self.width, self.height);
+  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
+  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan);
+  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
+    fetchTracksData(start, end);
+    self.container.refresh(start, end, meta, style);
+  });
+  self.draw(start, end, style);
+};
+
+ZoomNavigation.prototype.draw = function(start, end, style){
+  var self = this;
+  self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
+  self.selectableArea.toBack();
+  self.ruler.toBack();
+  self.bgrules.toBack();
+};
+
+ZoomNavigation.prototype.clear = function(){
+  var self = this;
+  self.ruler.remove();
+};
+
+ZoomNavigation.prototype.refresh = function(start, end, style){
+  var self = this;
+  self.clear();
+  self.draw(start, end, style);
+}
+
