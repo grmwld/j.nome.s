@@ -16,12 +16,17 @@ var Navigation = function(){
  * @param {Object} metadata
  * @param {Object} style
  */
-Navigation.prototype.display = function(start, end, meta, style) {
+Navigation.prototype.display = function(start, end) {
   var self = this;
-  self.overviewNavigation.display(start, end, meta, style);
-  self.ratioZoom.display(self.overviewNavigation.selected, style);
-  self.zoomNavigation.display(start, end, meta, style);
-  self.separator.display(style);
+  getGlobalStyle(function(style){
+    var seqid = $('#seqid').val();
+    getSeqidMetadata(seqid, function(meta){
+      self.overviewNavigation.display(start, end, meta, style);
+      self.ratioZoom.display(self.overviewNavigation.selected, style);
+      self.zoomNavigation.display(start, end, meta, style);
+      self.separator.display(style);
+    });
+  });
 };
 
 /**
@@ -32,11 +37,16 @@ Navigation.prototype.display = function(start, end, meta, style) {
  * @param {Object} metadata
  * @param {Object} style
  */
-Navigation.prototype.refresh = function(start, end, meta, style){
+Navigation.prototype.refresh = function(start, end){
   var self = this;
-  self.overviewNavigation.refresh(start, end, meta, style);
-  self.ratioZoom.refresh(self.overviewNavigation.selected, style);
-  self.zoomNavigation.refresh(start, end, meta, style);
+  getGlobalStyle(function(style){
+    var seqid = $('#seqid').val();
+    getSeqidMetadata(seqid, function(meta){
+      self.overviewNavigation.refresh(start, end, meta, style);
+      self.ratioZoom.refresh(self.overviewNavigation.selected, style);
+      self.zoomNavigation.refresh(start, end, meta, style);
+    });
+  });
 };
 
 

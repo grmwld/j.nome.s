@@ -33,7 +33,7 @@ $(document).ready(function() {
       , end = parseNum($('#end').val());
     sanitizeInputPos(start, end, function(start, end){
       fetchTracksData(start, end);
-      displayNavigation(navigation, start, end);
+      navigation.display(start, end);
     });
   });
   
@@ -46,7 +46,7 @@ $(document).ready(function() {
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
         fetchTracksData(start, end);
-        refreshNavigation(navigation, start, end);
+        navigation.refresh(start, end);
       });
     });
     return false;
@@ -271,35 +271,6 @@ var parseNum = function(str_num){
 
 // *********   Tracks and rulers navigation   ************
 
-/**
- * Draw the navigation rulers between 2 positions
- *
- * @param {Number} start
- * @param {Number} end
- */
-var displayNavigation = function(navigation, start, end){
-  getGlobalStyle(function(style){
-    var seqid = $('#seqid').val();
-    getSeqidMetadata(seqid, function(seqidMD){
-      navigation.display(start, end, seqidMD, style);
-    });
-  });
-}
-
-/**
- * Refresh the navigation rulers between 2 positions
- *
- * @param {Number} start
- * @param {Number} end
- */
-var refreshNavigation = function(navigation, start, end){
-  getGlobalStyle(function(style){
-    var seqid = $('#seqid').val();
-    getSeqidMetadata(seqid, function(seqidMD){
-      navigation.refresh(start, end, seqidMD, style);
-    });
-  });
-}
 /**
  * Render a track
  *
