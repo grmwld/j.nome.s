@@ -150,17 +150,22 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
  * @api private
  */
 var getSeqidMetadata = function(seqid, callback){
-  var reqURL = '/'
-    + window.location.href.split('/').slice(3, 5).join('/')
-    + '/' + seqid + ".json";
-  $.ajax({
-    type: "GET"
-  , url: reqURL
-  , dataType: "json"
-  , success: function(metadata) {
-      callback(metadata);
-    }
-  });
+  if (!localStorage[seqid+"metadata"]){
+    var reqURL = '/'
+      + window.location.href.split('/').slice(3, 5).join('/')
+      + '/' + seqid + ".json";
+    $.ajax({
+      type: "GET"
+    , url: reqURL
+    , dataType: "json"
+    , success: function(metadata) {
+        localStorage[seqid+"metadata"] = JSON.stringify(metadata);
+        callback(metadata);
+      }
+    });
+  } else {
+    callback(JSON.parse(localStorage[seqid+"metadata"]));
+  }
 }
 
 /**
@@ -170,15 +175,19 @@ var getSeqidMetadata = function(seqid, callback){
  */
 var getGlobalStyle = function(callback){
   var reqURL = '/globalconfig.json';
-  $.ajax({
-    type: "GET"
-  , url: reqURL
-  //, data: { seqid: seqid }
-  , dataType: "json"
-  , success: function(style) {
-      callback(style);
-    }
-  });
+  if (!localStorage["globalconfig"]){
+    $.ajax({
+      type: "GET"
+    , url: reqURL
+    , dataType: "json"
+    , success: function(style) {
+        localStorage["globalconfig"] = JSON.stringify(style);
+        callback(style);
+      }
+    });
+  } else {
+    callback(JSON.parse(localStorage["globalconfig"]));
+  }
 }
 
 /**

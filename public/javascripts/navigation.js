@@ -318,7 +318,6 @@ Separator.prototype.display = function(style){
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
   self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
-  self.draw(style);
 };
 
 
