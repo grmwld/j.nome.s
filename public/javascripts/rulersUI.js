@@ -18,9 +18,11 @@ Raphael.fn.lineTo = function(x1, y1, x2, y2){
  * @param {Object} style
  */
 Raphael.fn.drawBgRules = function(step, style){
+  var rules = this.set();
   for (var x = 0.5; x <= this.width; x += step){
-    this.lineTo(x, 0, x, this.height).attr(style);
+    rules.push(this.lineTo(x, 0, x, this.height).attr(style).toBack());
   }
+  return rules;
 }
 
 /**
@@ -157,13 +159,13 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
  * @param {Number} view_end
  * @param {Object} style
  */
-Raphael.fn.drawDocument = function(doc, view_start, view_end, style) {
+Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
   view_span = view_end - view_start;
   var nf = new PHP_JS().number_format
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, this.height*2/5, rel_doc_length, this.height/5).attr(style);
+    , d = this.rect(rel_start, 35+35*layer, rel_doc_length, 10).attr(style);
   d.attr({title:[
     'ID : ' + doc._id,
     'From : ' + nf(doc.start),

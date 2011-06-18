@@ -6,7 +6,7 @@ and uses [MongoDB][mongodb] for storing the data.
 
 ### Why j.nome.s
 
-Current genome browsers include [GBrowse][gbrowse], the [UCSC genomebrowser][ucsc_browser]
+Current genome browsers include [GBrowse][gbrowse], the [UCSC genome browser][ucsc_browser]
 or [Jbrowse][jbrowse]. The main problem with those project, is that they
 heavily rely on [perl][perl] and [BioPerl][bioperl] scripts in order to both crunch data
 and render the output.
@@ -29,6 +29,13 @@ KAZARIAN.
 
 ### Change log
   
+#### v0.3.0 : 2011-06-18
+* Possibility to reorder tracks by drag & drop
+* The order of tracks is remembered
+* query and render only new selected tracks is view does not change
+* Favicon redesigned
+* Display overlapping elements of a track on different Y-axis.
+
 #### v0.2.0 : 2011-06-14
 * Fixed selection going beyond boundaries
 * Fixed non-existing SEQID
