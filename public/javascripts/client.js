@@ -7,6 +7,8 @@
 
 $(document).ready(function() {
 
+  var navigation = new Navigation();
+
   /**
    * Setup dynamic prompt input text-fields.
    * The default value corresponds to the 'name' attribute
@@ -31,7 +33,7 @@ $(document).ready(function() {
       , end = parseNum($('#end').val());
     sanitizeInputPos(start, end, function(start, end){
       fetchTracksData(start, end);
-      drawNavigationRulers(start, end);
+      displayNavigation(navigation, start, end);
     });
   });
   
@@ -44,7 +46,7 @@ $(document).ready(function() {
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
         fetchTracksData(start, end);
-        drawNavigationRulers(start, end);
+        refreshNavigation(navigation, start, end);
       });
     });
     return false;
@@ -266,33 +268,29 @@ var parseNum = function(str_num){
  * @param {Number} start
  * @param {Number} end
  */
-var drawNavigationRulers = function(start, end){
-  $("#overviewnavigation").empty();
-  $("#ratiozoom").empty();
-  $("#zoomnavigation").empty();
-  $("#separator").empty();
+var displayNavigation = function(navigation, start, end){
   getGlobalStyle(function(style){
     var seqid = $('#seqid').val();
     getSeqidMetadata(seqid, function(seqidMD){
-      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
-        , ratiozoom = Raphael("ratiozoom", 1101, 50)
-        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
-        , separator = Raphael("separator", 1101, 10)
-        , currentSpan;
-      overviewNavigation.drawBgRules(10, style.bgrules);
-      overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
-      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
-      overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
-      ratiozoom.drawBgRules(10, style.bgrules);
-      ratiozoom.drawRatio(currentSpan);
-      zoomNavigation.drawBgRules(10, style.bgrules);
-      zoomNavigation.drawMainRuler(start, end, style.ruler);
-      zoomNavigation.explorableArea(start, end, style.selectionspan);
-      separator.drawBgRules(10, style.bgrules);
+      navigation.display(start, end, seqidMD, style);
     });
   });
 }
 
+/**
+ * Refresh the navigation rulers between 2 positions
+ *
+ * @param {Number} start
+ * @param {Number} end
+ */
+var refreshNavigation = function(navigation, start, end){
+  getGlobalStyle(function(style){
+    var seqid = $('#seqid').val();
+    getSeqidMetadata(seqid, function(seqidMD){
+      navigation.refresh(start, end, seqidMD, style);
+    });
+  });
+}
 /**
  * Render a track
  *
