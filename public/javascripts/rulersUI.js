@@ -35,15 +35,17 @@ Raphael.fn.drawBgRules = function(step, style){
 Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
   var nf = new PHP_JS().number_format
     , view_span = view_end - view_start
-    , view_step = view_span / 5;
-  this.lineTo(50, 2*this.height/3, this.width-50, 2*this.height/3).attr(style);
+    , view_step = view_span / 5
+    , ruler = this.set();
+  ruler.push(this.lineTo(50, 2*this.height/3, this.width-50, 2*this.height/3).attr(style));
   for (var x = 50.5; x <= this.width-50; x += 40) {
-    this.lineTo(x, 2*this.height/3-3, x, 2*this.height/3+3).attr(style);
+    ruler.push(this.lineTo(x, 2*this.height/3-3, x, 2*this.height/3+3).attr(style));
   }
   for (var x = 50; x <= this.width-50; x += 200) {
-    this.text(x, 12, nf(view_start+view_step*((x-50)/200)));
-    this.lineTo(x+0.5, 2*this.height/3-8, x+0.5, 2*this.height/3+8).attr(style);
+    ruler.push(this.text(x, 12, nf(view_start+view_step*((x-50)/200))));
+    ruler.push(this.lineTo(x+0.5, 2*this.height/3-8, x+0.5, 2*this.height/3+8).attr(style));
   }
+  return ruler;
 }
 
 /**
@@ -60,9 +62,11 @@ Raphael.fn.drawRatio = function(cur_span, style) {
     , ex1 = cur_span.attrs.x + cur_span.attrs.width
     , ey1 = 0
     , ex2 = this.width - 50
-    , ey2 = this.height;
-  this.lineTo(sx1, sy1, sx2, sy2).attr(style);
-  this.lineTo(ex1, ey1, ex2, ey2).attr(style);
+    , ey2 = this.height,
+    ratio = this.set();
+  ratio.push(this.lineTo(sx1, sy1, sx2, sy2).attr(style));
+  ratio.push(this.lineTo(ex1, ey1, ex2, ey2).attr(style));
+  return ratio();
 }
 
 /**
@@ -149,6 +153,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style) {
       }
     }
   );
+  return a;
 }
 
 /**
