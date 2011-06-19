@@ -86,10 +86,6 @@ OverviewNavigation.prototype.display = function(start, end, meta, style){
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
   self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
-  self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end){
-    fetchTracksData(start, end);
-    self.container.refresh(start, end, meta, style);
-  });
   self.draw(start, end, meta, style);
 };
 
@@ -106,6 +102,10 @@ OverviewNavigation.prototype.draw = function(start, end, meta, style){
   var self = this;
   self.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
   self.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
+  self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end){
+    fetchTracksData(start, end);
+    self.container.refresh(start, end, meta, style);
+  });
   self.selectableArea.toBack();
   self.selected.toBack();
   self.ruler.toBack();
@@ -120,6 +120,7 @@ OverviewNavigation.prototype.draw = function(start, end, meta, style){
 OverviewNavigation.prototype.clear = function(){
   var self = this;
   self.ruler.remove();
+  self.selectableArea.remove();
   self.selected.remove();
 };
 
