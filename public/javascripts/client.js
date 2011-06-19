@@ -9,6 +9,13 @@ $(document).ready(function() {
 
   var navigation = new Navigation();
 
+  tracks = {};
+  previous = {
+    tracks: []
+  , pos: 0
+  , seqid: ""
+  };
+
   /**
    * Setup dynamic prompt input text-fields.
    * The default value corresponds to the 'name' attribute
@@ -59,10 +66,6 @@ $(document).ready(function() {
   });
   $("#tracks").disableSelection();
 
-  localStorage["prevTracks"] = JSON.stringify([]);
-  localStorage["prevPos"] = 0;
-  localStorage["prevSeqID"] = "";
-
 });
 
 
@@ -82,33 +85,39 @@ var fetchTracksData = function(start, end){
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
-    , prevTracks = JSON.parse(localStorage["prevTracks"])
-    , prevPos = parseInt(localStorage["prevPos"], 10)
-    , prevSeqID = localStorage["prevSeqID"]
     , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   trackselector.each(function(i){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
-    if (   seqid !== prevSeqID
-        || prevTracks === []
-        || prevPos === 0
-        || prevTracks.indexOf(trackID) === -1
-        || prevPos !== start*end) {
-      requestTrackData(reqURL, seqid, start, end, trackID, function(track){
-        renderTrack(track, start, end);
+  });
+  tracksIDs.forEach(function(trackid){
+    if (   seqid !== previous.seqid
+        || previous.tracks === []
+        || previous.pos === 0
+        || previous.tracks.indexOf(trackid) === -1
+        || previous.pos !== start*end) {
+      requestTrackData(reqURL, seqid, start, end, trackid, function(track){
+        if (!tracks[trackid]){
+          tracks[trackid] = new Track(track, 1101, 50);
+          tracks[trackid].display(start, end);
+        } else {
+          tracks[trackid].refresh(start, end, track.data);
+        }
       });
     }
   });
-  prevTracks.forEach(function(ptrack){
+  previous.tracks.forEach(function(ptrack){
     if (tracksIDs.indexOf(ptrack) === -1){
-      $("#track"+ptrack).empty();
+      tracks[ptrack].empty();
+      delete tracks[ptrack];
     }
   });
   window.history.pushState({}, '',
     [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
-  localStorage["prevTracks"] = JSON.stringify(tracksIDs);
-  localStorage["prevPos"] = start*end
+  previous.tracks = tracksIDs;
+  previous.pos = start*end;
+  previous.seqid = seqid;
   $("#start").val(nf(start));
   $("#end").val(nf(end));
 }
@@ -269,59 +278,6 @@ var parseNum = function(str_num){
 }
 
 
-// *********   Tracks and rulers navigation   ************
-
-/**
- * Render a track
- *
- * @param {Object} track
- * @param {Number} start
- * @param {Number} end
- */
-var renderTrack = function(track, start, end){
-  var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
-    , trackCanvas
-    , bgrules
-    , bground
-    , layers = []
-    , next = false
-    , laidout = false;
-  $("#track"+track.metadata.id).empty();
-  $("#tracks").append(trackdiv);
-  trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
-  bground = trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
-  bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  trackCanvas.text(3, 5, track.metadata.name).attr({'font-size': 14, 'font-weight': "bold", 'text-anchor': "start"});
-  track.data.forEach(function(doc){
-    laidout = false;
-    for (var i = 0; i < layers.length; ++i){
-      for (var j = 0; j < layers[i].length; ++j){
-        if (    doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1]
-            ||  doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1]){
-          next = true;
-          break;
-        }
-      }
-      if (!next){
-        trackCanvas.drawDocument(doc, start, end, i, track.metadata.style);
-        layers[i].push([doc.start, doc.end]);
-        laidout = true;
-        break;
-      }
-      next = false;
-    }
-    if (!laidout){
-      bgrules.remove();
-      trackCanvas.setSize(trackCanvas.width, trackCanvas.height+35);
-      bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
-      bground.remove();
-      bground = trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
-      bground.toBack();
-      trackCanvas.drawDocument(doc, start, end, i, track.metadata.style);
-      layers.push([[doc.start, doc.end]]);
-    }
-  });
-}
 
 
 /**
