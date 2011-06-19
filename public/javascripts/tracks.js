@@ -68,7 +68,7 @@ Track.prototype.draw = function(start, end){
     }
     if (!laidout){
       self.bgrules.remove();
-      self.canvas.setSize(self.width, self.height+35);
+      self.canvas.setSize(self.canvas.width, self.canvas.height+35);
       self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
@@ -90,6 +90,7 @@ Track.prototype.empty = function(){
 Track.prototype.clear = function(){
   var self = this;
   self.documents.remove();
+  self.canvas.setSize(self.width, self.height);
 }
 
 /**
