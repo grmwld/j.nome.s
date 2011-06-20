@@ -28,7 +28,11 @@ j.nome.is is an ongoing project initiated by Alexis GRIMALDI and Avetis
 KAZARIAN.
 
 ### Change log
-  
+
+#### v0.3.1 : 2011-06-20
+* Lazier track and navigation refresh
+* Documents in a track are ordered
+
 #### v0.3.0 : 2011-06-18
 * Possibility to reorder tracks by drag & drop
 * The order of tracks is remembered

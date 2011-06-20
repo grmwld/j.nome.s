@@ -7,6 +7,15 @@
 
 $(document).ready(function() {
 
+  var navigation = new Navigation();
+
+  tracks = {};
+  previous = {
+    tracks: []
+  , pos: 0
+  , seqid: ""
+  };
+
   /**
    * Setup dynamic prompt input text-fields.
    * The default value corresponds to the 'name' attribute
@@ -31,7 +40,7 @@ $(document).ready(function() {
       , end = parseNum($('#end').val());
     sanitizeInputPos(start, end, function(start, end){
       fetchTracksData(start, end);
-      drawNavigationRulers(start, end);
+      navigation.display(start, end);
     });
   });
   
@@ -44,7 +53,7 @@ $(document).ready(function() {
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
         fetchTracksData(start, end);
-        drawNavigationRulers(start, end);
+        navigation.refresh(start, end);
       });
     });
     return false;
@@ -56,9 +65,6 @@ $(document).ready(function() {
   , opacity: 0.9
   });
   $("#tracks").disableSelection();
-
-  localStorage["prevTracks"] = JSON.stringify([]);
-  localStorage["prevPos"] = 0;
 
 });
 
@@ -79,31 +85,39 @@ var fetchTracksData = function(start, end){
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
-    , prevTracks = JSON.parse(localStorage["prevTracks"])
-    , prevPos = parseInt(localStorage["prevPos"], 10)
     , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   trackselector.each(function(i){
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
-    if (   prevTracks === []
-        || prevPos === 0
-        || prevTracks.indexOf(trackID) === -1
-        || prevPos !== start*end) {
-      requestTrackData(reqURL, seqid, start, end, trackID, function(track){
-        renderTrack(track, start, end);
+  });
+  tracksIDs.forEach(function(trackid){
+    if (   seqid !== previous.seqid
+        || previous.tracks === []
+        || previous.pos === 0
+        || previous.tracks.indexOf(trackid) === -1
+        || previous.pos !== start*end) {
+      requestTrackData(reqURL, seqid, start, end, trackid, function(track){
+        if (!tracks[trackid]){
+          tracks[trackid] = new Track(track, 1101, 50);
+          tracks[trackid].display(start, end);
+        } else {
+          tracks[trackid].refresh(start, end, track.data);
+        }
       });
     }
   });
-  prevTracks.forEach(function(ptrack){
+  previous.tracks.forEach(function(ptrack){
     if (tracksIDs.indexOf(ptrack) === -1){
-      $("#track"+ptrack).empty();
+      tracks[ptrack].empty();
+      delete tracks[ptrack];
     }
   });
   window.history.pushState({}, '',
     [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
-  localStorage["prevTracks"] = JSON.stringify(tracksIDs);
-  localStorage["prevPos"] = start*end
+  previous.tracks = tracksIDs;
+  previous.pos = start*end;
+  previous.seqid = seqid;
   $("#start").val(nf(start));
   $("#end").val(nf(end));
 }
@@ -145,17 +159,22 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
  * @api private
  */
 var getSeqidMetadata = function(seqid, callback){
-  var reqURL = '/'
-    + window.location.href.split('/').slice(3, 5).join('/')
-    + '/' + seqid + ".json";
-  $.ajax({
-    type: "GET"
-  , url: reqURL
-  , dataType: "json"
-  , success: function(metadata) {
-      callback(metadata);
-    }
-  });
+  if (!localStorage[seqid+"metadata"]){
+    var reqURL = '/'
+      + window.location.href.split('/').slice(3, 5).join('/')
+      + '/' + seqid + ".json";
+    $.ajax({
+      type: "GET"
+    , url: reqURL
+    , dataType: "json"
+    , success: function(metadata) {
+        localStorage[seqid+"metadata"] = JSON.stringify(metadata);
+        callback(metadata);
+      }
+    });
+  } else {
+    callback(JSON.parse(localStorage[seqid+"metadata"]));
+  }
 }
 
 /**
@@ -165,15 +184,19 @@ var getSeqidMetadata = function(seqid, callback){
  */
 var getGlobalStyle = function(callback){
   var reqURL = '/globalconfig.json';
-  $.ajax({
-    type: "GET"
-  , url: reqURL
-  //, data: { seqid: seqid }
-  , dataType: "json"
-  , success: function(style) {
-      callback(style);
-    }
-  });
+  if (!localStorage["globalconfig"]){
+    $.ajax({
+      type: "GET"
+    , url: reqURL
+    , dataType: "json"
+    , success: function(style) {
+        localStorage["globalconfig"] = JSON.stringify(style);
+        callback(style);
+      }
+    });
+  } else {
+    callback(JSON.parse(localStorage["globalconfig"]));
+  }
 }
 
 /**
@@ -255,92 +278,6 @@ var parseNum = function(str_num){
 }
 
 
-// *********   Tracks and rulers navigation   ************
-
-/**
- * Draw the navigation rulers between 2 positions
- *
- * @param {Number} start
- * @param {Number} end
- */
-var drawNavigationRulers = function(start, end){
-  $("#overviewnavigation").empty();
-  $("#ratiozoom").empty();
-  $("#zoomnavigation").empty();
-  $("#separator").empty();
-  getGlobalStyle(function(style){
-    var seqid = $('#seqid').val();
-    getSeqidMetadata(seqid, function(seqidMD){
-      var overviewNavigation = Raphael("overviewnavigation", 1101, 50)
-        , ratiozoom = Raphael("ratiozoom", 1101, 50)
-        , zoomNavigation = Raphael("zoomnavigation", 1101, 50)
-        , separator = Raphael("separator", 1101, 10)
-        , currentSpan;
-      overviewNavigation.drawBgRules(10, style.bgrules);
-      overviewNavigation.drawMainRuler(0, seqidMD.length, style.ruler);
-      currentSpan = overviewNavigation.currentSpan(start, end, seqidMD.length, style.selectedspan);
-      overviewNavigation.explorableArea(0, seqidMD.length, style.selectionspan);
-      ratiozoom.drawBgRules(10, style.bgrules);
-      ratiozoom.drawRatio(currentSpan);
-      zoomNavigation.drawBgRules(10, style.bgrules);
-      zoomNavigation.drawMainRuler(start, end, style.ruler);
-      zoomNavigation.explorableArea(start, end, style.selectionspan);
-      separator.drawBgRules(10, style.bgrules);
-    });
-  });
-}
-
-/**
- * Render a track
- *
- * @param {Object} track
- * @param {Number} start
- * @param {Number} end
- */
-var renderTrack = function(track, start, end){
-  var trackdiv = $("<div class='track' id=track"+ track.metadata.id +"></div>")
-    , trackCanvas
-    , bgrules
-    , bground
-    , layers = []
-    , next = false
-    , laidout = false;
-  $("#track"+track.metadata.id).empty();
-  $("#tracks").append(trackdiv);
-  trackCanvas = Raphael("track"+track.metadata.id, 1101, 50);
-  bground = trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
-  bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
-  trackCanvas.text(3, 5, track.metadata.name).attr({'font-size': 14, 'font-weight': "bold", 'text-anchor': "start"});
-  track.data.forEach(function(doc){
-    laidout = false;
-    for (var i = 0; i < layers.length; ++i){
-      for (var j = 0; j < layers[i].length; ++j){
-        if (    doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1]
-            ||  doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1]){
-          next = true;
-          break;
-        }
-      }
-      if (!next){
-        trackCanvas.drawDocument(doc, start, end, i, track.metadata.style);
-        layers[i].push([doc.start, doc.end]);
-        laidout = true;
-        break;
-      }
-      next = false;
-    }
-    if (!laidout){
-      bgrules.remove();
-      trackCanvas.setSize(trackCanvas.width, trackCanvas.height+35);
-      bgrules = trackCanvas.drawBgRules(10, { stroke: "#eee" });
-      bground.remove();
-      bground = trackCanvas.rect(0, 0, trackCanvas.width, trackCanvas.height).attr({ fill: "#fff", stroke: "#fff" });
-      bground.toBack();
-      trackCanvas.drawDocument(doc, start, end, i, track.metadata.style);
-      layers.push([[doc.start, doc.end]]);
-    }
-  });
-}
 
 
 /**
