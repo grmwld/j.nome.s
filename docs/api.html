@@ -139,9 +139,9 @@ KAZARIAN.</p>
 
 <h3>Change log</h3>
 
-<h4>v0.3.1 : 2011-06-</h4>
+<h4>v0.3.1 : 2011-06-20</h4>
 
-<ul><li>Lazier track and navigation refresh</li></ul>
+<ul><li>Lazier track and navigation refresh</li><li>Documents in a track are ordered</li></ul>
 
 <h4>v0.3.0 : 2011-06-18</h4>
 
@@ -2132,6 +2132,9 @@ Instanciates and creates the containing elements if they don't exist.</p>
     , <span class="variable">layers</span> = []
     , <span class="variable">laidout</span> = <span class="variable">false</span>
     , <span class="variable">next</span> = <span class="variable">false</span>;
+  <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">sort</span>(<span class="keyword">function</span>(<span class="variable">a</span>, <span class="variable">b</span>){
+    <span class="keyword">return</span> (<span class="variable">b</span>[&<span class="variable">quot</span>;<span class="variable">end</span>&<span class="variable">quot</span>;]-<span class="variable">b</span>[&<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;]) - (<span class="variable">a</span>[&<span class="variable">quot</span>;<span class="variable">end</span>&<span class="variable">quot</span>;]-<span class="variable">a</span>[&<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;]);
+  });
   <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
     <span class="variable">laidout</span> = <span class="variable">false</span>;
     <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">layers</span>.<span class="variable">length</span>; ++<span class="variable">i</span>){
@@ -2152,7 +2155,7 @@ Instanciates and creates the containing elements if they don't exist.</p>
     }
     <span class="keyword">if</span> (!<span class="variable">laidout</span>){
       <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">remove</span>();
-      <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">35</span>);
+      <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">30</span>);
       <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
       <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
       <span class="variable">layers</span>.<span class="variable">push</span>([[<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]]);
@@ -2221,7 +2224,7 @@ This method first cleans the canvas then draws the new documents</p>
     , <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>
-    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">40</span>+<span class="number integer">35</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">10</span>).<span class="variable">attr</span>(<span class="variable">style</span>)
+    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">35</span>+<span class="number integer">30</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">12</span>).<span class="variable">attr</span>(<span class="variable">style</span>)
     , <span class="variable">title</span> = [];
   <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="variable">doc</span>){
     <span class="variable">title</span>.<span class="variable">push</span>(<span class="variable">i</span> + <span class="string">' : '</span> + <span class="variable">doc</span>[<span class="variable">i</span>]);

@@ -25,7 +25,7 @@ h1 Documentation
 
     1. The name of the database is the ID of the corresponding dataset.
     2. Inside the database, the reference genome sequence is stored in a GridFS, resulting in the `fs.files` and `fs.chunks` collections.
-    3. The data of your tracks must be contained in a collection in JFF format (a JSON equivalent of the [GFF][gff] format).
+    3. The data of your tracks must be contained in a collection in JFF format (a JSON equivalent to the [GFF][gff] format).
 
     The JFF format follows the [GFF specifications][gff] with the only required field being `_id`, which must be a unique integer in the collection.
 
@@ -66,7 +66,7 @@ h1 Documentation
 
     ##### Non-quantitative data
 
-    To load non-quantitative data (such as a gene annotation), your raw data must be in JFF format, which is a JSON equivalent of the [GFF][gff] format.
+    To load non-quantitative data (such as a gene annotation), your raw data must be in JFF format, which is a JSON equivalent to the [GFF][gff] format.
     Then use the [mongoimport][mongoimport] command to load it in the dataset of your choice.
     Typically, it would be something like :
       
