@@ -11,6 +11,7 @@ var Track = function(track, width, height){
   this.metadata = track.metadata;
   this.data = track.data;
   this.canvas = undefined;
+  this.background = undefined;
   this.bgrules = undefined;
   this.documents = undefined;
   this.title = undefined;
@@ -30,9 +31,11 @@ Track.prototype.display = function(start, end){
     $("#tracks").append(self.div);
   }
   self.canvas = Raphael("track"+self.metadata.id, self.width, self.height);
+  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.hight).attr({ fill: "#fff", stroke: "#fff" });
   self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
   self.title = self.canvas.text(3, 5, self.metadata.name).attr({'font-size': 14, 'font-weight': "bold", 'text-anchor': "start"});
   self.documents = self.canvas.set();
+  self.orderLayers();
   self.draw(start, end);
 };
 
@@ -70,14 +73,25 @@ Track.prototype.draw = function(start, end){
       next = false;
     }
     if (!laidout){
+      self.background.remove();
       self.bgrules.remove();
       self.canvas.setSize(self.canvas.width, self.canvas.height+30);
+      self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
       self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
+      self.orderLayers();
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
     }
   });
-}
+};
+
+Track.prototype.orderLayers = function(){
+  var self = this;
+  self.documents.toBack();
+  self.title.toBack();
+  self.bgrules.toBack();
+  self.background.toBack();
+};
 
 /**
  * Empty the track
@@ -85,7 +99,7 @@ Track.prototype.draw = function(start, end){
 Track.prototype.empty = function(){
   var self = this;
   $("#track"+self.metadata.id).empty();
-}
+};
 
 /**
  * Clears the documents from the track canvas
@@ -94,7 +108,7 @@ Track.prototype.clear = function(){
   var self = this;
   self.documents.remove();
   self.canvas.setSize(self.width, self.height);
-}
+};
 
 /**
  * Refresh the documents in the track canvas.
