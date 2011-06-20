@@ -62,7 +62,7 @@ $(document).ready(function() {
   $("#tracks").sortable({
     placeholder: "ui-state-highlight"
   , forcePlaceholderSize: true
-  , opacity: 0.9
+  , opacity: 0.8
   });
   $("#tracks").disableSelection();
 
