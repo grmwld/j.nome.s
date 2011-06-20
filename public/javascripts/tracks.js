@@ -48,6 +48,9 @@ Track.prototype.draw = function(start, end){
     , layers = []
     , laidout = false
     , next = false;
+  self.data.sort(function(a, b){
+    return (b["end"]-b["start"]) - (a["end"]-a["start"]);
+  });
   self.data.forEach(function(doc){
     laidout = false;
     for (var i = 0; i < layers.length; ++i){
@@ -68,7 +71,7 @@ Track.prototype.draw = function(start, end){
     }
     if (!laidout){
       self.bgrules.remove();
-      self.canvas.setSize(self.canvas.width, self.canvas.height+35);
+      self.canvas.setSize(self.canvas.width, self.canvas.height+30);
       self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
@@ -126,7 +129,7 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, 40+35*layer, rel_doc_length, 10).attr(style)
+    , d = this.rect(rel_start, 35+30*layer, rel_doc_length, 12).attr(style)
     , title = [];
   for (var i in doc){
     title.push(i + ' : ' + doc[i]);
