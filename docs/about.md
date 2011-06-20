@@ -29,6 +29,10 @@ KAZARIAN.
 
 ### Change log
 
+#### v0.3.2 : 2011-06-20
+* Fixed visual bug in track reordering
+* Better centering of output-gui
+
 #### v0.3.1 : 2011-06-20
 * Lazier track and navigation refresh
 * Documents in a track are ordered
