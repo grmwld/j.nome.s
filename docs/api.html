@@ -139,6 +139,10 @@ KAZARIAN.</p>
 
 <h3>Change log</h3>
 
+<h4>v0.3.2 : 2011-06-20</h4>
+
+<ul><li>Fixed visual bug in track reordering</li><li>Better centering of output-gui</li></ul>
+
 <h4>v0.3.1 : 2011-06-20</h4>
 
 <ul><li>Lazier track and navigation refresh</li><li>Documents in a track are ordered</li></ul>
@@ -1245,7 +1249,7 @@ negative or too big values.
   $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">sortable</span>({
     <span class="variable">placeholder</span>: &<span class="variable">quot</span>;<span class="variable">ui</span>-<span class="variable">state</span>-<span class="variable">highlight</span>&<span class="variable">quot</span>;
   , <span class="variable">forcePlaceholderSize</span>: <span class="variable">true</span>
-  , <span class="variable">opacity</span>: <span class="number float">0.9</span>
+  , <span class="variable">opacity</span>: <span class="number float">0.8</span>
   });
   $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">disableSelection</span>();
 
@@ -2087,6 +2091,7 @@ This calls the clear() and draw() methods back-to-back</p>
   <span class="this">this</span>.<span class="variable">metadata</span> = <span class="variable">track</span>.<span class="variable">metadata</span>;
   <span class="this">this</span>.<span class="variable">data</span> = <span class="variable">track</span>.<span class="variable">data</span>;
   <span class="this">this</span>.<span class="variable">canvas</span> = <span class="variable">undefined</span>;
+  <span class="this">this</span>.<span class="variable">background</span> = <span class="variable">undefined</span>;
   <span class="this">this</span>.<span class="variable">bgrules</span> = <span class="variable">undefined</span>;
   <span class="this">this</span>.<span class="variable">documents</span> = <span class="variable">undefined</span>;
   <span class="this">this</span>.<span class="variable">title</span> = <span class="variable">undefined</span>;
@@ -2110,9 +2115,11 @@ Instanciates and creates the containing elements if they don't exist.</p>
     $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">append</span>(<span class="variable">self</span>.<span class="variable">div</span>);
   }
   <span class="variable">self</span>.<span class="variable">canvas</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
+  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">hight</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
   <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
   <span class="variable">self</span>.<span class="variable">title</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">text</span>(<span class="number integer">3</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({<span class="string">'font-size'</span>: <span class="number integer">14</span>, <span class="string">'font-weight'</span>: &<span class="variable">quot</span>;<span class="variable">bold</span>&<span class="variable">quot</span>;, <span class="string">'text-anchor'</span>: &<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;});
   <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
+  <span class="variable">self</span>.<span class="variable">orderLayers</span>();
   <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
 };</code></pre>
 </td>
@@ -2154,14 +2161,25 @@ Instanciates and creates the containing elements if they don't exist.</p>
       <span class="variable">next</span> = <span class="variable">false</span>;
     }
     <span class="keyword">if</span> (!<span class="variable">laidout</span>){
+      <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">remove</span>();
       <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">remove</span>();
       <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">30</span>);
+      <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
       <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
+      <span class="variable">self</span>.<span class="variable">orderLayers</span>();
       <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
       <span class="variable">layers</span>.<span class="variable">push</span>([[<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]]);
     }
   });
-}</code></pre>
+};
+
+<span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">orderLayers</span> = <span class="keyword">function</span>(){
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">toBack</span>();
+  <span class="variable">self</span>.<span class="variable">title</span>.<span class="variable">toBack</span>();
+  <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">toBack</span>();
+  <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">toBack</span>();
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -2173,7 +2191,7 @@ Instanciates and creates the containing elements if they don't exist.</p>
 <pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">empty</span> = <span class="keyword">function</span>(){
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   $(&<span class="variable">quot</span>;#<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>).<span class="variable">empty</span>();
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -2186,7 +2204,7 @@ Instanciates and creates the containing elements if they don't exist.</p>
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">remove</span>();
   <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
