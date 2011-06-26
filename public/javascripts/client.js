@@ -36,11 +36,12 @@ $(document).ready(function() {
    * negative or too big values.
    */
   validateForm(function(){
-    var start = parseNum($('#start').val())
+    var seqid = $('#seqid').val() 
+      , start = parseNum($('#start').val())
       , end = parseNum($('#end').val());
     sanitizeInputPos(start, end, function(start, end){
-      fetchTracksData(start, end);
-      navigation.display(start, end);
+      fetchTracksData(seqid, start, end);
+      navigation.display(seqid, start, end);
     });
   });
   
@@ -49,11 +50,12 @@ $(document).ready(function() {
    */
   $("#submit").click(function() {
     validateForm(function(){
-      var start = parseNum($('#start').val())
+      var seqid = $('#seqid').val()
+        , start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
-        fetchTracksData(start, end);
-        navigation.refresh(start, end);
+        fetchTracksData(seqid, start, end);
+        navigation.refresh(seqid, start, end);
       });
     });
     return false;
@@ -65,6 +67,13 @@ $(document).ready(function() {
   , opacity: 0.8
   });
   $("#tracks").disableSelection();
+
+  window.onpopstate = function(event) {
+    var state = event.state;
+    console.log(JSON.stringify(state));
+    fetchTracksData(state.seqid, state.start, state.end);
+    navigation.refresh(state.seqid, state.start, state.end);
+  };
 
 });
 
@@ -79,9 +88,8 @@ $(document).ready(function() {
  * @param {Number} start
  * @param {Number} end
  */
-var fetchTracksData = function(start, end){
+var fetchTracksData = function(seqid, start, end){
   var nf = new PHP_JS().number_format
-    , seqid = $("#seqid").val()
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
@@ -112,7 +120,12 @@ var fetchTracksData = function(start, end){
       delete tracks[ptrack];
     }
   });
-  window.history.pushState({}, '',
+  window.history.pushState({
+    seqid: seqid
+  , start: start
+  , end: end
+  , tracksIDs: tracksIDs
+  }, '',
     [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
   );
   previous.tracks = tracksIDs;

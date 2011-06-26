@@ -16,10 +16,9 @@ var Navigation = function(){
  * @param {Object} metadata
  * @param {Object} style
  */
-Navigation.prototype.display = function(start, end) {
+Navigation.prototype.display = function(seqid, start, end) {
   var self = this;
   getGlobalStyle(function(style){
-    var seqid = $('#seqid').val();
     getSeqidMetadata(seqid, function(meta){
       self.overviewNavigation.display(start, end, meta, style);
       self.ratioZoom.display(self.overviewNavigation.selected, style);
@@ -37,10 +36,9 @@ Navigation.prototype.display = function(start, end) {
  * @param {Object} metadata
  * @param {Object} style
  */
-Navigation.prototype.refresh = function(start, end){
+Navigation.prototype.refresh = function(seqid, start, end){
   var self = this;
   getGlobalStyle(function(style){
-    var seqid = $('#seqid').val();
     getSeqidMetadata(seqid, function(meta){
       self.overviewNavigation.refresh(start, end, meta, style);
       self.ratioZoom.refresh(self.overviewNavigation.selected, style);
@@ -103,8 +101,8 @@ OverviewNavigation.prototype.draw = function(start, end, meta, style){
   self.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
   self.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
   self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end){
-    fetchTracksData(start, end);
-    self.container.refresh(start, end, meta, style);
+    fetchTracksData(meta._id, start, end);
+    self.container.refresh(meta._id, start, end);
   });
   self.selectableArea.toBack();
   self.selected.toBack();
@@ -191,8 +189,8 @@ ZoomNavigation.prototype.draw = function(start, end, meta, style){
   var self = this;
   self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
   self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
-    fetchTracksData(start, end);
-    self.container.refresh(start, end, meta, style);
+    fetchTracksData(meta._id, start, end);
+    self.container.refresh(seqid, start, end);
   });
   self.selectableArea.toBack();
   self.ruler.toBack();
