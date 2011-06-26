@@ -71,9 +71,10 @@ $(document).ready(function() {
 
   window.onpopstate = function(event) {
     var state = event.state;
-    console.log(JSON.stringify(state));
-    fetchTracksData(state.seqid, state.start, state.end);
-    navigation.refresh(state.seqid, state.start, state.end);
+    if (state){
+      fetchTracksData(state.seqid, state.start, state.end, false);
+      navigation.refresh(state.seqid, state.start, state.end);
+    }
   };
 
 });
