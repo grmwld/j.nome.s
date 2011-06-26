@@ -62,6 +62,9 @@ $(document).ready(function() {
     return false;
   });
 
+  /**
+   * Makes the tracks divs sortable
+   */
   $("#tracks").sortable({
     placeholder: "ui-state-highlight"
   , forcePlaceholderSize: true
@@ -69,6 +72,9 @@ $(document).ready(function() {
   });
   $("#tracks").disableSelection();
 
+  /**
+   * Handle history navigation
+   */
   window.onpopstate = function(event) {
     var state = event.state;
     if (state){
