@@ -40,7 +40,7 @@ $(document).ready(function() {
       , start = parseNum($('#start').val())
       , end = parseNum($('#end').val());
     sanitizeInputPos(start, end, function(start, end){
-      fetchTracksData(seqid, start, end);
+      fetchTracksData(seqid, start, end, true);
       navigation.display(seqid, start, end);
     });
   });
@@ -54,8 +54,9 @@ $(document).ready(function() {
         , start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
       sanitizeInputPos(start, end, function(start, end){
-        fetchTracksData(seqid, start, end);
+        fetchTracksData(seqid, start, end, true);
         navigation.refresh(seqid, start, end);
+        
       });
     });
     return false;
@@ -88,7 +89,7 @@ $(document).ready(function() {
  * @param {Number} start
  * @param {Number} end
  */
-var fetchTracksData = function(seqid, start, end){
+var fetchTracksData = function(seqid, start, end, updatehistory){
   var nf = new PHP_JS().number_format
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
@@ -120,14 +121,16 @@ var fetchTracksData = function(seqid, start, end){
       delete tracks[ptrack];
     }
   });
-  window.history.pushState({
-    seqid: seqid
-  , start: start
-  , end: end
-  , tracksIDs: tracksIDs
-  }, '',
-    [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
-  );
+  if (updatehistory){
+    window.history.pushState({
+      seqid: seqid
+    , start: start
+    , end: end
+    , tracksIDs: tracksIDs
+    }, '',
+      [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
+    );
+  }
   previous.tracks = tracksIDs;
   previous.pos = start*end;
   previous.seqid = seqid;

@@ -101,7 +101,7 @@ OverviewNavigation.prototype.draw = function(start, end, meta, style){
   self.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
   self.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
   self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end){
-    fetchTracksData(meta._id, start, end);
+    fetchTracksData(meta._id, start, end, true);
     self.container.refresh(meta._id, start, end);
   });
   self.selectableArea.toBack();
@@ -189,7 +189,7 @@ ZoomNavigation.prototype.draw = function(start, end, meta, style){
   var self = this;
   self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
   self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
-    fetchTracksData(meta._id, start, end);
+    fetchTracksData(meta._id, start, end, true);
     self.container.refresh(seqid, start, end);
   });
   self.selectableArea.toBack();
