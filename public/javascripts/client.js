@@ -39,10 +39,8 @@ $(document).ready(function() {
     var seqid = $('#seqid').val() 
       , start = parseNum($('#start').val())
       , end = parseNum($('#end').val());
-    sanitizeInputPos(start, end, function(start, end){
       fetchTracksData(seqid, start, end, true);
       navigation.display(seqid, start, end);
-    });
   });
   
   /**
@@ -53,11 +51,8 @@ $(document).ready(function() {
       var seqid = $('#seqid').val()
         , start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
-      sanitizeInputPos(start, end, function(start, end){
         fetchTracksData(seqid, start, end, true);
         navigation.refresh(seqid, start, end);
-        
-      });
     });
     return false;
   });
@@ -220,7 +215,7 @@ var getGlobalStyle = function(callback){
   } else {
     callback(JSON.parse(localStorage["globalconfig"]));
   }
-}
+};
 
 /**
  * Validates the values in the form.
@@ -229,16 +224,27 @@ var getGlobalStyle = function(callback){
  * @param {Function} callback
  */
 var validateForm = function(callback){
-  var seqid = $("#seqid").val()
+  var nf = new PHP_JS().number_format
+    , seqid = $("#seqid").val()
     , start = parseNum($("#start").val())
     , end = parseNum($("#end").val())
     , okSeqid = seqid != 'seqid'
     , okStart = !isNaN(start)
-    , okEnd = !isNaN(end);
-  if (okSeqid && okStart && okEnd){
-    callback();
+    , okEnd = !isNaN(end)
+    , temp = 0;
+  if (start > end){
+    temp = end;
+    end = start;
+    start = temp;
   }
-}
+  if (okSeqid && okStart && okEnd){
+    sanitizeInputPos(start, end, function(start, end){
+      $("#start").val(nf(start));
+      $("#end").val(nf(end));
+      callback(true);
+    });
+  }
+};
 
 /**
  * Reset positions to 0 or seqid.length if it exceeds those limits.
@@ -249,15 +255,12 @@ var validateForm = function(callback){
  * @param {Function} callback
  */
 var sanitizeInputPos = function(start, end, callback){
-  var nf = new PHP_JS().number_format;
   getSeqidMetadata($("#seqid").val(), function(seqidMD){
     start = Math.max(0, start)
     end = Math.min(seqidMD.length, end);
-    $("#start").val(nf(start));
-    $("#end").val(nf(end));
     callback(start, end);
   });
-}
+};
 
 /**
  * Clear prompt from field
