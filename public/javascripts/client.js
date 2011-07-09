@@ -109,7 +109,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
         || previous.pos !== start*end) {
       requestTrackData(reqURL, seqid, start, end, trackid, function(track){
         if (!tracks[trackid]){
-          tracks[trackid] = new Track(track, 1101, 50);
+          tracks[trackid] = new Track(track, 1101, 80);
           tracks[trackid].display(start, end);
         } else {
           tracks[trackid].refresh(start, end, track.data);
@@ -138,7 +138,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
   previous.seqid = seqid;
   $("#start").val(nf(start));
   $("#end").val(nf(end));
-}
+};
 
 /**
  * Request data of a given track between 2 positions of a seqid.
@@ -167,7 +167,7 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
       callback(data);
     }
   });
-}
+};
 
 /**
  * Get the metadata associated to the current seqid

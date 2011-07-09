@@ -40,19 +40,36 @@ Track.prototype.display = function(start, end){
 };
 
 /**
+ * Draw the track's data according to it's type
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @see drawDocuments()
+ */
+Track.prototype.draw = function(start, end){
+  var self = this;
+  if (self.metadata.type === 'ref') {
+    self.drawDocuments(start, end);
+  }
+  else if (self.metadata.type === 'profile') {
+    self.drawProfile(start, end);
+  }
+};
+
+/**
  * Draw the documents in the track canvas
  *
  * @param {Number} start
  * @param {Number} end
  * @see drawDocument()
  */
-Track.prototype.draw = function(start, end){
+Track.prototype.drawDocuments = function(start, end) {
   var self = this
     , layers = []
     , laidout = false
     , next = false;
   self.data.sort(function(a, b){
-    return (b["end"]-b["start"]) - (a["end"]-a["start"]);
+    return (b.end - b.start) - (a.end - a.start);
   });
   self.data.forEach(function(doc){
     laidout = false;
@@ -73,18 +90,39 @@ Track.prototype.draw = function(start, end){
       next = false;
     }
     if (!laidout){
-      self.background.remove();
-      self.bgrules.remove();
-      self.canvas.setSize(self.canvas.width, self.canvas.height+30);
-      self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
-      self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
-      self.orderLayers();
+      if (layers.length){
+        self.background.remove();
+        self.bgrules.remove();
+        self.canvas.setSize(self.canvas.width, self.canvas.height+30);
+        self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
+        self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
+        self.orderLayers();
+      }
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
     }
   });
 };
 
+/**
+ * Draw a profile track
+ *
+ * @param {Number} start
+ * @param {Number} end
+ */
+Track.prototype.drawProfile = function(start, end) {
+  var self = this
+    , plot;
+  console.log('drawing profile data');
+};
+
+/**
+ * Draw the documents in the track canvas
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @see drawDocument()
+ */
 Track.prototype.orderLayers = function(){
   var self = this;
   self.documents.toBack();
@@ -125,7 +163,7 @@ Track.prototype.refresh = function(start, end, data){
   self.clear();
   self.data = data;
   self.draw(start, end);
-}
+};
 
 
 
@@ -138,8 +176,8 @@ Track.prototype.refresh = function(start, end, data){
  * @param {Object} style
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  view_span = view_end - view_start;
-  var nf = new PHP_JS().number_format
+  var view_span = view_end - view_start
+    , nf = new PHP_JS().number_format
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
@@ -150,4 +188,4 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
   }
   d.attr({ title: title.join('\n') });
   return d;
-}
+};

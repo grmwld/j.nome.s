@@ -21,7 +21,6 @@
       , "stroke": "#00afba"
       }
     }
-  }
   , "IXT010_aa_cov": {
       "id": "IXT010_aa_cov"
     , "name": "IXT010_coverage"
