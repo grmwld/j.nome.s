@@ -5,6 +5,7 @@
       "id": "gaps"
     , "name": "gaps"
     , "description": "Assembly gaps"
+    , "type": "ref"
     , "style": {
         "fill": "purple"
       , "stroke": "purple"
@@ -14,9 +15,19 @@
       "id": "ucsc_refgene"
     , "name": "ucsc_genes"
     , "description": "Reference genes from UCSC"
+    , "type": "ref"
     , "style": {
         "fill": "#00afba"
       , "stroke": "#00afba"
+      }
+    }
+  }
+  , "IXT010_aa_cov": {
+      "id": "IXT010_aa_cov"
+    , "name": "IXT010_coverage"
+    , "description": "Coverage of the IXT010 gPET dataset"
+    , "type": "profile"
+    , "style": {
       }
     }
   }

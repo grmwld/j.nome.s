@@ -34,7 +34,7 @@ var TrackSchema = new mongoose.Schema({
 var Track = function(metadata){
   this.metadata = metadata;
   this.model =  mongoose.model(metadata.name, TrackSchema,metadata.id);
-}
+};
 
 /**
  * Fetch all documents on seqid between 2 positions
@@ -57,7 +57,7 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
     , data: docs
     });
   });
-}
+};
 
 
 
