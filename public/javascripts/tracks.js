@@ -91,12 +91,7 @@ Track.prototype.drawDocuments = function(start, end) {
     }
     if (!laidout){
       if (layers.length){
-        self.background.remove();
-        self.bgrules.remove();
-        self.canvas.setSize(self.canvas.width, self.canvas.height+30);
-        self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
-        self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
-        self.orderLayers();
+        self.resize(self.canvas.width, self.canvas.height+30);
       }
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
@@ -121,7 +116,8 @@ Track.prototype.drawProfile = function(start, end) {
     }
   });
   console.log(xvals.length);
-  self.documents = self.canvas.g.linechart(50, 0, self.width-100, self.height, xvals, yvals, { shade: true });
+  self.resize(self.canvas.width, 100);
+  self.documents = self.canvas.g.linechart(50, 0, self.width-100, 100, xvals, yvals, { shade: true, gutter: 1 });
 };
 
 /**
@@ -137,6 +133,19 @@ Track.prototype.orderLayers = function(){
   self.title.toBack();
   self.bgrules.toBack();
   self.background.toBack();
+};
+
+/**
+ * Resize the track's canvas
+ */
+Track.prototype.resize = function(width, height) {
+  var self = this;
+  self.background.remove();
+  self.bgrules.remove();
+  self.canvas.setSize(width, height);
+  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
+  self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
+  self.orderLayers();
 };
 
 /**
@@ -189,7 +198,7 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, 35+30*layer, rel_doc_length, 12).attr(style)
+    , d = this.rect(rel_start, 35+30*layer, rel_doc_length, 10).attr(style)
     , title = [];
   for (var i in doc){
     title.push(i + ' : ' + doc[i]);
