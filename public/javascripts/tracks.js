@@ -112,8 +112,16 @@ Track.prototype.drawDocuments = function(start, end) {
  */
 Track.prototype.drawProfile = function(start, end) {
   var self = this
-    , plot;
-  console.log('drawing profile data');
+    , xvals = []
+    , yvals = [];
+  self.data.forEach(function(doc){
+    for (var i = doc.start; i < doc.end; ++i){
+      xvals.push(i);
+      yvals.push(doc.score);
+    }
+  });
+  console.log(xvals.length);
+  self.documents = self.canvas.g.linechart(50, 0, self.width-100, self.height, xvals, yvals, { shade: true });
 };
 
 /**
