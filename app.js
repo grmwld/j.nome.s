@@ -43,11 +43,11 @@ app.configure(function(){
 app.configure('development', function(){
   require('express-trace')(app);
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true })); 
-  console.log('Application started in development mode.')
+  console.log('Application started in development mode.');
 });
 
 app.configure('test', function(){
-  console.log('Application started in test mode.')
+  console.log('Application started in test mode.');
 });
 
 app.configure('production', function(){
