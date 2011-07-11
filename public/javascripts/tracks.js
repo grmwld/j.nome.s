@@ -31,7 +31,7 @@ Track.prototype.display = function(start, end){
     $("#tracks").append(self.div);
   }
   self.canvas = Raphael("track"+self.metadata.id, self.width, self.height);
-  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.hight).attr({ fill: "#fff", stroke: "#fff" });
+  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
   self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
   self.title = self.canvas.text(3, 5, self.metadata.name).attr({'font-size': 14, 'font-weight': "bold", 'text-anchor': "start"});
   self.documents = self.canvas.set();
@@ -91,7 +91,7 @@ Track.prototype.drawDocuments = function(start, end) {
     }
     if (!laidout){
       if (layers.length){
-        self.resize(self.canvas.width, self.canvas.height+30);
+        self.resize(self.canvas.width, self.canvas.height+20);
       }
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
@@ -115,7 +115,6 @@ Track.prototype.drawProfile = function(start, end) {
       yvals.push(doc.score);
     }
   });
-  console.log(xvals.length);
   self.resize(self.canvas.width, 100);
   self.documents = self.canvas.g.linechart(50, 0, self.width-100, 100, xvals, yvals, { shade: true, gutter: 1 });
 };
@@ -198,7 +197,7 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, 35+30*layer, rel_doc_length, 10).attr(style)
+    , d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style)
     , title = [];
   for (var i in doc){
     title.push(i + ' : ' + doc[i]);

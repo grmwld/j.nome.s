@@ -109,7 +109,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
         || previous.pos !== start*end) {
       requestTrackData(reqURL, seqid, start, end, trackid, function(track){
         if (!tracks[trackid]){
-          tracks[trackid] = new Track(track, 1101, 80);
+          tracks[trackid] = new Track(track, 1101, 50);
           tracks[trackid].display(start, end);
         } else {
           tracks[trackid].refresh(start, end, track.data);

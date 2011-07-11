@@ -23,6 +23,12 @@ var TrackSchema = new mongoose.Schema({
 , strand: String
 });
 
+TrackSchema.index({
+  seqid: 1,
+  start: 1,
+  end: 1
+});
+
 
 /**
  * Class representing a track.
