@@ -138,7 +138,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
   previous.seqid = seqid;
   $("#start").val(nf(start));
   $("#end").val(nf(end));
-}
+};
 
 /**
  * Request data of a given track between 2 positions of a seqid.
@@ -167,7 +167,7 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
       callback(data);
     }
   });
-}
+};
 
 /**
  * Get the metadata associated to the current seqid
