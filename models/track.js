@@ -29,20 +29,53 @@ var Track = function(db, metadata){
  * @api public
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
-  var self = this;
+  var self = this
+    , start = parseInt(start, 10)
+    , end = parseInt(end, 10);
   self.collection.find({
     seqid: seqid
-  , start: {$lt: parseInt(end, 10)}
-  , end: {$gt: parseInt(start, 10)}
+  , start: {$lt: end}
+  , end: {$gt: start}
   }).toArray(function(err, docs){
-    console.log(docs);
-    callback(err, {
-      metadata: self.metadata
-    , data: docs
-    });
+    if (self.metadata.type === 'profile' && docs.length > 10000){
+      processProfile(docs, function(data){
+        callback(null, {
+          metadata: self.metadata
+        , data: data
+        });
+      });
+    } else {
+      callback(err, {
+        metadata: self.metadata
+      , data: docs
+      });
+    }
   });
 };
 
+var processProfile = function(docs, callback){
+  var smoothed = []
+    , bin = []
+    , bin_start = docs[0].start
+    , step = parseInt(Math.min((docs[docs.length-1].end - docs[0].start) / 10000, 1000), 10)
+    , i = 0;
+  docs.forEach(function(doc){
+    for (i = doc.start; i < doc.end; ++i){
+      bin.push(doc.score);
+      if (bin.length === step){
+        bin.sort();
+        smoothed.push({
+          start: bin_start
+        , end: bin_start + step
+        , score: bin[parseInt((bin.length+1)/2, 10)]
+        });
+        bin = [];
+        bin_start = doc.start + i;
+      }
+    }
+  });
+  callback(smoothed);
+};
 
 
 /**
