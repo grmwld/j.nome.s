@@ -108,20 +108,29 @@ Track.prototype.drawDocuments = function(start, end) {
 Track.prototype.drawProfile = function(start, end) {
   var self = this
     , xvals = []
-    , yvals = [];
+    , yvals = []
+    , i = 0;
   if (self.data.length !== 0){
     self.data.forEach(function(doc){
-      for (var i = doc.start; i < doc.end; ++i){
+      for (i = doc.start; i < doc.end; i++){
         xvals.push(i);
         yvals.push(doc.score);
       }
     });
-    self.resize(self.canvas.width, 100);
-    self.documents = self.canvas.g.linechart(35, 10, self.width-70, 100, xvals, yvals, {
+    self.resize(self.canvas.width, 150);
+    self.documents = self.canvas.g.linechart(35, 10, self.width-70, 150, xvals, yvals, {
       shade: true
     , gutter: 15
     , axis: "0 0 0 1"
-    });
+    }).hoverColumn(
+      function(){
+        this.popups = self.canvas.set();
+        this.popups.push(self.canvas.g.popup(this.x, this.y[0], Math.floor(this.values[0])).insertBefore(this));
+      },
+      function () {
+        this.popups && this.popups.remove();
+      }
+    );
   }
 };
 

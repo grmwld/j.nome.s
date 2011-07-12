@@ -60,8 +60,9 @@ var processProfile = function(docs, callback){
     , bin_start = docs[0].start
     , step = parseInt(Math.min((docs[docs.length-1].end - docs[0].start) / 10000, 1000), 10)
     , i = 0;
+  console.log(step);
   docs.forEach(function(doc){
-    for (i = doc.start; i < doc.end; ++i){
+    for (i = doc.start; i < doc.end; i++){
       bin.push(doc.score);
       if (bin.length === step){
         bin.sort();
@@ -71,7 +72,7 @@ var processProfile = function(docs, callback){
         , score: bin[parseInt((bin.length+1)/2, 10)]
         });
         bin = [];
-        bin_start = doc.start + doc.end - i;
+        bin_start = i;
       }
     }
   });
