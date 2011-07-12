@@ -2,6 +2,7 @@
  * Module dependencies
  */
 var util = require('util')
+    async = require('async')
   , utils = require('../lib/utils');
 
 var Mongolian = require('mongolian');
@@ -29,20 +30,35 @@ var Track = function(db, metadata){
  * @api public
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
-  var self = this;
-  self.collection.find({
-    seqid: seqid
-  , start: {$lt: parseInt(end, 10)}
-  , end: {$gt: parseInt(start, 10)}
-  }).toArray(function(err, docs){
-    console.log(docs);
-    callback(err, {
-      metadata: self.metadata
-    , data: docs
+  var self = this
+    , step = 1000000
+    , params = [];
+  for (var i = parseInt(start, 10); i < parseInt(end, 10); i+=step){
+    params.push([self.collection, seqid, i, i+step]);
+  }
+  setTimeout(function(){
+    async.concat(params, findInterval, function(err, results){
+      callback(err, {
+        metadata: self.metadata
+      , data: results
+      });
     });
-  });
+  }, 200);
 };
 
+var findInterval = function(params, callback){
+  var collection = params[0]
+    , seqid = params[1]
+    , start = params[2]
+    , end = params[3]
+  collection.find({
+    seqid: seqid
+  , start: {$lt: end}
+  , end: {$gt: start}
+  }).toArray(function(err, docs){
+    callback(err, docs);
+  });
+};
 
 
 /**

@@ -162,7 +162,7 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
     , end: end
     , trackID: trackID
     }
-  , dataType: "json"
+  //, dataType: "json"
   , success: function(data) {
       callback(data);
     }
