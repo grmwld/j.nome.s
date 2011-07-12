@@ -117,7 +117,11 @@ Track.prototype.drawProfile = function(start, end) {
       }
     });
     self.resize(self.canvas.width, 100);
-    self.documents = self.canvas.g.linechart(50, 0, self.width-100, 100, xvals, yvals, { shade: true, gutter: 1 });
+    self.documents = self.canvas.g.linechart(35, 10, self.width-70, 100, xvals, yvals, {
+      shade: true
+    , gutter: 15
+    , axis: "0 0 0 1"
+    });
   }
 };
 
