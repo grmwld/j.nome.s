@@ -2,33 +2,9 @@
  * Module dependencies
  */
 var util = require('util')
-  , mongoose = require('mongoose')
   , utils = require('../lib/utils');
 
-
-/**
- * Mongoose schema representing a document from a
- * jff formatted collection.
- * Corresponds to an entry from a track
- */
-var TrackSchema = new mongoose.Schema({
-  _id: Number
-, seqid: String
-, source: String
-, type: String
-, start: Number
-, end: Number
-, score: Number
-, phase: Number
-, strand: String
-});
-
-TrackSchema.index({
-  seqid: 1,
-  start: 1,
-  end: 1
-});
-
+var Mongolian = require('mongolian');
 
 /**
  * Class representing a track.
@@ -37,9 +13,10 @@ TrackSchema.index({
  * @param {String} collection
  * @api public
  */
-var Track = function(metadata){
+var Track = function(db, metadata){
   this.metadata = metadata;
-  this.model =  mongoose.model(metadata.name, TrackSchema,metadata.id);
+  this.db = db;
+  this.collection = this.db.collection(metadata.id);
 };
 
 /**
@@ -53,11 +30,12 @@ var Track = function(metadata){
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
   var self = this;
-  self.model.find({
+  self.collection.find({
     seqid: seqid
-  , start: {$lt: end}
-  , end: {$gt: start}
-  }, function(err, docs){
+  , start: {$lt: parseInt(end, 10)}
+  , end: {$gt: parseInt(start, 10)}
+  }).toArray(function(err, docs){
+    console.log(docs);
     callback(err, {
       metadata: self.metadata
     , data: docs
