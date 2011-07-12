@@ -71,7 +71,7 @@ var processProfile = function(docs, callback){
         , score: bin[parseInt((bin.length+1)/2, 10)]
         });
         bin = [];
-        bin_start = doc.start + i;
+        bin_start = doc.start + doc.end - i;
       }
     }
   });
