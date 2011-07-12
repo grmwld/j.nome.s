@@ -11,7 +11,7 @@
     "node": "v0.4.8"
   },
   "dependencies": {
-    "express": "2.3.11"
+    "express": "2.4.2"
   , "express-trace": "0.0.2"
   , "async": "0.1.9"
   , "jade": "0.12.1"
