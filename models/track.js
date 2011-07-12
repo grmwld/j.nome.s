@@ -68,7 +68,7 @@ var processProfile = function(docs, callback){
         smoothed.push({
           start: bin_start
         , end: bin_start + step
-        , score: bin[parseInt((bin.length+1)/2, 10)]
+        , score: bin[~~((bin.length+1)/2)]
         });
         bin = [];
         bin_start = i;
