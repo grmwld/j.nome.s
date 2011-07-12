@@ -117,10 +117,10 @@ Track.prototype.drawProfile = function(start, end) {
         yvals.push(doc.score);
       }
     });
-    self.resize(self.canvas.width, 150);
-    self.documents = self.canvas.g.linechart(35, 10, self.width-70, 150, xvals, yvals, {
+    self.resize(self.canvas.width, 170);
+    self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, {
       shade: true
-    , gutter: 15
+    , gutter: 25
     , axis: "0 0 0 1"
     }).hoverColumn(
       function(){

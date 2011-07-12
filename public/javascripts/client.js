@@ -64,6 +64,7 @@ $(document).ready(function() {
     placeholder: "ui-state-highlight"
   , forcePlaceholderSize: true
   , opacity: 0.8
+  , cursor: "move"
   });
   $("#tracks").disableSelection();
 
