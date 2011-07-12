@@ -1,43 +1,7 @@
 /**
  * Module dependencies
  */
-var mongoose = require('mongoose')
-  , Schema = mongoose.Schema
-
-
-/**
- * Mongoose schema representing the fs.files part of a GridStore
- *
- * @api private
- */
-var File = new Schema({
-  chunksize: Number
-, length: Number
-, md5: String
-, filename: String
-, _id: String
-});
-
-/**
- * Mongoose schema representing the fs.chunks part of a GridStore
- *
- * @api private
- */
-var Chunk = new Schema({
-  files_id: [File]
-, n: Number
-});
-
-/**
- * Virtual method allowing easy access to the data
- * contained in a GridStore object
- *
- * @api private
- */
-Chunk.virtual('data')
-  .get(function(){
-    return this.doc.data.buffer.toString().slice(0, -256);
-  });
+var Mongolian = require('mongolian');
 
 
 /**
@@ -45,13 +9,12 @@ Chunk.virtual('data')
  *
  * @api public
  */
-var Reference = function(){
-  this.files = mongoose.model('File', File, 'fs.files');
-  this.chunks = mongoose.model('Chunk', Chunk, 'fs.chunks');
+var Reference = function(db){
+  this.gridfs = db.gridfs();
 }
 
 /**
- * Gets the length of a seqid.
+ * Gets the metadata of seqid stored in the gridfs.
  *
  * @param {String} seqid
  * @param {Function} callback
@@ -59,8 +22,16 @@ var Reference = function(){
  */
 Reference.prototype.getMetadata = function(seqid, callback){
   var self = this;
-  self.files.findById(seqid, function(err, doc){
-    callback(err, doc);
+  self.gridfs.findOne(seqid, function(err, doc){
+    callback(err, {
+      _id: doc._id
+    , length: doc.length
+    , chunkSize: doc.chunkSize
+    , md5: doc.md5
+    , filename: doc.filename
+    , contentType: doc.contentType
+    , uploadDate: doc.uploadDate
+    });
   });
 };
 

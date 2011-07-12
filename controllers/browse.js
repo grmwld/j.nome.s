@@ -70,9 +70,10 @@ var route = function(app){
    */
   app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
     if (req.params.format === 'json'){
-      var reference = new Reference();
-      reference.getMetadata(req.params.seqid, function(err, doc){
-        res.send(doc);
+      var reference = new Reference(req.dataset);
+      reference.getMetadata(req.params.seqid, function(err, metadata){
+        console.log(metadata);
+        res.send(metadata);
       });
     }
   });

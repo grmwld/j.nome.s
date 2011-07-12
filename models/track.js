@@ -2,10 +2,10 @@
  * Module dependencies
  */
 var util = require('util')
-    async = require('async')
+  , async = require('async')
+  , Mongolian = require('mongolian')
   , utils = require('../lib/utils');
 
-var Mongolian = require('mongolian');
 
 /**
  * Class representing a track.
