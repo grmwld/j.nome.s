@@ -72,7 +72,6 @@ var route = function(app){
     if (req.params.format === 'json'){
       var reference = new Reference(req.dataset);
       reference.getMetadata(req.params.seqid, function(err, metadata){
-        console.log(metadata);
         res.send(metadata);
       });
     }

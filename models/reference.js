@@ -1,7 +1,8 @@
 /**
  * Module dependencies
  */
-var Mongolian = require('mongolian');
+var Mongolian = require('mongolian')
+  , NotFound = require('../controllers/errors').NotFound;
 
 
 /**
@@ -23,15 +24,19 @@ var Reference = function(db){
 Reference.prototype.getMetadata = function(seqid, callback){
   var self = this;
   self.gridfs.findOne(seqid, function(err, doc){
-    callback(err, {
-      _id: doc._id
-    , length: doc.length
-    , chunkSize: doc.chunkSize
-    , md5: doc.md5
-    , filename: doc.filename
-    , contentType: doc.contentType
-    , uploadDate: doc.uploadDate
-    });
+    if (doc){
+      callback(err, {
+        _id: doc._id
+      , length: doc.length
+      , chunkSize: doc.chunkSize
+      , md5: doc.md5
+      , filename: doc.filename
+      , contentType: doc.contentType
+      , uploadDate: doc.uploadDate
+      });
+    } else {
+      callback(err, null);
+    }
   });
 };
 

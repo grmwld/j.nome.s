@@ -186,8 +186,10 @@ var getSeqidMetadata = function(seqid, callback){
     , url: reqURL
     , dataType: "json"
     , success: function(metadata) {
-        localStorage[seqid+"metadata"] = JSON.stringify(metadata);
-        callback(metadata);
+        if (metadata){
+          localStorage[seqid+"metadata"] = JSON.stringify(metadata);
+          callback(metadata);
+        }
       }
     });
   } else {

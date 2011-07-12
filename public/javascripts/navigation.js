@@ -40,7 +40,6 @@ Navigation.prototype.refresh = function(seqid, start, end){
   var self = this;
   getGlobalStyle(function(style){
     getSeqidMetadata(seqid, function(meta){
-      console.log(meta);
       self.overviewNavigation.refresh(start, end, meta, style);
       self.ratioZoom.refresh(self.overviewNavigation.selected, style);
       self.zoomNavigation.refresh(start, end, meta, style);
