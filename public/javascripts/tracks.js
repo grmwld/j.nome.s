@@ -109,14 +109,16 @@ Track.prototype.drawProfile = function(start, end) {
   var self = this
     , xvals = []
     , yvals = [];
-  self.data.forEach(function(doc){
-    for (var i = doc.start; i < doc.end; ++i){
-      xvals.push(i);
-      yvals.push(doc.score);
-    }
-  });
-  self.resize(self.canvas.width, 100);
-  self.documents = self.canvas.g.linechart(50, 0, self.width-100, 100, xvals, yvals, { shade: true, gutter: 1 });
+  if (self.data.length !== 0){
+    self.data.forEach(function(doc){
+      for (var i = doc.start; i < doc.end; ++i){
+        xvals.push(i);
+        yvals.push(doc.score);
+      }
+    });
+    self.resize(self.canvas.width, 100);
+    self.documents = self.canvas.g.linechart(50, 0, self.width-100, 100, xvals, yvals, { shade: true, gutter: 1 });
+  }
 };
 
 /**

@@ -31,35 +31,52 @@ var Track = function(db, metadata){
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
   var self = this
-    , step = 1000000
-    , params = [];
-  for (var i = parseInt(start, 10); i < parseInt(end, 10); i+=step){
-    params.push([self.collection, seqid, i, i+step]);
-  }
-  setTimeout(function(){
-    async.concat(params, findInterval, function(err, results){
-      callback(err, {
-        metadata: self.metadata
-      , data: results
-      });
-    });
-  }, 200);
-};
-
-var findInterval = function(params, callback){
-  var collection = params[0]
-    , seqid = params[1]
-    , start = params[2]
-    , end = params[3]
-  collection.find({
+    , start = parseInt(start, 10)
+    , end = parseInt(end, 10);
+  self.collection.find({
     seqid: seqid
   , start: {$lt: end}
   , end: {$gt: start}
   }).toArray(function(err, docs){
-    callback(err, docs);
+    if (self.metadata.type === 'profile' && docs.length > 10000){
+      processProfile(docs, function(data){
+        callback(null, {
+          metadata: self.metadata
+        , data: data
+        });
+      });
+    } else {
+      callback(err, {
+        metadata: self.metadata
+      , data: docs
+      });
+    }
   });
 };
 
+var processProfile = function(docs, callback){
+  var smoothed = []
+    , bin = []
+    , bin_start = docs[0].start
+    , step = parseInt(Math.min((docs[docs.length-1].end - docs[0].start) / 10000, 1000), 10)
+    , i = 0;
+  docs.forEach(function(doc){
+    for (i = doc.start; i < doc.end; ++i){
+      bin.push(doc.score);
+      if (bin.length === step){
+        bin.sort();
+        smoothed.push({
+          start: bin_start
+        , end: bin_start + step
+        , score: bin[parseInt((bin.length+1)/2, 10)]
+        });
+        bin = [];
+        bin_start = doc.start + i;
+      }
+    }
+  });
+  callback(smoothed);
+};
 
 /**
  * Expose public functions, classes and methods
