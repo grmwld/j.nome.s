@@ -29,5 +29,13 @@
     , "style": {
       }
     }
+  , "IXT010_bb_cov": {
+      "id": "IXT010_bb_cov"
+    , "name": "IXT010_coverageib"
+    , "description": "Coverage 2 of the IXT010 gPET dataset"
+    , "type": "profile"
+    , "style": {
+      }
+    }
   }
 }
