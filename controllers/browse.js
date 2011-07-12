@@ -48,7 +48,7 @@ var route = function(app){
    * @handles {Route#POST} /browse/:dataset
    */
   app.post('/browse/:dataset', dbutils.connect, function(req, res){
-    var track = new Track(app._locals.config[req.params.dataset].tracks[req.body.trackID]);
+    var track = new Track(req.dataset, app._locals.config[req.params.dataset].tracks[req.body.trackID]);
     track.fetchInInterval(
       req.body.seqid
     , req.body.start
@@ -70,9 +70,9 @@ var route = function(app){
    */
   app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
     if (req.params.format === 'json'){
-      var reference = new Reference();
-      reference.getMetadata(req.params.seqid, function(err, doc){
-        res.send(doc);
+      var reference = new Reference(req.dataset);
+      reference.getMetadata(req.params.seqid, function(err, metadata){
+        res.send(metadata);
       });
     }
   });

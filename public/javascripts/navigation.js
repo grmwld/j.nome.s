@@ -190,7 +190,7 @@ ZoomNavigation.prototype.draw = function(start, end, meta, style){
   self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
   self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
     fetchTracksData(meta._id, start, end, true);
-    self.container.refresh(seqid, start, end);
+    self.container.refresh(meta._id, start, end);
   });
   self.selectableArea.toBack();
   self.ruler.toBack();

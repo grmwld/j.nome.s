@@ -2,32 +2,9 @@
  * Module dependencies
  */
 var util = require('util')
-  , mongoose = require('mongoose')
+  , async = require('async')
+  , Mongolian = require('mongolian')
   , utils = require('../lib/utils');
-
-
-/**
- * Mongoose schema representing a document from a
- * jff formatted collection.
- * Corresponds to an entry from a track
- */
-var TrackSchema = new mongoose.Schema({
-  _id: Number
-, seqid: String
-, source: String
-, type: String
-, start: Number
-, end: Number
-, score: Number
-, phase: Number
-, strand: String
-});
-
-TrackSchema.index({
-  seqid: 1,
-  start: 1,
-  end: 1
-});
 
 
 /**
@@ -37,9 +14,10 @@ TrackSchema.index({
  * @param {String} collection
  * @api public
  */
-var Track = function(metadata){
+var Track = function(db, metadata){
   this.metadata = metadata;
-  this.model =  mongoose.model(metadata.name, TrackSchema,metadata.id);
+  this.db = db;
+  this.collection = this.db.collection(metadata.id);
 };
 
 /**
@@ -52,20 +30,53 @@ var Track = function(metadata){
  * @api public
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
-  var self = this;
-  self.model.find({
+  var self = this
+    , start = parseInt(start, 10)
+    , end = parseInt(end, 10);
+  self.collection.find({
     seqid: seqid
   , start: {$lt: end}
   , end: {$gt: start}
-  }, function(err, docs){
-    callback(err, {
-      metadata: self.metadata
-    , data: docs
-    });
+  }).toArray(function(err, docs){
+    if (self.metadata.type === 'profile' && docs.length > 10000){
+      processProfile(docs, function(data){
+        callback(null, {
+          metadata: self.metadata
+        , data: data
+        });
+      });
+    } else {
+      callback(err, {
+        metadata: self.metadata
+      , data: docs
+      });
+    }
   });
 };
 
-
+var processProfile = function(docs, callback){
+  var smoothed = []
+    , bin = []
+    , bin_start = docs[0].start
+    , step = parseInt(Math.min((docs[docs.length-1].end - docs[0].start) / 10000, 1000), 10)
+    , i = 0;
+  docs.forEach(function(doc){
+    for (i = doc.start; i < doc.end; ++i){
+      bin.push(doc.score);
+      if (bin.length === step){
+        bin.sort();
+        smoothed.push({
+          start: bin_start
+        , end: bin_start + step
+        , score: bin[parseInt((bin.length+1)/2, 10)]
+        });
+        bin = [];
+        bin_start = doc.start + doc.end - i;
+      }
+    }
+  });
+  callback(smoothed);
+};
 
 /**
  * Expose public functions, classes and methods
