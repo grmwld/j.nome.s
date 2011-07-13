@@ -107,10 +107,10 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
         || previous.tracks === []
         || previous.pos === 0
         || previous.tracks.indexOf(trackid) === -1
-        || previous.pos !== start*end) {
+        || previous.pos !== (start+1)*end) {
       requestTrackData(reqURL, seqid, start, end, trackid, function(track){
         if (!tracks[trackid]){
-          tracks[trackid] = new Track(track, 1101, 50);
+          tracks[trackid] = new Track(track, 1100, 50);
           tracks[trackid].display(start, end);
         } else {
           tracks[trackid].refresh(start, end, track.data);
@@ -135,7 +135,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
     );
   }
   previous.tracks = tracksIDs;
-  previous.pos = start*end;
+  previous.pos = (start+1)*end;
   previous.seqid = seqid;
   $("#start").val(nf(start));
   $("#end").val(nf(end));
