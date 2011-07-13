@@ -56,26 +56,24 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
 
 var processProfile = function(docs, callback){
   var smoothed = []
-    , bin = {
-        score: 0
-      , start: docs[0].start
-      , len: 0
-      }
+    , score = 0
+    , start = docs[0].start
+    , length = 0
     , step = parseInt(Math.min((docs[docs.length-1].end - docs[0].start) / 10000, 1000), 10)
     , i = 0;
   docs.forEach(function(doc){
     for (i = doc.start; i < doc.end; i++){
-      bin.score += doc.score;
-      bin.len++;
-      if (bin.len === step){
+      score += doc.score;
+      length++;
+      if (length === step){
         smoothed.push({
-          start: bin.start
-        , end: bin.start + step
-        , score: ~~( bin.score / step )
+          start: start
+        , end: start + length
+        , score: ~~(score/length)
         });
-        bin.score = 0;
-        bin.start = i;
-        bin.len = 0;
+        score = 0;
+        start = i;
+        length = 0;
       }
     }
   });
