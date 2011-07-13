@@ -32,7 +32,7 @@ var Track = function(db, metadata){
 Track.prototype.fetchInInterval = function(seqid, start, end, callback){
   var self = this
     , start = parseInt(start, 10)
-    , end = parseInt(end, 10);
+    , end = parseInt(end, 10)
   self.collection.find({
     seqid: seqid
   , start: {$lt: end}
@@ -56,22 +56,26 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
 
 var processProfile = function(docs, callback){
   var smoothed = []
-    , bin = []
-    , bin_start = docs[0].start
+    , bin = {
+        score: 0
+      , start: docs[0].start
+      , len: 0
+      }
     , step = parseInt(Math.min((docs[docs.length-1].end - docs[0].start) / 10000, 1000), 10)
     , i = 0;
   docs.forEach(function(doc){
     for (i = doc.start; i < doc.end; i++){
-      bin.push(doc.score);
-      if (bin.length === step){
-        bin.sort();
+      bin.score += doc.score;
+      bin.len++;
+      if (bin.len === step){
         smoothed.push({
-          start: bin_start
-        , end: bin_start + step
-        , score: bin[~~((bin.length+1)/2)]
+          start: bin.start
+        , end: bin.start + step
+        , score: ~~( bin.score / step )
         });
-        bin = [];
-        bin_start = i;
+        bin.score = 0;
+        bin.start = i;
+        bin.len = 0;
       }
     }
   });
