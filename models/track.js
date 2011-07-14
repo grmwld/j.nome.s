@@ -54,6 +54,16 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback){
   });
 };
 
+/**
+ * Process a profile, reducing it's complexity by computing the mean.
+ * This allows the server not to send useless huge amount of data while the
+ * view (which is reduced to 1 or 2 megapixels) would not allow one to see the
+ * most minute details of the profile.
+ *
+ * @param {Array} docs
+ * @param {Function} callback
+ * @api private
+ */
 var processProfile = function(docs, callback){
   var smoothed = []
     , score = 0
@@ -66,11 +76,11 @@ var processProfile = function(docs, callback){
       score += doc.score;
       length++;
       if (length === step){
-        smoothed.push({
-          start: start
-        , end: start + length
-        , score: ~~(score/length)
-        });
+        smoothed.push([
+          start
+        , start + length
+        , ~~(score/length)
+        ]);
         score = 0;
         start = i;
         length = 0;

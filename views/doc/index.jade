@@ -75,10 +75,38 @@ h1 Documentation
     Check the [MongoDB documentation][mongodoc] for more details.
 
 
+    ##### Quantitative data
+
+    Quantitative data are currently rendered as profiles, that is a basic X-Y plot.
+    
+    The raw data should be stored in a tsv or csv file format similar to the [BedGraph format][bedgraph]:
+    
+    >     seqid           start   end     score
+    >
+    >     scaffold_1      0       26      0
+    >     scaffold_1      26      80      1
+    >     scaffold_1      80      130     2
+    >     scaffold_1      130     157     3
+    >     scaffold_1      157     259     4
+
+    This type of format can easily be loaded in a mongodb database with the following command :
+
+    >     $ mongoimport -d myDataset -c myTrack --type {c,t}sv
+    >       -f seqid,start,end,score --file myTrackData.{c,t}sv
+
+    Alternatively, if the data is in JSON format, it can be imported with a command similiar to the one used for non-quantitative data.
+
+    Finally, be sure to compute the relevant indexes, as quantitative data are generally huge. Trying to query the track without computing indexes
+    will result in terrible performances, to the point of non-usability. In a mongo shell, issue the following commands :
+
+    >     > use myDataset
+    >     > db.myProfileTrack.ensureIndex({seqid:1,start:1,end:1})
+
+
     ### Configuration
 
     Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
-    These configuration files can be found in j.nome.s/config
+    These configuration files can be found in `j.nome.s/config`
 
     The only required file is **global.json** which contains general settings. You
     can then add as many configuration files as you need, one per dataset.
@@ -163,3 +191,4 @@ h1 Documentation
     [mongoimport]: http://www.mongodb.org/display/DOCS/Import+Export+Tools
     [npm]: http://npmjs.org/
     [gff]: http://www.sanger.ac.uk/resources/software/gff/spec.html
+    [bedgraph]: https://cgwb.nci.nih.gov/goldenPath/help/bedgraph.html

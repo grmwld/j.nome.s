@@ -24,10 +24,16 @@ efficient way to respectively store and access huge amount of data.
 
 ### Who
 
-j.nome.is is an ongoing project initiated by Alexis GRIMALDI and Avetis
-KAZARIAN.
+j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervized by Avetis KAZARIAN.
 
 ### Change log
+
+#### v0.4.0 : 2011-07-13
+* Fixed bug in the lazy track refresh if position 0 was part of the view
+* Improved history navigation
+* Improved form validation
+* Switched to [node-mongolian][mongolian] (from mongoose) for performance reasons.
+* Implemented profile tracks visualisation.
 
 #### v0.3.2 : 2011-06-20
 * Fixed visual bug in track reordering
@@ -69,3 +75,4 @@ KAZARIAN.
 [expressjs]: http://expressjs.com/
 [nodejs]: http://nodejs.org/
 [mongodb]: http://www.mongodb.org/
+[mongolian]: https://github.com/marcello3d/node-mongolian
