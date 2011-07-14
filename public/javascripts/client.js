@@ -36,12 +36,11 @@ $(document).ready(function() {
    * negative or too big values.
    */
   validateForm(function(){
-    var start = parseNum($('#start').val())
+    var seqid = $('#seqid').val() 
+      , start = parseNum($('#start').val())
       , end = parseNum($('#end').val());
-    sanitizeInputPos(start, end, function(start, end){
-      fetchTracksData(start, end);
-      navigation.display(start, end);
-    });
+      fetchTracksData(seqid, start, end, true);
+      navigation.display(seqid, start, end);
   });
   
   /**
@@ -49,22 +48,36 @@ $(document).ready(function() {
    */
   $("#submit").click(function() {
     validateForm(function(){
-      var start = parseNum($('#start').val())
+      var seqid = $('#seqid').val()
+        , start = parseNum($('#start').val())
         , end = parseNum($('#end').val());
-      sanitizeInputPos(start, end, function(start, end){
-        fetchTracksData(start, end);
-        navigation.refresh(start, end);
-      });
+        fetchTracksData(seqid, start, end, true);
+        navigation.refresh(seqid, start, end);
     });
     return false;
   });
 
+  /**
+   * Makes the tracks divs sortable
+   */
   $("#tracks").sortable({
     placeholder: "ui-state-highlight"
   , forcePlaceholderSize: true
   , opacity: 0.8
+  , cursor: "move"
   });
   $("#tracks").disableSelection();
+
+  /**
+   * Handle history navigation
+   */
+  window.onpopstate = function(event) {
+    var state = event.state;
+    if (state){
+      fetchTracksData(state.seqid, state.start, state.end, false);
+      navigation.refresh(state.seqid, state.start, state.end);
+    }
+  };
 
 });
 
@@ -79,9 +92,8 @@ $(document).ready(function() {
  * @param {Number} start
  * @param {Number} end
  */
-var fetchTracksData = function(start, end){
+var fetchTracksData = function(seqid, start, end, updatehistory){
   var nf = new PHP_JS().number_format
-    , seqid = $("#seqid").val()
     , trackselector = $('#trackselector :checked')
     , tracksIDs = []
     , trackID
@@ -95,10 +107,10 @@ var fetchTracksData = function(start, end){
         || previous.tracks === []
         || previous.pos === 0
         || previous.tracks.indexOf(trackid) === -1
-        || previous.pos !== start*end) {
+        || previous.pos !== (start+1)*end) {
       requestTrackData(reqURL, seqid, start, end, trackid, function(track){
         if (!tracks[trackid]){
-          tracks[trackid] = new Track(track, 1101, 50);
+          tracks[trackid] = new Track(track, 1100, 50);
           tracks[trackid].display(start, end);
         } else {
           tracks[trackid].refresh(start, end, track.data);
@@ -112,15 +124,22 @@ var fetchTracksData = function(start, end){
       delete tracks[ptrack];
     }
   });
-  window.history.pushState({}, '',
-    [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
-  );
+  if (updatehistory){
+    window.history.pushState({
+      seqid: seqid
+    , start: start
+    , end: end
+    , tracksIDs: tracksIDs
+    }, '',
+      [reqURL, seqid, start, end, tracksIDs.join('&')].join('/')
+    );
+  }
   previous.tracks = tracksIDs;
-  previous.pos = start*end;
+  previous.pos = (start+1)*end;
   previous.seqid = seqid;
   $("#start").val(nf(start));
   $("#end").val(nf(end));
-}
+};
 
 /**
  * Request data of a given track between 2 positions of a seqid.
@@ -149,7 +168,7 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
       callback(data);
     }
   });
-}
+};
 
 /**
  * Get the metadata associated to the current seqid
@@ -168,8 +187,10 @@ var getSeqidMetadata = function(seqid, callback){
     , url: reqURL
     , dataType: "json"
     , success: function(metadata) {
-        localStorage[seqid+"metadata"] = JSON.stringify(metadata);
-        callback(metadata);
+        if (metadata){
+          localStorage[seqid+"metadata"] = JSON.stringify(metadata);
+          callback(metadata);
+        }
       }
     });
   } else {
@@ -197,7 +218,7 @@ var getGlobalStyle = function(callback){
   } else {
     callback(JSON.parse(localStorage["globalconfig"]));
   }
-}
+};
 
 /**
  * Validates the values in the form.
@@ -206,16 +227,27 @@ var getGlobalStyle = function(callback){
  * @param {Function} callback
  */
 var validateForm = function(callback){
-  var seqid = $("#seqid").val()
+  var nf = new PHP_JS().number_format
+    , seqid = $("#seqid").val()
     , start = parseNum($("#start").val())
     , end = parseNum($("#end").val())
     , okSeqid = seqid != 'seqid'
     , okStart = !isNaN(start)
-    , okEnd = !isNaN(end);
-  if (okSeqid && okStart && okEnd){
-    callback();
+    , okEnd = !isNaN(end)
+    , temp = 0;
+  if (start > end){
+    temp = end;
+    end = start;
+    start = temp;
   }
-}
+  if (okSeqid && okStart && okEnd){
+    sanitizeInputPos(start, end, function(start, end){
+      $("#start").val(nf(start));
+      $("#end").val(nf(end));
+      callback(true);
+    });
+  }
+};
 
 /**
  * Reset positions to 0 or seqid.length if it exceeds those limits.
@@ -226,15 +258,12 @@ var validateForm = function(callback){
  * @param {Function} callback
  */
 var sanitizeInputPos = function(start, end, callback){
-  var nf = new PHP_JS().number_format;
   getSeqidMetadata($("#seqid").val(), function(seqidMD){
     start = Math.max(0, start)
     end = Math.min(seqidMD.length, end);
-    $("#start").val(nf(start));
-    $("#end").val(nf(end));
     callback(start, end);
   });
-}
+};
 
 /**
  * Clear prompt from field

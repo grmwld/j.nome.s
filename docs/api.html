@@ -134,10 +134,13 @@ efficient way to respectively store and access huge amount of data.</p>
 
 <h3>Who</h3>
 
-<p>j.nome.is is an ongoing project initiated by Alexis GRIMALDI and Avetis
-KAZARIAN.</p>
+<p>j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervized by Avetis KAZARIAN.</p>
 
 <h3>Change log</h3>
+
+<h4>v0.4.0 : 2011-07-13</h4>
+
+<ul><li>Fixed bug in the lazy track refresh if position 0 was part of the view</li><li>Improved history navigation</li><li>Improved form validation</li><li>Switched to <a href="https://github.com/marcello3d/node-mongolian">node-mongolian</a> (from mongoose) for performance reasons.</li><li>Implemented profile tracks visualisation.</li></ul>
 
 <h4>v0.3.2 : 2011-06-20</h4>
 
@@ -211,11 +214,11 @@ KAZARIAN.</p>
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'development'</span>, <span class="keyword">function</span>(){
   <span class="variable">require</span>(<span class="string">'express-trace'</span>)(<span class="variable">app</span>);
   <span class="variable">app</span>.<span class="variable">use</span>(<span class="variable">express</span>.<span class="variable">errorHandler</span>({ <span class="variable">dumpExceptions</span>: <span class="variable">true</span>, <span class="variable">showStack</span>: <span class="variable">true</span> })); 
-  <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in development mode.'</span>)
+  <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in development mode.'</span>);
 });
 
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'test'</span>, <span class="keyword">function</span>(){
-  <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in test mode.'</span>)
+  <span class="variable">console</span>.<span class="variable">log</span>(<span class="string">'Application started in test mode.'</span>);
 });
 
 <span class="variable">app</span>.<span class="variable">configure</span>(<span class="string">'production'</span>, <span class="keyword">function</span>(){
@@ -411,7 +414,7 @@ The track data is sent to the AJAX request event.</p>
 </td>
 <td class="code">
 <pre><code><span class="variable">app</span>.<span class="variable">post</span>(<span class="string">'/browse/:dataset'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
-    <span class="keyword">var</span> <span class="variable">track</span> = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>[<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>].<span class="variable">tracks</span>[<span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">trackID</span>]);
+    <span class="keyword">var</span> <span class="variable">track</span> = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">req</span>.<span class="variable">dataset</span>, <span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>[<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>].<span class="variable">tracks</span>[<span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">trackID</span>]);
     <span class="variable">track</span>.<span class="variable">fetchInInterval</span>(
       <span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">seqid</span>
     , <span class="variable">req</span>.<span class="variable">body</span>.<span class="variable">start</span>
@@ -437,9 +440,9 @@ in order to connect to the mongo database.</p>
 <td class="code">
 <pre><code><span class="variable">app</span>.<span class="variable">get</span>(<span class="string">'/browse/:dataset/:seqid.:format'</span>, <span class="variable">dbutils</span>.<span class="variable">connect</span>, <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>){
     <span class="keyword">if</span> (<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">format</span> === <span class="string">'json'</span>){
-      <span class="keyword">var</span> <span class="variable">reference</span> = <span class="keyword">new</span> <span class="class">Reference</span>();
-      <span class="variable">reference</span>.<span class="variable">getMetadata</span>(<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">doc</span>){
-        <span class="variable">res</span>.<span class="variable">send</span>(<span class="variable">doc</span>);
+      <span class="keyword">var</span> <span class="variable">reference</span> = <span class="keyword">new</span> <span class="class">Reference</span>(<span class="variable">req</span>.<span class="variable">dataset</span>);
+      <span class="variable">reference</span>.<span class="variable">getMetadata</span>(<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">metadata</span>){
+        <span class="variable">res</span>.<span class="variable">send</span>(<span class="variable">metadata</span>);
       });
     }
   });</code></pre>
@@ -822,50 +825,8 @@ the homepage '/'</p>
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">mongoose</span> = <span class="variable">require</span>(<span class="string">'mongoose'</span>)
+<pre><code><span class="keyword">var</span> <span class="class">Mongolian</span> = <span class="variable">require</span>(<span class="string">'mongolian'</span>)
   , <span class="class">NotFound</span> = <span class="variable">require</span>(<span class="string">'../controllers/errors'</span>).<span class="class">NotFound</span>;</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Connects to a database with mongoose</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>String</em>  dbname</p></li><li><p><strong>api</strong>: <em>private</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">connectdb</span> = <span class="keyword">function</span>(<span class="variable">dbname</span>){
-  <span class="variable">mongoose</span>.<span class="variable">connect</span>(<span class="string">'mongodb://localhost/'</span> + <span class="variable">dbname</span>);
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Change the database to which the application is connected</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>String</em>  database name</p></li><li><p><strong>api</strong>: <em>private</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">changedb</span> = <span class="keyword">function</span>(<span class="variable">dbname</span>){
-  <span class="variable">mongoose</span>.<span class="variable">connection</span>.<span class="variable">db</span>.<span class="variable">databaseName</span> = <span class="variable">dbname</span>;
-}</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Updates the session stored dataset name</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  request</p></li><li><p><strong>api</strong>: <em>private</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">updateSessionDataset</span> = <span class="keyword">function</span>(<span class="variable">req</span>){
-  <span class="variable">req</span>.<span class="variable">session</span>.<span class="variable">dataset</span> = <span class="variable">mongoose</span>.<span class="variable">connection</span>.<span class="variable">db</span>.<span class="variable">databaseName</span>;
-}</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -878,22 +839,14 @@ the homepage '/'</p>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">connect</span> = <span class="keyword">function</span>(<span class="variable">req</span>, <span class="variable">res</span>, <span class="variable">next</span>){
-  <span class="keyword">var</span> <span class="variable">dbname</span> = <span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>;
+  <span class="keyword">var</span> <span class="variable">server</span> = <span class="keyword">new</span> <span class="class">Mongolian</span>;
   <span class="keyword">if</span> (!<span class="variable">req</span>.<span class="variable">app</span>.<span class="variable">_locals</span>.<span class="variable">config</span>[<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>]){
     <span class="keyword">return</span> <span class="variable">next</span>(<span class="keyword">new</span> <span class="class">NotFound</span>(&<span class="variable">quot</span>;<span class="variable">dataset</span> <span class="string">'&quot; + req.params.dataset + &quot;'</span> <span class="variable">does</span> <span class="variable">not</span> <span class="variable">exist</span>.&<span class="variable">quot</span>;));
+  } <span class="keyword">else</span> {
+    <span class="variable">req</span>.<span class="variable">dataset</span> = <span class="variable">server</span>.<span class="variable">db</span>(<span class="variable">req</span>.<span class="variable">params</span>.<span class="variable">dataset</span>);
+    <span class="variable">next</span>();
   }
-  <span class="keyword">if</span> (<span class="variable">req</span>.<span class="variable">session</span>.<span class="variable">dataset</span> != <span class="variable">dbname</span>){
-    <span class="keyword">if</span> (!<span class="variable">req</span>.<span class="variable">session</span>.<span class="variable">dataset</span>){
-      <span class="variable">connectdb</span>(<span class="variable">dbname</span>);
-      <span class="variable">updateSessionDataset</span>(<span class="variable">req</span>);
-    }
-    <span class="keyword">else</span> {
-      <span class="variable">changedb</span>(<span class="variable">dbname</span>);
-      <span class="variable">updateSessionDataset</span>(<span class="variable">req</span>);
-    }
-  }
-  <span class="variable">next</span>();
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -974,51 +927,8 @@ a callback when all items have been processed</p>
  </p>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">mongoose</span> = <span class="variable">require</span>(<span class="string">'mongoose'</span>)
-  , <span class="class">Schema</span> = <span class="variable">mongoose</span>.<span class="class">Schema</span></code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Mongoose schema representing the fs.files part of a GridStore</p>
-
-<ul><li><p><strong>api</strong>: <em>private</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">File</span> = <span class="keyword">new</span> <span class="class">Schema</span>({
-  <span class="variable">chunksize</span>: <span class="class">Number</span>
-, <span class="variable">length</span>: <span class="class">Number</span>
-, <span class="variable">md5</span>: <span class="class">String</span>
-, <span class="variable">filename</span>: <span class="class">String</span>
-, <span class="variable">_id</span>: <span class="class">String</span>
-});</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Mongoose schema representing the fs.chunks part of a GridStore</p>
-
-<ul><li><p><strong>api</strong>: <em>private</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Chunk</span> = <span class="keyword">new</span> <span class="class">Schema</span>({
-  <span class="variable">files_id</span>: [<span class="class">File</span>]
-, <span class="variable">n</span>: <span class="class">Number</span>
-});</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Virtual method allowing easy access to the data
-contained in a GridStore object</p>
-
-<ul><li><p><strong>api</strong>: <em>private</em></p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Chunk</span>.<span class="variable">virtual</span>(<span class="string">'data'</span>)
-  .<span class="variable">get</span>(<span class="keyword">function</span>(){
-    <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">doc</span>.<span class="variable">data</span>.<span class="variable">buffer</span>.<span class="variable">toString</span>().<span class="variable">slice</span>(<span class="number integer">0</span>, -<span class="number integer">256</span>);
-  });</code></pre>
+<pre><code><span class="keyword">var</span> <span class="class">Mongolian</span> = <span class="variable">require</span>(<span class="string">'mongolian'</span>)
+  , <span class="class">NotFound</span> = <span class="variable">require</span>(<span class="string">'../controllers/errors'</span>).<span class="class">NotFound</span>;</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1028,15 +938,14 @@ contained in a GridStore object</p>
 <ul><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Reference</span> = <span class="keyword">function</span>(){
-  <span class="this">this</span>.<span class="variable">files</span> = <span class="variable">mongoose</span>.<span class="variable">model</span>(<span class="string">'File'</span>, <span class="class">File</span>, <span class="string">'fs.files'</span>);
-  <span class="this">this</span>.<span class="variable">chunks</span> = <span class="variable">mongoose</span>.<span class="variable">model</span>(<span class="string">'Chunk'</span>, <span class="class">Chunk</span>, <span class="string">'fs.chunks'</span>);
+<pre><code><span class="keyword">var</span> <span class="class">Reference</span> = <span class="keyword">function</span>(<span class="variable">db</span>){
+  <span class="this">this</span>.<span class="variable">gridfs</span> = <span class="variable">db</span>.<span class="variable">gridfs</span>();
 }</code></pre>
 </td>
 </tr>
 <tr class="code">
 <td class="docs">
-<p>Gets the length of a seqid.</p>
+<p>Gets the metadata of seqid stored in the gridfs.</p>
 
 <h2></h2>
 
@@ -1045,8 +954,20 @@ contained in a GridStore object</p>
 <td class="code">
 <pre><code><span class="class">Reference</span>.<span class="variable">prototype</span>.<span class="variable">getMetadata</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">callback</span>){
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">self</span>.<span class="variable">files</span>.<span class="variable">findById</span>(<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">doc</span>){
-    <span class="variable">callback</span>(<span class="variable">err</span>, <span class="variable">doc</span>);
+  <span class="variable">self</span>.<span class="variable">gridfs</span>.<span class="variable">findOne</span>(<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">doc</span>){
+    <span class="keyword">if</span> (<span class="variable">doc</span>){
+      <span class="variable">callback</span>(<span class="variable">err</span>, {
+        <span class="variable">_id</span>: <span class="variable">doc</span>.<span class="variable">_id</span>
+      , <span class="variable">length</span>: <span class="variable">doc</span>.<span class="variable">length</span>
+      , <span class="variable">chunkSize</span>: <span class="variable">doc</span>.<span class="variable">chunkSize</span>
+      , <span class="variable">md5</span>: <span class="variable">doc</span>.<span class="variable">md5</span>
+      , <span class="variable">filename</span>: <span class="variable">doc</span>.<span class="variable">filename</span>
+      , <span class="variable">contentType</span>: <span class="variable">doc</span>.<span class="variable">contentType</span>
+      , <span class="variable">uploadDate</span>: <span class="variable">doc</span>.<span class="variable">uploadDate</span>
+      });
+    } <span class="keyword">else</span> {
+      <span class="variable">callback</span>(<span class="variable">err</span>, <span class="keyword">null</span>);
+    }
   });
 };</code></pre>
 </td>
@@ -1099,29 +1020,9 @@ contained in a GridStore object</p>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">util</span> = <span class="variable">require</span>(<span class="string">'util'</span>)
-  , <span class="variable">mongoose</span> = <span class="variable">require</span>(<span class="string">'mongoose'</span>)
+  , <span class="variable">async</span> = <span class="variable">require</span>(<span class="string">'async'</span>)
+  , <span class="class">Mongolian</span> = <span class="variable">require</span>(<span class="string">'mongolian'</span>)
   , <span class="variable">utils</span> = <span class="variable">require</span>(<span class="string">'../lib/utils'</span>);</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Mongoose schema representing a document from a
-jff formatted collection.
-Corresponds to an entry from a track
- </p>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">TrackSchema</span> = <span class="keyword">new</span> <span class="variable">mongoose</span>.<span class="class">Schema</span>({
-  <span class="variable">_id</span>: <span class="class">Number</span>
-, <span class="variable">seqid</span>: <span class="class">String</span>
-, <span class="variable">source</span>: <span class="class">String</span>
-, <span class="variable">type</span>: <span class="class">String</span>
-, <span class="variable">start</span>: <span class="class">Number</span>
-, <span class="variable">end</span>: <span class="class">Number</span>
-, <span class="variable">score</span>: <span class="class">Number</span>
-, <span class="variable">phase</span>: <span class="class">Number</span>
-, <span class="variable">strand</span>: <span class="class">String</span>
-});</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1133,10 +1034,11 @@ Corresponds to an entry from a track
 <ul><li><p><strong>param</strong>: <em>String</em>  name</p></li><li><p><strong>param</strong>: <em>String</em>  collection</p></li><li><p><strong>api</strong>: <em>public</em></p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Track</span> = <span class="keyword">function</span>(<span class="variable">metadata</span>){
+<pre><code><span class="keyword">var</span> <span class="class">Track</span> = <span class="keyword">function</span>(<span class="variable">db</span>, <span class="variable">metadata</span>){
   <span class="this">this</span>.<span class="variable">metadata</span> = <span class="variable">metadata</span>;
-  <span class="this">this</span>.<span class="variable">model</span> =  <span class="variable">mongoose</span>.<span class="variable">model</span>(<span class="variable">metadata</span>.<span class="variable">name</span>, <span class="class">TrackSchema</span>,<span class="variable">metadata</span>.<span class="variable">id</span>);
-}</code></pre>
+  <span class="this">this</span>.<span class="variable">db</span> = <span class="variable">db</span>;
+  <span class="this">this</span>.<span class="variable">collection</span> = <span class="this">this</span>.<span class="variable">db</span>.<span class="variable">collection</span>(<span class="variable">metadata</span>.<span class="variable">id</span>);
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1149,18 +1051,68 @@ Corresponds to an entry from a track
 </td>
 <td class="code">
 <pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">fetchInInterval</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">callback</span>){
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">self</span>.<span class="variable">model</span>.<span class="variable">find</span>({
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>
+    , <span class="variable">start</span> = <span class="variable">parseInt</span>(<span class="variable">start</span>, <span class="number integer">10</span>)
+    , <span class="variable">end</span> = <span class="variable">parseInt</span>(<span class="variable">end</span>, <span class="number integer">10</span>)
+  <span class="variable">self</span>.<span class="variable">collection</span>.<span class="variable">find</span>({
     <span class="variable">seqid</span>: <span class="variable">seqid</span>
   , <span class="variable">start</span>: {$<span class="variable">lt</span>: <span class="variable">end</span>}
   , <span class="variable">end</span>: {$<span class="variable">gt</span>: <span class="variable">start</span>}
-  }, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">docs</span>){
-    <span class="variable">callback</span>(<span class="variable">err</span>, {
-      <span class="variable">metadata</span>: <span class="variable">self</span>.<span class="variable">metadata</span>
-    , <span class="variable">data</span>: <span class="variable">docs</span>
-    });
+  }).<span class="variable">toArray</span>(<span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">docs</span>){
+    <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'profile'</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">docs</span>.<span class="variable">length</span> &<span class="variable">gt</span>; <span class="number integer">10000</span>){
+      <span class="variable">processProfile</span>(<span class="variable">docs</span>, <span class="keyword">function</span>(<span class="variable">data</span>){
+        <span class="variable">callback</span>(<span class="keyword">null</span>, {
+          <span class="variable">metadata</span>: <span class="variable">self</span>.<span class="variable">metadata</span>
+        , <span class="variable">data</span>: <span class="variable">data</span>
+        });
+      });
+    } <span class="keyword">else</span> {
+      <span class="variable">callback</span>(<span class="variable">err</span>, {
+        <span class="variable">metadata</span>: <span class="variable">self</span>.<span class="variable">metadata</span>
+      , <span class="variable">data</span>: <span class="variable">docs</span>
+      });
+    }
   });
-}</code></pre>
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Process a profile, reducing it's complexity by computing the mean.
+This allows the server not to send useless huge amount of data while the
+view (which is reduced to 1 or 2 megapixels) would not allow one to see the
+most minute details of the profile.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Array</em>  docs</p></li><li><p><strong>param</strong>: <em>Function</em>  callback</p></li><li><p><strong>api</strong>: <em>private</em></p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">processProfile</span> = <span class="keyword">function</span>(<span class="variable">docs</span>, <span class="variable">callback</span>){
+  <span class="keyword">var</span> <span class="variable">smoothed</span> = []
+    , <span class="variable">score</span> = <span class="number integer">0</span>
+    , <span class="variable">start</span> = <span class="variable">docs</span>[<span class="number integer">0</span>].<span class="variable">start</span>
+    , <span class="variable">length</span> = <span class="number integer">0</span>
+    , <span class="variable">step</span> = <span class="variable">parseInt</span>(<span class="class">Math</span>.<span class="variable">min</span>((<span class="variable">docs</span>[<span class="variable">docs</span>.<span class="variable">length</span>-<span class="number integer">1</span>].<span class="variable">end</span> - <span class="variable">docs</span>[<span class="number integer">0</span>].<span class="variable">start</span>) / <span class="number integer">10000</span>, <span class="number integer">1000</span>), <span class="number integer">10</span>)
+    , <span class="variable">i</span> = <span class="number integer">0</span>;
+  <span class="variable">docs</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
+    <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">doc</span>.<span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">doc</span>.<span class="variable">end</span>; <span class="variable">i</span>++){
+      <span class="variable">score</span> += <span class="variable">doc</span>.<span class="variable">score</span>;
+      <span class="variable">length</span>++;
+      <span class="keyword">if</span> (<span class="variable">length</span> === <span class="variable">step</span>){
+        <span class="variable">smoothed</span>.<span class="variable">push</span>({
+          <span class="variable">start</span>: <span class="variable">start</span>
+        , <span class="variable">end</span>: <span class="variable">start</span> + <span class="variable">length</span>
+        , <span class="variable">score</span>: ~~(<span class="variable">score</span>/<span class="variable">length</span>)
+        });
+        <span class="variable">score</span> = <span class="number integer">0</span>;
+        <span class="variable">start</span> = <span class="variable">i</span>;
+        <span class="variable">length</span> = <span class="number integer">0</span>;
+      }
+    }
+  });
+  <span class="variable">callback</span>(<span class="variable">smoothed</span>);
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1219,12 +1171,11 @@ negative or too big values.
 </td>
 <td class="code">
 <pre><code><span class="variable">validateForm</span>(<span class="keyword">function</span>(){
-    <span class="keyword">var</span> <span class="variable">start</span> = <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())
+    <span class="keyword">var</span> <span class="variable">seqid</span> = $(<span class="string">'#seqid'</span>).<span class="variable">val</span>() 
+      , <span class="variable">start</span> = <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())
       , <span class="variable">end</span> = <span class="variable">parseNum</span>($(<span class="string">'#end'</span>).<span class="variable">val</span>());
-    <span class="variable">sanitizeInputPos</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
-      <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-      <span class="variable">navigation</span>.<span class="variable">display</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-    });
+      <span class="variable">fetchTracksData</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">true</span>);
+      <span class="variable">navigation</span>.<span class="variable">display</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>);
   });</code></pre>
 </td>
 </tr>
@@ -1236,22 +1187,44 @@ negative or too big values.
 <td class="code">
 <pre><code>$(&<span class="variable">quot</span>;#<span class="variable">submit</span>&<span class="variable">quot</span>;).<span class="variable">click</span>(<span class="keyword">function</span>() {
     <span class="variable">validateForm</span>(<span class="keyword">function</span>(){
-      <span class="keyword">var</span> <span class="variable">start</span> = <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())
+      <span class="keyword">var</span> <span class="variable">seqid</span> = $(<span class="string">'#seqid'</span>).<span class="variable">val</span>()
+        , <span class="variable">start</span> = <span class="variable">parseNum</span>($(<span class="string">'#start'</span>).<span class="variable">val</span>())
         , <span class="variable">end</span> = <span class="variable">parseNum</span>($(<span class="string">'#end'</span>).<span class="variable">val</span>());
-      <span class="variable">sanitizeInputPos</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
-        <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-        <span class="variable">navigation</span>.<span class="variable">refresh</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-      });
+        <span class="variable">fetchTracksData</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">true</span>);
+        <span class="variable">navigation</span>.<span class="variable">refresh</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>);
     });
     <span class="keyword">return</span> <span class="variable">false</span>;
-  });
-
-  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">sortable</span>({
+  });</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Makes the tracks divs sortable
+   </p>
+</td>
+<td class="code">
+<pre><code>$(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">sortable</span>({
     <span class="variable">placeholder</span>: &<span class="variable">quot</span>;<span class="variable">ui</span>-<span class="variable">state</span>-<span class="variable">highlight</span>&<span class="variable">quot</span>;
   , <span class="variable">forcePlaceholderSize</span>: <span class="variable">true</span>
   , <span class="variable">opacity</span>: <span class="number float">0.8</span>
+  , <span class="variable">cursor</span>: &<span class="variable">quot</span>;<span class="variable">move</span>&<span class="variable">quot</span>;
   });
-  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">disableSelection</span>();
+  $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">disableSelection</span>();</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Handle history navigation
+   </p>
+</td>
+<td class="code">
+<pre><code><span class="variable">window</span>.<span class="variable">onpopstate</span> = <span class="keyword">function</span>(<span class="variable">event</span>) {
+    <span class="keyword">var</span> <span class="variable">state</span> = <span class="variable">event</span>.<span class="variable">state</span>;
+    <span class="keyword">if</span> (<span class="variable">state</span>){
+      <span class="variable">fetchTracksData</span>(<span class="variable">state</span>.<span class="variable">seqid</span>, <span class="variable">state</span>.<span class="variable">start</span>, <span class="variable">state</span>.<span class="variable">end</span>, <span class="variable">false</span>);
+      <span class="variable">navigation</span>.<span class="variable">refresh</span>(<span class="variable">state</span>.<span class="variable">seqid</span>, <span class="variable">state</span>.<span class="variable">start</span>, <span class="variable">state</span>.<span class="variable">end</span>);
+    }
+  };
 
 });
 
@@ -1270,9 +1243,8 @@ After rendering, 'start' and 'end' values are updated</p>
 <ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="keyword">var</span> <span class="variable">fetchTracksData</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+<pre><code><span class="keyword">var</span> <span class="variable">fetchTracksData</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">updatehistory</span>){
   <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
-    , <span class="variable">seqid</span> = $(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>()
     , <span class="variable">trackselector</span> = $(<span class="string">'#trackselector :checked'</span>)
     , <span class="variable">tracksIDs</span> = []
     , <span class="variable">trackID</span>
@@ -1286,10 +1258,10 @@ After rendering, 'start' and 'end' values are updated</p>
         || <span class="variable">previous</span>.<span class="variable">tracks</span> === []
         || <span class="variable">previous</span>.<span class="variable">pos</span> === <span class="number integer">0</span>
         || <span class="variable">previous</span>.<span class="variable">tracks</span>.<span class="variable">indexOf</span>(<span class="variable">trackid</span>) === -<span class="number integer">1</span>
-        || <span class="variable">previous</span>.<span class="variable">pos</span> !== <span class="variable">start</span>*<span class="variable">end</span>) {
+        || <span class="variable">previous</span>.<span class="variable">pos</span> !== (<span class="variable">start</span>+<span class="number integer">1</span>)*<span class="variable">end</span>) {
       <span class="variable">requestTrackData</span>(<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">trackid</span>, <span class="keyword">function</span>(<span class="variable">track</span>){
         <span class="keyword">if</span> (!<span class="variable">tracks</span>[<span class="variable">trackid</span>]){
-          <span class="variable">tracks</span>[<span class="variable">trackid</span>] = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">track</span>, <span class="number integer">1101</span>, <span class="number integer">50</span>);
+          <span class="variable">tracks</span>[<span class="variable">trackid</span>] = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">track</span>, <span class="number integer">1100</span>, <span class="number integer">50</span>);
           <span class="variable">tracks</span>[<span class="variable">trackid</span>].<span class="variable">display</span>(<span class="variable">start</span>, <span class="variable">end</span>);
         } <span class="keyword">else</span> {
           <span class="variable">tracks</span>[<span class="variable">trackid</span>].<span class="variable">refresh</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">track</span>.<span class="variable">data</span>);
@@ -1303,15 +1275,22 @@ After rendering, 'start' and 'end' values are updated</p>
       <span class="keyword">delete</span> <span class="variable">tracks</span>[<span class="variable">ptrack</span>];
     }
   });
-  <span class="variable">window</span>.<span class="variable">history</span>.<span class="variable">pushState</span>({}, <span class="string">''</span>,
-    [<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">tracksIDs</span>.<span class="variable">join</span>(<span class="string">'&amp;'</span>)].<span class="variable">join</span>(<span class="string">'/'</span>)
-  );
+  <span class="keyword">if</span> (<span class="variable">updatehistory</span>){
+    <span class="variable">window</span>.<span class="variable">history</span>.<span class="variable">pushState</span>({
+      <span class="variable">seqid</span>: <span class="variable">seqid</span>
+    , <span class="variable">start</span>: <span class="variable">start</span>
+    , <span class="variable">end</span>: <span class="variable">end</span>
+    , <span class="variable">tracksIDs</span>: <span class="variable">tracksIDs</span>
+    }, <span class="string">''</span>,
+      [<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">tracksIDs</span>.<span class="variable">join</span>(<span class="string">'&amp;'</span>)].<span class="variable">join</span>(<span class="string">'/'</span>)
+    );
+  }
   <span class="variable">previous</span>.<span class="variable">tracks</span> = <span class="variable">tracksIDs</span>;
-  <span class="variable">previous</span>.<span class="variable">pos</span> = <span class="variable">start</span>*<span class="variable">end</span>;
+  <span class="variable">previous</span>.<span class="variable">pos</span> = (<span class="variable">start</span>+<span class="number integer">1</span>)*<span class="variable">end</span>;
   <span class="variable">previous</span>.<span class="variable">seqid</span> = <span class="variable">seqid</span>;
   $(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">start</span>));
   $(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">end</span>));
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1339,7 +1318,7 @@ The callback is triggered with the collected data</p>
       <span class="variable">callback</span>(<span class="variable">data</span>);
     }
   });
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1361,8 +1340,10 @@ The callback is triggered with the collected data</p>
     , <span class="variable">url</span>: <span class="variable">reqURL</span>
     , <span class="variable">dataType</span>: &<span class="variable">quot</span>;<span class="variable">json</span>&<span class="variable">quot</span>;
     , <span class="variable">success</span>: <span class="keyword">function</span>(<span class="variable">metadata</span>) {
-        <span class="variable">localStorage</span>[<span class="variable">seqid</span>+&<span class="variable">quot</span>;<span class="variable">metadata</span>&<span class="variable">quot</span>;] = <span class="class">JSON</span>.<span class="variable">stringify</span>(<span class="variable">metadata</span>);
-        <span class="variable">callback</span>(<span class="variable">metadata</span>);
+        <span class="keyword">if</span> (<span class="variable">metadata</span>){
+          <span class="variable">localStorage</span>[<span class="variable">seqid</span>+&<span class="variable">quot</span>;<span class="variable">metadata</span>&<span class="variable">quot</span>;] = <span class="class">JSON</span>.<span class="variable">stringify</span>(<span class="variable">metadata</span>);
+          <span class="variable">callback</span>(<span class="variable">metadata</span>);
+        }
       }
     });
   } <span class="keyword">else</span> {
@@ -1395,7 +1376,7 @@ The callback is triggered with the collected data</p>
   } <span class="keyword">else</span> {
     <span class="variable">callback</span>(<span class="class">JSON</span>.<span class="variable">parse</span>(<span class="variable">localStorage</span>[&<span class="variable">quot</span>;<span class="variable">globalconfig</span>&<span class="variable">quot</span>;]));
   }
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1409,16 +1390,27 @@ If the form is valid, the callback is triggered.</p>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">validateForm</span> = <span class="keyword">function</span>(<span class="variable">callback</span>){
-  <span class="keyword">var</span> <span class="variable">seqid</span> = $(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>()
+  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
+    , <span class="variable">seqid</span> = $(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>()
     , <span class="variable">start</span> = <span class="variable">parseNum</span>($(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>())
     , <span class="variable">end</span> = <span class="variable">parseNum</span>($(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>())
     , <span class="variable">okSeqid</span> = <span class="variable">seqid</span> != <span class="string">'seqid'</span>
     , <span class="variable">okStart</span> = !<span class="variable">isNaN</span>(<span class="variable">start</span>)
-    , <span class="variable">okEnd</span> = !<span class="variable">isNaN</span>(<span class="variable">end</span>);
-  <span class="keyword">if</span> (<span class="variable">okSeqid</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">okStart</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">okEnd</span>){
-    <span class="variable">callback</span>();
+    , <span class="variable">okEnd</span> = !<span class="variable">isNaN</span>(<span class="variable">end</span>)
+    , <span class="variable">temp</span> = <span class="number integer">0</span>;
+  <span class="keyword">if</span> (<span class="variable">start</span> &<span class="variable">gt</span>; <span class="variable">end</span>){
+    <span class="variable">temp</span> = <span class="variable">end</span>;
+    <span class="variable">end</span> = <span class="variable">start</span>;
+    <span class="variable">start</span> = <span class="variable">temp</span>;
   }
-}</code></pre>
+  <span class="keyword">if</span> (<span class="variable">okSeqid</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">okStart</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">okEnd</span>){
+    <span class="variable">sanitizeInputPos</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+      $(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">start</span>));
+      $(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">end</span>));
+      <span class="variable">callback</span>(<span class="variable">true</span>);
+    });
+  }
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1432,15 +1424,12 @@ The call back is triggered with the new start and end positions.</p>
 </td>
 <td class="code">
 <pre><code><span class="keyword">var</span> <span class="variable">sanitizeInputPos</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">callback</span>){
-  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>;
   <span class="variable">getSeqidMetadata</span>($(&<span class="variable">quot</span>;#<span class="variable">seqid</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(), <span class="keyword">function</span>(<span class="variable">seqidMD</span>){
     <span class="variable">start</span> = <span class="class">Math</span>.<span class="variable">max</span>(<span class="number integer">0</span>, <span class="variable">start</span>)
     <span class="variable">end</span> = <span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">seqidMD</span>.<span class="variable">length</span>, <span class="variable">end</span>);
-    $(&<span class="variable">quot</span>;#<span class="variable">start</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">start</span>));
-    $(&<span class="variable">quot</span>;#<span class="variable">end</span>&<span class="variable">quot</span>;).<span class="variable">val</span>(<span class="variable">nf</span>(<span class="variable">end</span>));
     <span class="variable">callback</span>(<span class="variable">start</span>, <span class="variable">end</span>);
   });
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -1574,10 +1563,9 @@ Returns NaN if the formated number cannot be parsed.</p>
 <ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>param</strong>: <em>Object</em>  metadata</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">Navigation</span>.<span class="variable">prototype</span>.<span class="variable">display</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
+<pre><code><span class="class">Navigation</span>.<span class="variable">prototype</span>.<span class="variable">display</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>) {
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   <span class="variable">getGlobalStyle</span>(<span class="keyword">function</span>(<span class="variable">style</span>){
-    <span class="keyword">var</span> <span class="variable">seqid</span> = $(<span class="string">'#seqid'</span>).<span class="variable">val</span>();
     <span class="variable">getSeqidMetadata</span>(<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">meta</span>){
       <span class="variable">self</span>.<span class="variable">overviewNavigation</span>.<span class="variable">display</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">meta</span>, <span class="variable">style</span>);
       <span class="variable">self</span>.<span class="variable">ratioZoom</span>.<span class="variable">display</span>(<span class="variable">self</span>.<span class="variable">overviewNavigation</span>.<span class="variable">selected</span>, <span class="variable">style</span>);
@@ -1597,10 +1585,9 @@ Returns NaN if the formated number cannot be parsed.</p>
 <ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>param</strong>: <em>Object</em>  metadata</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">Navigation</span>.<span class="variable">prototype</span>.<span class="variable">refresh</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+<pre><code><span class="class">Navigation</span>.<span class="variable">prototype</span>.<span class="variable">refresh</span> = <span class="keyword">function</span>(<span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>){
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   <span class="variable">getGlobalStyle</span>(<span class="keyword">function</span>(<span class="variable">style</span>){
-    <span class="keyword">var</span> <span class="variable">seqid</span> = $(<span class="string">'#seqid'</span>).<span class="variable">val</span>();
     <span class="variable">getSeqidMetadata</span>(<span class="variable">seqid</span>, <span class="keyword">function</span>(<span class="variable">meta</span>){
       <span class="variable">self</span>.<span class="variable">overviewNavigation</span>.<span class="variable">refresh</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">meta</span>, <span class="variable">style</span>);
       <span class="variable">self</span>.<span class="variable">ratioZoom</span>.<span class="variable">refresh</span>(<span class="variable">self</span>.<span class="variable">overviewNavigation</span>.<span class="variable">selected</span>, <span class="variable">style</span>);
@@ -1667,8 +1654,8 @@ This method draws in the canvas previously instanciated.</p>
   <span class="variable">self</span>.<span class="variable">ruler</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawMainRuler</span>(<span class="number integer">0</span>, <span class="variable">meta</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">ruler</span>);
   <span class="variable">self</span>.<span class="variable">selected</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">currentSpan</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">meta</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">selectedspan</span>);
   <span class="variable">self</span>.<span class="variable">selectableArea</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">explorableArea</span>(<span class="number integer">0</span>, <span class="variable">meta</span>.<span class="variable">length</span>, <span class="variable">style</span>.<span class="variable">selectionspan</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
-    <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-    <span class="variable">self</span>.<span class="variable">container</span>.<span class="variable">refresh</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">meta</span>, <span class="variable">style</span>);
+    <span class="variable">fetchTracksData</span>(<span class="variable">meta</span>.<span class="variable">_id</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">true</span>);
+    <span class="variable">self</span>.<span class="variable">container</span>.<span class="variable">refresh</span>(<span class="variable">meta</span>.<span class="variable">_id</span>, <span class="variable">start</span>, <span class="variable">end</span>);
   });
   <span class="variable">self</span>.<span class="variable">selectableArea</span>.<span class="variable">toBack</span>();
   <span class="variable">self</span>.<span class="variable">selected</span>.<span class="variable">toBack</span>();
@@ -1767,8 +1754,8 @@ This method draws in the canvas previously instanciated.</p>
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   <span class="variable">self</span>.<span class="variable">ruler</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawMainRuler</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">style</span>.<span class="variable">ruler</span>);
   <span class="variable">self</span>.<span class="variable">selectableArea</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">explorableArea</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">style</span>.<span class="variable">selectionspan</span>, <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
-    <span class="variable">fetchTracksData</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-    <span class="variable">self</span>.<span class="variable">container</span>.<span class="variable">refresh</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">meta</span>, <span class="variable">style</span>);
+    <span class="variable">fetchTracksData</span>(<span class="variable">meta</span>.<span class="variable">_id</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">true</span>);
+    <span class="variable">self</span>.<span class="variable">container</span>.<span class="variable">refresh</span>(<span class="variable">meta</span>.<span class="variable">_id</span>, <span class="variable">start</span>, <span class="variable">end</span>);
   });
   <span class="variable">self</span>.<span class="variable">selectableArea</span>.<span class="variable">toBack</span>();
   <span class="variable">self</span>.<span class="variable">ruler</span>.<span class="variable">toBack</span>();
@@ -2115,12 +2102,33 @@ Instanciates and creates the containing elements if they don't exist.</p>
     $(&<span class="variable">quot</span>;#<span class="variable">tracks</span>&<span class="variable">quot</span>;).<span class="variable">append</span>(<span class="variable">self</span>.<span class="variable">div</span>);
   }
   <span class="variable">self</span>.<span class="variable">canvas</span> = <span class="class">Raphael</span>(&<span class="variable">quot</span>;<span class="variable">track</span>&<span class="variable">quot</span>;+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
-  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">hight</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
+  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
   <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
   <span class="variable">self</span>.<span class="variable">title</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">text</span>(<span class="number integer">3</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({<span class="string">'font-size'</span>: <span class="number integer">14</span>, <span class="string">'font-weight'</span>: &<span class="variable">quot</span>;<span class="variable">bold</span>&<span class="variable">quot</span>;, <span class="string">'text-anchor'</span>: &<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;});
   <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
   <span class="variable">self</span>.<span class="variable">orderLayers</span>();
   <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the track's data according to it's type</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocuments</em>
+()</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">draw</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'ref'</span>) {
+    <span class="variable">self</span>.<span class="variable">drawDocuments</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+  }
+  <span class="keyword">else</span> <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'profile'</span>) {
+    <span class="variable">self</span>.<span class="variable">drawProfile</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+  }
 };</code></pre>
 </td>
 </tr>
@@ -2134,13 +2142,13 @@ Instanciates and creates the containing elements if they don't exist.</p>
 ()</p></li></ul>
 </td>
 <td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">draw</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>){
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">drawDocuments</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>
     , <span class="variable">layers</span> = []
     , <span class="variable">laidout</span> = <span class="variable">false</span>
     , <span class="variable">next</span> = <span class="variable">false</span>;
   <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">sort</span>(<span class="keyword">function</span>(<span class="variable">a</span>, <span class="variable">b</span>){
-    <span class="keyword">return</span> (<span class="variable">b</span>[&<span class="variable">quot</span>;<span class="variable">end</span>&<span class="variable">quot</span>;]-<span class="variable">b</span>[&<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;]) - (<span class="variable">a</span>[&<span class="variable">quot</span>;<span class="variable">end</span>&<span class="variable">quot</span>;]-<span class="variable">a</span>[&<span class="variable">quot</span>;<span class="variable">start</span>&<span class="variable">quot</span>;]);
+    <span class="keyword">return</span> (<span class="variable">b</span>.<span class="variable">end</span> - <span class="variable">b</span>.<span class="variable">start</span>) - (<span class="variable">a</span>.<span class="variable">end</span> - <span class="variable">a</span>.<span class="variable">start</span>);
   });
   <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
     <span class="variable">laidout</span> = <span class="variable">false</span>;
@@ -2161,24 +2169,88 @@ Instanciates and creates the containing elements if they don't exist.</p>
       <span class="variable">next</span> = <span class="variable">false</span>;
     }
     <span class="keyword">if</span> (!<span class="variable">laidout</span>){
-      <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">remove</span>();
-      <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">remove</span>();
-      <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">30</span>);
-      <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
-      <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
-      <span class="variable">self</span>.<span class="variable">orderLayers</span>();
+      <span class="keyword">if</span> (<span class="variable">layers</span>.<span class="variable">length</span>){
+        <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">20</span>);
+      }
       <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
       <span class="variable">layers</span>.<span class="variable">push</span>([[<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]]);
     }
   });
-};
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw a profile track</p>
 
-<span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">orderLayers</span> = <span class="keyword">function</span>(){
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">drawProfile</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>
+    , <span class="variable">xvals</span> = []
+    , <span class="variable">yvals</span> = []
+    , <span class="variable">i</span> = <span class="number integer">0</span>;
+  <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">length</span> !== <span class="number integer">0</span>){
+    <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
+      <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">doc</span>.<span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">doc</span>.<span class="variable">end</span>; <span class="variable">i</span>++){
+        <span class="variable">xvals</span>.<span class="variable">push</span>(<span class="variable">i</span>);
+        <span class="variable">yvals</span>.<span class="variable">push</span>(<span class="variable">doc</span>.<span class="variable">score</span>);
+      }
+    });
+    <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="number integer">170</span>);
+    <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">g</span>.<span class="variable">linechart</span>(<span class="number integer">25</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">width</span>-<span class="number integer">50</span>, <span class="number integer">170</span>, <span class="variable">xvals</span>, <span class="variable">yvals</span>, {
+      <span class="variable">shade</span>: <span class="variable">true</span>
+    , <span class="variable">gutter</span>: <span class="number integer">25</span>
+    , <span class="variable">axis</span>: &<span class="variable">quot</span>;<span class="number integer">0</span> <span class="number integer">0</span> <span class="number integer">0</span> <span class="number integer">1</span>&<span class="variable">quot</span>;
+    }).<span class="variable">hoverColumn</span>(
+      <span class="keyword">function</span>(){
+        <span class="this">this</span>.<span class="variable">popups</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
+        <span class="this">this</span>.<span class="variable">popups</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">g</span>.<span class="variable">popup</span>(<span class="this">this</span>.<span class="variable">x</span>, <span class="this">this</span>.<span class="variable">y</span>[<span class="number integer">0</span>], ~~(<span class="this">this</span>.<span class="variable">values</span>[<span class="number integer">0</span>])).<span class="variable">insertBefore</span>(<span class="this">this</span>));
+      },
+      <span class="keyword">function</span> () {
+        <span class="this">this</span>.<span class="variable">popups</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="this">this</span>.<span class="variable">popups</span>.<span class="variable">remove</span>();
+      }
+    );
+  }
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the documents in the track canvas</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocument</em>
+()</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">orderLayers</span> = <span class="keyword">function</span>(){
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">toBack</span>();
   <span class="variable">self</span>.<span class="variable">title</span>.<span class="variable">toBack</span>();
   <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">toBack</span>();
   <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">toBack</span>();
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Resize the track's canvas
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">resize</span> = <span class="keyword">function</span>(<span class="variable">width</span>, <span class="variable">height</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">remove</span>();
+  <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">remove</span>();
+  <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">width</span>, <span class="variable">height</span>);
+  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({ <span class="variable">fill</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>;, <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">fff</span>&<span class="variable">quot</span>; });
+  <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: &<span class="variable">quot</span>;#<span class="variable">eee</span>&<span class="variable">quot</span>; });
+  <span class="variable">self</span>.<span class="variable">orderLayers</span>();
 };</code></pre>
 </td>
 </tr>
@@ -2224,7 +2296,7 @@ This method first cleans the canvas then draws the new documents</p>
   <span class="variable">self</span>.<span class="variable">clear</span>();
   <span class="variable">self</span>.<span class="variable">data</span> = <span class="variable">data</span>;
   <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-}</code></pre>
+};</code></pre>
 </td>
 </tr>
 <tr class="code">
@@ -2237,19 +2309,19 @@ This method first cleans the canvas then draws the new documents</p>
 </td>
 <td class="code">
 <pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawDocument</span> = <span class="keyword">function</span>(<span class="variable">doc</span>, <span class="variable">view_start</span>, <span class="variable">view_end</span>, <span class="variable">layer</span>, <span class="variable">style</span>) {
-  <span class="variable">view_span</span> = <span class="variable">view_end</span> - <span class="variable">view_start</span>;
-  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
+  <span class="keyword">var</span> <span class="variable">view_span</span> = <span class="variable">view_end</span> - <span class="variable">view_start</span>
+    , <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>
     , <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>
     , <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>
-    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">35</span>+<span class="number integer">30</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">12</span>).<span class="variable">attr</span>(<span class="variable">style</span>)
+    , <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">20</span>+<span class="number integer">20</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">10</span>).<span class="variable">attr</span>(<span class="variable">style</span>)
     , <span class="variable">title</span> = [];
   <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="variable">doc</span>){
     <span class="variable">title</span>.<span class="variable">push</span>(<span class="variable">i</span> + <span class="string">' : '</span> + <span class="variable">doc</span>[<span class="variable">i</span>]);
   }
   <span class="variable">d</span>.<span class="variable">attr</span>({ <span class="variable">title</span>: <span class="variable">title</span>.<span class="variable">join</span>(<span class="string">'\n'</span>) });
   <span class="keyword">return</span> <span class="variable">d</span>;
-}
+};
 </code></pre>
 </td>
 </tr>	</body>
