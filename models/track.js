@@ -76,11 +76,11 @@ var processProfile = function(docs, callback){
       score += doc.score;
       length++;
       if (length === step){
-        smoothed.push({
-          start: start
-        , end: start + length
-        , score: ~~(score/length)
-        });
+        smoothed.push([
+          start
+        , start + length
+        , ~~(score/length)
+        ]);
         score = 0;
         start = i;
         length = 0;
