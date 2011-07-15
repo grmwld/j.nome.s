@@ -15,7 +15,7 @@ var Track = function(track, width, height) {
   this.bgrules = undefined;
   this.documents = undefined;
   this.title = undefined;
-  this.div = $("<div class='track' id=track"+ this.metadata.id +"></div>");
+  this.div = $('<div class=\'track\' id=track'+ this.metadata.id +'></div>');
 };
 
 /**
@@ -180,13 +180,13 @@ Track.prototype.resize = function(width, height) {
  */
 Track.prototype.empty = function() {
   var self = this;
-  $("#track"+self.metadata.id).empty();
+  $('#track'+self.metadata.id).empty();
 };
 
 /**
  * Clears the documents from the track canvas
  */
-Track.prototype.clear = function(){
+Track.prototype.clear = function() {
   var self = this;
   self.documents.remove();
   self.canvas.setSize(self.width, self.height);
@@ -202,7 +202,7 @@ Track.prototype.clear = function(){
  * @see Track.clear()
  * @see Track.draw()
  */
-Track.prototype.refresh = function(start, end, data){
+Track.prototype.refresh = function(start, end, data) {
   var self = this;
   self.clear();
   self.data = data;
@@ -220,14 +220,14 @@ Track.prototype.refresh = function(start, end, data){
  * @param {Object} style
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  var view_span = view_end - view_start
-    , nf = new PHP_JS().number_format
-    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style)
-    , title = [];
-  for (var i in doc){
+  var view_span = view_end - view_start;
+  var nf = new PHP_JS().number_format;
+  var rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_doc_length = rel_end - rel_start;
+  var d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style);
+  var title = [];
+  for (var i in doc) {
     title.push(i + ' : ' + doc[i]);
   }
   d.attr({ title: title.join('\n') });
