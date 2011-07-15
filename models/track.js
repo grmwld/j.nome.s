@@ -1,11 +1,8 @@
 /**
  * Module dependencies
  */
-var util = require('util')
-  , async = require('async')
-  , Mongolian = require('mongolian')
-  , utils = require('../lib/utils')
-  , cutils = require('../lib/cutils');
+var Mongolian = require('mongolian')
+var cutils = require('../lib/cutils');
 
 
 /**
@@ -15,7 +12,7 @@ var util = require('util')
  * @param {String} collection
  * @api public
  */
-var Track = function(db, metadata){
+var Track = function(db, metadata) {
   this.metadata = metadata;
   this.db = db;
   this.collection = this.db.collection(metadata.id);
@@ -30,17 +27,17 @@ var Track = function(db, metadata){
  * @param {Function} callback
  * @api public
  */
-Track.prototype.fetchInInterval = function(seqid, start, end, callback){
+Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var self = this
     , start = parseInt(start, 10)
     , end = parseInt(end, 10)
     , data;
   self.collection.find({
     seqid: seqid
-  , start: {$lt: end}
-  , end: {$gt: start}
-  }).toArray(function(err, docs){
-    if (self.metadata.type === 'profile' && docs.length > 2000){
+  , start: { $lt: end }
+  , end: { $gt: start }
+  }).toArray(function(err, docs) {
+    if (self.metadata.type === 'profile' && docs.length > 2000) {
       callback(null, {
         metadata: self.metadata
       , data: cutils.processProfile(docs)

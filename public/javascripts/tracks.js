@@ -5,7 +5,7 @@
  * @param {Number} width
  * @param {Number} height
  */
-var Track = function(track, width, height){
+var Track = function(track, width, height) {
   this.width = width;
   this.height = height;
   this.metadata = track.metadata;
@@ -15,7 +15,7 @@ var Track = function(track, width, height){
   this.bgrules = undefined;
   this.documents = undefined;
   this.title = undefined;
-  this.div = $("<div class='track' id=track"+ this.metadata.id +"></div>");
+  this.div = $('<div class=\'track\' id=track'+ this.metadata.id +'></div>');
 };
 
 /**
@@ -25,15 +25,22 @@ var Track = function(track, width, height){
  * @param {Number} start
  * @param {Number} end
  */
-Track.prototype.display = function(start, end){
+Track.prototype.display = function(start, end) {
   var self = this;
-  if ($("#track"+self.metadata.id).length === 0){
-    $("#tracks").append(self.div);
+  if ($('#track'+self.metadata.id).length === 0){
+    $('#tracks').append(self.div);
   }
-  self.canvas = Raphael("track"+self.metadata.id, self.width, self.height);
-  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
-  self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
-  self.title = self.canvas.text(3, 5, self.metadata.name).attr({'font-size': 14, 'font-weight': "bold", 'text-anchor': "start"});
+  self.canvas = Raphael('track'+self.metadata.id, self.width, self.height);
+  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({
+    fill: '#fff'
+  , stroke: '#fff'
+  });
+  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
+  self.title = self.canvas.text(3, 5, self.metadata.name).attr({
+    'font-size': 14
+  , 'font-weight': 'bold'
+  , 'text-anchor': 'start'
+  });
   self.documents = self.canvas.set();
   self.orderLayers();
   self.draw(start, end);
@@ -46,7 +53,7 @@ Track.prototype.display = function(start, end){
  * @param {Number} end
  * @see drawDocuments()
  */
-Track.prototype.draw = function(start, end){
+Track.prototype.draw = function(start, end) {
   var self = this;
   if (self.metadata.type === 'ref') {
     self.drawDocuments(start, end);
@@ -64,24 +71,27 @@ Track.prototype.draw = function(start, end){
  * @see drawDocument()
  */
 Track.prototype.drawDocuments = function(start, end) {
-  var self = this
-    , layers = []
-    , laidout = false
-    , next = false;
-  self.data.sort(function(a, b){
+  var self = this;
+  var layers = [];
+  var laidout = false;
+  var next = false;
+  var start_overlap;
+  var end_overlap;
+  self.data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
-  self.data.forEach(function(doc){
+  self.data.forEach(function(doc) {
     laidout = false;
-    for (var i = 0; i < layers.length; ++i){
-      for (var j = 0; j < layers[i].length; ++j){
-        if (   doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1]
-            || doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1]){
+    for (var i = 0; i < layers.length; ++i) {
+      for (var j = 0; j < layers[i].length; ++j) {
+        start_overlap = doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1];
+        end_overlap = doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1];
+        if (start_overlap || end_overlap) {
           next = true;
           break;
         }
       }
-      if (!next){
+      if (!next) {
         self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
         layers[i].push([doc.start, doc.end]);
         laidout = true;
@@ -89,8 +99,8 @@ Track.prototype.drawDocuments = function(start, end) {
       }
       next = false;
     }
-    if (!laidout){
-      if (layers.length){
+    if (!laidout) {
+      if (layers.length) {
         self.resize(self.canvas.width, self.canvas.height+20);
       }
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
@@ -106,13 +116,13 @@ Track.prototype.drawDocuments = function(start, end) {
  * @param {Number} end
  */
 Track.prototype.drawProfile = function(start, end) {
-  var self = this
-    , xvals = []
-    , yvals = []
-    , i = 0;
-  if (self.data.length !== 0){
-    self.data.forEach(function(doc){
-      for (i = doc[0]; i < doc[1]; i++){
+  var self = this;
+  var xvals = [];
+  var yvals = [];
+  var i = 0;
+  if (self.data.length !== 0) {
+    self.data.forEach(function(doc) {
+      for (i = doc[0]; i < doc[1]; i++) {
         xvals.push(i);
         yvals.push(doc[2]);
       }
@@ -121,13 +131,13 @@ Track.prototype.drawProfile = function(start, end) {
     self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, {
       shade: true
     , gutter: 25
-    , axis: "0 0 0 1"
+    , axis: '0 0 0 1'
     }).hoverColumn(
       function(){
         this.popups = self.canvas.set();
         this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])).insertBefore(this));
       },
-      function () {
+      function() {
         this.popups && this.popups.remove();
       }
     );
@@ -141,7 +151,7 @@ Track.prototype.drawProfile = function(start, end) {
  * @param {Number} end
  * @see drawDocument()
  */
-Track.prototype.orderLayers = function(){
+Track.prototype.orderLayers = function() {
   var self = this;
   self.documents.toBack();
   self.title.toBack();
@@ -157,23 +167,26 @@ Track.prototype.resize = function(width, height) {
   self.background.remove();
   self.bgrules.remove();
   self.canvas.setSize(width, height);
-  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({ fill: "#fff", stroke: "#fff" });
-  self.bgrules = self.canvas.drawBgRules(10, { stroke: "#eee" });
+  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({
+    fill: '#fff'
+  , stroke: '#fff'
+  });
+  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
   self.orderLayers();
 };
 
 /**
  * Empty the track
  */
-Track.prototype.empty = function(){
+Track.prototype.empty = function() {
   var self = this;
-  $("#track"+self.metadata.id).empty();
+  $('#track'+self.metadata.id).empty();
 };
 
 /**
  * Clears the documents from the track canvas
  */
-Track.prototype.clear = function(){
+Track.prototype.clear = function() {
   var self = this;
   self.documents.remove();
   self.canvas.setSize(self.width, self.height);
@@ -189,7 +202,7 @@ Track.prototype.clear = function(){
  * @see Track.clear()
  * @see Track.draw()
  */
-Track.prototype.refresh = function(start, end, data){
+Track.prototype.refresh = function(start, end, data) {
   var self = this;
   self.clear();
   self.data = data;
@@ -207,14 +220,14 @@ Track.prototype.refresh = function(start, end, data){
  * @param {Object} style
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  var view_span = view_end - view_start
-    , nf = new PHP_JS().number_format
-    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_doc_length = rel_end - rel_start
-    , d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style)
-    , title = [];
-  for (var i in doc){
+  var view_span = view_end - view_start;
+  var nf = new PHP_JS().number_format;
+  var rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50;
+  var rel_doc_length = rel_end - rel_start;
+  var d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style);
+  var title = [];
+  for (var i in doc) {
     title.push(i + ' : ' + doc[i]);
   }
   d.attr({ title: title.join('\n') });
