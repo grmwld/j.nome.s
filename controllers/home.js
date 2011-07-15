@@ -4,20 +4,20 @@
  *
  * @param {Object} application
  */
-var route = function(app){
+var route = function(app) {
   
   /**
    * Route to homepage
    *
    * @handle {Route#GET} /
    */
-  app.get('/', function(req, res){
+  app.get('/', function(req, res) {
     res.render('index', {
       title: 'j.nome.s'
     });
   });
 
-}
+};
 
 
 /**

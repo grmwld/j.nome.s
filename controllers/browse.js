@@ -1,9 +1,9 @@
 /**
  * Module dependencies
  */
-var dbutils = require('../lib/dbutils')
-  , Reference = require('../models/reference').Reference
-  , Track = require('../models/track').Track;
+var dbutils = require('../lib/dbutils');
+var Reference = require('../models/reference').Reference;
+var Track = require('../models/track').Track;
 
 
 /**
@@ -13,7 +13,7 @@ var dbutils = require('../lib/dbutils')
  * @param {Object} application
  * @api public
  */
-var route = function(app){
+var route = function(app) {
 
   /**
    * Route to a specific dataset
@@ -25,7 +25,7 @@ var route = function(app){
    * @see dbutils.connect
    * @handles {Route#GET} /browse/:dataset
    */
-  app.get('/browse/:dataset', dbutils.connect, function(req, res, next){
+  app.get('/browse/:dataset', dbutils.connect, function(req, res, next) {
     res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset
@@ -47,13 +47,13 @@ var route = function(app){
    * @see dbutils.connect
    * @handles {Route#POST} /browse/:dataset
    */
-  app.post('/browse/:dataset', dbutils.connect, function(req, res){
+  app.post('/browse/:dataset', dbutils.connect, function(req, res) {
     var track = new Track(req.dataset, app._locals.config[req.params.dataset].tracks[req.body.trackID]);
     track.fetchInInterval(
       req.body.seqid
     , req.body.start
     , req.body.end
-    , function(err, data){
+    , function(err, data) {
         res.send(data);
       }
     );
@@ -68,10 +68,10 @@ var route = function(app){
    * @see dbutils.connect
    * @handles {Route#POST} /browse/:dataset/:seqid.json
    */
-  app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res){
-    if (req.params.format === 'json'){
+  app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res) {
+    if (req.params.format === 'json') {
       var reference = new Reference(req.dataset);
-      reference.getMetadata(req.params.seqid, function(err, metadata){
+      reference.getMetadata(req.params.seqid, function(err, metadata) {
         res.send(metadata);
       });
     }
@@ -86,9 +86,9 @@ var route = function(app){
    * @see dbutils.connect
    * @handles {Route#GET} /browse/:dataset/:seqid/:start/:end/:tracks
    */
-  app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/:seqid/:start/:end/:tracks', dbutils.connect, function(req, res) {
     var checked = {};
-    req.params.tracks.split('&').forEach(function(track){
+    req.params.tracks.split('&').forEach(function(track) {
       checked[track] = true;
     });
     res.render('browse', {
@@ -110,11 +110,11 @@ var route = function(app){
    * @see dbutils.connect
    * @handles {Route#GET} /browse/:dataset/*
    */
-  app.get('/browse/:dataset/*', dbutils.connect, function(req, res){
+  app.get('/browse/:dataset/*', dbutils.connect, function(req, res) {
     res.redirect('/browse/' + req.params.dataset);
   });
 
-}
+};
 
 
 /**

@@ -12,7 +12,7 @@ var util = require('util');
  *
  * @param {String} message
  */
-var NotFound = function(message){
+var NotFound = function(message) {
   this.name = 'NotFound';
   this.message = (message) ? message : "Not Found";
   Error.call(this, message);
@@ -27,7 +27,7 @@ util.inherits(NotFound, Error);
  * @param {Object} application
  * @api public
  */
-var route = function(app){
+var route = function(app) {
 
   /**
    * Handle 404 errors.
@@ -36,7 +36,7 @@ var route = function(app){
    * so that the next matching handler can handle it.
    * Otherwise, renders the 404 view.
    */
-  app.error(function(err, req, res, next){
+  app.error(function(err, req, res, next) {
     if (err instanceof NotFound) {
       res.render('404.jade', {
         title: 'Not Found'
@@ -54,7 +54,7 @@ var route = function(app){
    * Since this is the final exception handler,
    * not callback is necessary.
    */
-  app.error(function(err, req, res){
+  app.error(function(err, req, res) {
     res.render('500.jade', {
       title: 'Server Error'
     , status: 500
@@ -68,7 +68,7 @@ var route = function(app){
    * @handle {Route#GET} /404
    * @throws {NotFound}
    */
-  app.get('/404', function(req, res){
+  app.get('/404', function(req, res) {
     throw new NotFound;
   });
 
@@ -78,7 +78,7 @@ var route = function(app){
    * @handle {Route#GET} /500
    * @throws {Error}
    */
-  app.get('/500', function(req, res){
+  app.get('/500', function(req, res) {
     throw new Error('Server Side Error.');
   });
 
@@ -87,11 +87,11 @@ var route = function(app){
    *
    * @throws {NotFound}
    */
-  app.use(function(req, res){
+  app.use(function(req, res) {
     throw new NotFound('404 - Page not found.');
   });
 
-}
+};
 
 
 /**
