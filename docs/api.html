@@ -138,6 +138,10 @@ efficient way to respectively store and access huge amount of data.</p>
 
 <h3>Change log</h3>
 
+<h4>v0.4.1 : 2011-07-15</h4>
+
+<ul><li>Fixed bug in navigation and tracks alignment</li></ul>
+
 <h4>v0.4.0 : 2011-07-13</h4>
 
 <ul><li>Fixed bug in the lazy track refresh if position 0 was part of the view</li><li>Improved history navigation</li><li>Improved form validation</li><li>Switched to <a href="https://github.com/marcello3d/node-mongolian">node-mongolian</a> (from mongoose) for performance reasons.</li><li>Implemented profile tracks visualisation.</li></ul>
@@ -1100,11 +1104,11 @@ most minute details of the profile.</p>
       <span class="variable">score</span> += <span class="variable">doc</span>.<span class="variable">score</span>;
       <span class="variable">length</span>++;
       <span class="keyword">if</span> (<span class="variable">length</span> === <span class="variable">step</span>){
-        <span class="variable">smoothed</span>.<span class="variable">push</span>({
-          <span class="variable">start</span>: <span class="variable">start</span>
-        , <span class="variable">end</span>: <span class="variable">start</span> + <span class="variable">length</span>
-        , <span class="variable">score</span>: ~~(<span class="variable">score</span>/<span class="variable">length</span>)
-        });
+        <span class="variable">smoothed</span>.<span class="variable">push</span>([
+          <span class="variable">start</span>
+        , <span class="variable">start</span> + <span class="variable">length</span>
+        , ~~(<span class="variable">score</span>/<span class="variable">length</span>)
+        ]);
         <span class="variable">score</span> = <span class="number integer">0</span>;
         <span class="variable">start</span> = <span class="variable">i</span>;
         <span class="variable">length</span> = <span class="number integer">0</span>;
@@ -1261,7 +1265,7 @@ After rendering, 'start' and 'end' values are updated</p>
         || <span class="variable">previous</span>.<span class="variable">pos</span> !== (<span class="variable">start</span>+<span class="number integer">1</span>)*<span class="variable">end</span>) {
       <span class="variable">requestTrackData</span>(<span class="variable">reqURL</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">trackid</span>, <span class="keyword">function</span>(<span class="variable">track</span>){
         <span class="keyword">if</span> (!<span class="variable">tracks</span>[<span class="variable">trackid</span>]){
-          <span class="variable">tracks</span>[<span class="variable">trackid</span>] = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">track</span>, <span class="number integer">1100</span>, <span class="number integer">50</span>);
+          <span class="variable">tracks</span>[<span class="variable">trackid</span>] = <span class="keyword">new</span> <span class="class">Track</span>(<span class="variable">track</span>, <span class="number integer">1101</span>, <span class="number integer">50</span>);
           <span class="variable">tracks</span>[<span class="variable">trackid</span>].<span class="variable">display</span>(<span class="variable">start</span>, <span class="variable">end</span>);
         } <span class="keyword">else</span> {
           <span class="variable">tracks</span>[<span class="variable">trackid</span>].<span class="variable">refresh</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">track</span>.<span class="variable">data</span>);
@@ -2195,9 +2199,9 @@ Instanciates and creates the containing elements if they don't exist.</p>
     , <span class="variable">i</span> = <span class="number integer">0</span>;
   <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">length</span> !== <span class="number integer">0</span>){
     <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>){
-      <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">doc</span>.<span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">doc</span>.<span class="variable">end</span>; <span class="variable">i</span>++){
+      <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">doc</span>[<span class="number integer">0</span>]; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">doc</span>[<span class="number integer">1</span>]; <span class="variable">i</span>++){
         <span class="variable">xvals</span>.<span class="variable">push</span>(<span class="variable">i</span>);
-        <span class="variable">yvals</span>.<span class="variable">push</span>(<span class="variable">doc</span>.<span class="variable">score</span>);
+        <span class="variable">yvals</span>.<span class="variable">push</span>(<span class="variable">doc</span>[<span class="number integer">2</span>]);
       }
     });
     <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="number integer">170</span>);
