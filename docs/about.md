@@ -28,6 +28,9 @@ j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervized by A
 
 ### Change log
 
+#### v0.4.1 : 2011-07-15
+* Fixed bug in navigation and tracks alignment
+
 #### v0.4.0 : 2011-07-13
 * Fixed bug in the lazy track refresh if position 0 was part of the view
 * Improved history navigation
