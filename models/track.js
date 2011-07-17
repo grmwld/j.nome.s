@@ -5,6 +5,47 @@ var Mongolian = require('mongolian')
 var processProfile = require('../lib/cutils').processProfile;
 
 
+var queryProfile = function(collection, seqid, start, end, step, callback) {
+  var query = {
+    seqid: seqid
+  , start: { $lt: end }
+  , end: { $gt: start }
+  }
+  if (step === 1000) {
+    var queryCache = query;
+    if (step === 1000) {
+      queryCache.step = 1000
+    }
+    collection.find(queryCache).toArray(function(err, cachedDocs) {
+      if (cachedDocs.length !== 0) {
+        callback(err, cachedDocs);
+      } else {
+        collection.find(query).toArray(function(err, docs) {
+          callback(err, processProfile(docs, step));
+          if (step >= 1000) {
+            // TODO update cached
+          }
+        });
+      }
+    });
+  } else {
+    collection.find(query).toArray(function(err, docs) {
+      callback(err, processProfile(docs, step));
+    });
+  }
+};
+
+var queryRef = function(collection, seqid, start, end, step, callback) {
+  collection.find({
+    seqid: seqid
+  , start: { $lt: end }
+  , end: { $gt: start }
+  }).toArray(function(err, docs) {
+    callback(err, docs);
+  });
+};
+
+
 /**
  * Class representing a track.
  * 
@@ -32,17 +73,15 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var start = ~~start;
   var end = ~~end;
   var step = ~~(Math.min((end-start)/2000+1, 2000));
-  self.collection.find({
-    seqid: seqid
-  , start: { $lt: end }
-  , end: { $gt: start }
-  }).toArray(function(err, docs) {
-    callback(null, {
+  var query = self.metadata.type === 'profile' ? queryProfile : queryRef;
+  query(self.collection, seqid, start, end, step, function(err, docs) {
+    callback(err, {
       metadata: self.metadata
-    , data: self.metadata.type === 'profile' ? processProfile(docs, step) : docs
+    , data: docs
     });
   });
 };
+
 
 
 /**
