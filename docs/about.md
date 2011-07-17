@@ -28,49 +28,52 @@ j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervized by A
 
 ### Change log
 
+#### v0.4.3 : 2011-07-17
+* Improved profile handling performance by caching data.
+
 #### v0.4.2 : 2011-07-17
-* Fixed bug in profile rendering for views less than 2kb
+* Fixed bug in profile rendering for views less than 2kb.
 
 #### v0.4.1 : 2011-07-15
-* Fixed bug in navigation and tracks alignment
+* Fixed bug in navigation and tracks alignment.
 
 #### v0.4.0 : 2011-07-13
-* Fixed bug in the lazy track refresh if position 0 was part of the view
-* Improved history navigation
-* Improved form validation
+* Fixed bug in the lazy track refresh if position 0 was part of the view.
+* Improved history navigation.
+* Improved form validation.
 * Switched to [node-mongolian][mongolian] (from mongoose) for performance reasons.
 * Implemented profile tracks visualisation.
 
 #### v0.3.2 : 2011-06-20
-* Fixed visual bug in track reordering
-* Better centering of output-gui
+* Fixed visual bug in track reordering.
+* Better centering of output-gui.
 
 #### v0.3.1 : 2011-06-20
-* Lazier track and navigation refresh
-* Documents in a track are ordered
+* Lazier track and navigation refresh.
+* Documents in a track are ordered.
 
 #### v0.3.0 : 2011-06-18
-* Possibility to reorder tracks by drag & drop
-* The order of tracks is remembered
-* query and render only new selected tracks is view does not change
-* Favicon redesigned
+* Possibility to reorder tracks by drag & drop.
+* The order of tracks is remembered.
+* query and render only new selected tracks is view does not change.
+* Favicon redesigned.
 * Display overlapping elements of a track on different Y-axis.
 
 #### v0.2.0 : 2011-06-14
-* Fixed selection going beyond boundaries
-* Fixed non-existing SEQID
-* Fixed SEQID position overflow
-* Use ID instead of name in track rendering
-* Display the track name in the SVG canvas
-* Use configuration files for styles
-* Handle 500 and 404 errors
-* Link to generated API documentation
-* Wrote 'about' section
-* Wrote 'documentation' section
-* Wrote package.json to keep track of dependencies
+* Fixed selection going beyond boundaries.
+* Fixed non-existing SEQID.
+* Fixed SEQID position overflow.
+* Use ID instead of name in track rendering.
+* Display the track name in the SVG canvas.
+* Use configuration files for styles.
+* Handle 500 and 404 errors.
+* Link to generated API documentation.
+* Wrote 'about' section.
+* Wrote 'documentation' section.
+* Wrote package.json to keep track of dependencies.
 
 #### v0.1 : 2011-06-11
-* Navigation via rulers
+* Navigation via rulers.
 
 
 [gbrowse]: http://www.gbrowse.org/index.html
