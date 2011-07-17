@@ -122,9 +122,9 @@ Track.prototype.drawProfile = function(start, end) {
   var i = 0;
   if (self.data.length !== 0) {
     self.data.forEach(function(doc) {
-      for (i = doc[0]; i < doc[1]; i++) {
+      for (i = doc.start; i < doc.end; i++) {
         xvals.push(i);
-        yvals.push(doc[2]);
+        yvals.push(doc.score);
       }
     });
     self.resize(self.canvas.width, 170);

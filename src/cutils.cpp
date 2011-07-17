@@ -10,23 +10,20 @@ static Handle<Value> processProfile(const Arguments& args)
     Local<String> kstart = String::New("start");
     Local<String> kend = String::New("end");
     Local<String> kscore = String::New("score");
-    Local<Number> zero = Number::New(0);
-    Local<Number> one = Number::New(1);
-    Local<Number> two = Number::New(2);
+    Local<String> kseqid = String::New("seqid");
+    Local<String> vseqid;
     Local<Array> output;
-    Local<Array> point;
     Local<Array> input;
     Local<Object> doc;
+    Local<Object> point;
     unsigned int length = 0;
     unsigned int score = 0;
+    unsigned int step;
     unsigned int input_length;
     unsigned int doc_start;
     unsigned int doc_end;
     unsigned int doc_score;
     unsigned int start;
-    unsigned int step;
-    unsigned int view_start;
-    unsigned int view_end;
     unsigned int i;
     unsigned int j;
     
@@ -36,11 +33,10 @@ static Handle<Value> processProfile(const Arguments& args)
     }
 
     input = Local<Array>(Array::Cast(*args[0]));
+    step = args[1]->ToNumber()->NumberValue();
+    vseqid = input->Get(Number::New(0))->ToObject()->Get(kseqid)->ToString();
     input_length = input->Length();
-    start = input->Get(zero)->ToObject()->Get(kstart)->NumberValue();
-    view_start = start;
-    view_end = input->Get(Number::New(input_length-1))->ToObject()->Get(kend)->NumberValue();
-    step = std::min(((view_end - view_start) / 2000) + 1, (unsigned int)1000);
+    start = input->Get(Number::New(0))->ToObject()->Get(kstart)->NumberValue();
     output = Array::New(2000);
 
     for (i = 0; i < input_length; ++i)
@@ -57,10 +53,11 @@ static Handle<Value> processProfile(const Arguments& args)
 
             if (length == step)
             {
-                point = Array::New(3);
-                point->Set(zero, Number::New(start));
-                point->Set(one, Number::New(start + length));
-                point->Set(two, Number::New(score / length));
+                point = Object::New();
+                point->Set(kseqid, vseqid);
+                point->Set(kstart, Number::New(start));
+                point->Set(kend, Number::New(start + length));
+                point->Set(kscore, Number::New(score / length));
                 output->Set(Number::New(output->Length()), point);
                 score = 0;
                 start = j;
