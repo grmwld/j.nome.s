@@ -28,10 +28,10 @@ var Track = function(db, metadata) {
  * @api public
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
-  var self = this
-    , start = parseInt(start, 10)
-    , end = parseInt(end, 10)
-    , data;
+  var self = this;
+  var start = ~~start;
+  var end = ~~end;
+  var step = ~~(Math.min((end-start)/2000+1, 2000));
   self.collection.find({
     seqid: seqid
   , start: { $lt: end }
@@ -39,7 +39,7 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   }).toArray(function(err, docs) {
     callback(null, {
       metadata: self.metadata
-    , data: self.metadata.type === 'profile' ? processProfile(docs) : docs
+    , data: self.metadata.type === 'profile' ? processProfile(docs, step) : docs
     });
   });
 };

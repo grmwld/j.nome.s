@@ -19,14 +19,12 @@ static Handle<Value> processProfile(const Arguments& args)
     Local<Object> doc;
     unsigned int length = 0;
     unsigned int score = 0;
+    unsigned int step;
     unsigned int input_length;
     unsigned int doc_start;
     unsigned int doc_end;
     unsigned int doc_score;
     unsigned int start;
-    unsigned int step;
-    unsigned int view_start;
-    unsigned int view_end;
     unsigned int i;
     unsigned int j;
     
@@ -36,11 +34,9 @@ static Handle<Value> processProfile(const Arguments& args)
     }
 
     input = Local<Array>(Array::Cast(*args[0]));
+    step = args[1]->ToNumber()->NumberValue();
     input_length = input->Length();
     start = input->Get(zero)->ToObject()->Get(kstart)->NumberValue();
-    view_start = start;
-    view_end = input->Get(Number::New(input_length-1))->ToObject()->Get(kend)->NumberValue();
-    step = std::min(((view_end - view_start) / 2000) + 1, (unsigned int)1000);
     output = Array::New(2000);
 
     for (i = 0; i < input_length; ++i)
