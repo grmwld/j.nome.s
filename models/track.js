@@ -5,26 +5,48 @@ var Mongolian = require('mongolian')
 var processProfile = require('../lib/cutils').processProfile;
 
 
+var formatProfileDocs = function(docs) {
+  var fdocs = [];
+  docs.forEach(function(doc){
+    fdocs.push([
+      doc.start
+    , doc.end
+    , doc.score
+    ]);
+  });
+  return fdocs;
+};
+
 var queryProfile = function(collection, seqid, start, end, step, callback) {
   var query = {
     seqid: seqid
   , start: { $lt: end }
   , end: { $gt: start }
+  , step: {$ne: 2000}
   }
-  if (step === 1000) {
+  if (step === 2000) {
     var queryCache = query;
-    if (step === 1000) {
-      queryCache.step = 1000
+    if (step === 2000) {
+      queryCache.step = 2000
     }
     collection.find(queryCache).toArray(function(err, cachedDocs) {
       if (cachedDocs.length !== 0) {
-        callback(err, cachedDocs);
+        callback(err, formatProfileDocs(cachedDocs));
       } else {
-        collection.find(query).toArray(function(err, docs) {
-          callback(err, processProfile(docs, step));
-          if (step >= 1000) {
-            // TODO update cached
-          }
+        collection.find({ seqid: seqid }).toArray(function(err, docs) {
+          pdocs = processProfile(docs, step);
+          pdocs.forEach(function(doc) {
+            collection.insert({
+              seqid: seqid
+            , start: doc[0]
+            , end: doc[1]
+            , score: doc[2]
+            , step: 2000
+            }, function(){});
+          });
+          collection.find(queryCache).toArray(function(err, cachedDocs) {
+            callback(err, formatProfileDocs(cachedDocs));
+          });
         });
       }
     });
