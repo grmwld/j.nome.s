@@ -4,20 +4,20 @@
  *
  * @param {Object} application
  */
-var route = function(app){
+var route = function(app) {
   
   /**
    * Route to base 'doc' page.
    *
    * @handle {Route#GET} /doc
    */
-  app.get('/doc', function(req, res){
+  app.get('/doc', function(req, res) {
     res.render('doc', {
       title: 'Documentation'
     });
   });
 
-}
+};
 
 
 /**

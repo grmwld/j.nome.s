@@ -28,6 +28,9 @@ j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervized by A
 
 ### Change log
 
+#### v0.4.2 : 2011-07-17
+* Fixed bug in profile rendering for views less than 2kb
+
 #### v0.4.1 : 2011-07-15
 * Fixed bug in navigation and tracks alignment
 

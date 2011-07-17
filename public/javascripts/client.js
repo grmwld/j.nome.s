@@ -36,23 +36,23 @@ $(document).ready(function() {
    * negative or too big values.
    */
   validateForm(function(){
-    var seqid = $('#seqid').val() 
-      , start = parseNum($('#start').val())
-      , end = parseNum($('#end').val());
-      fetchTracksData(seqid, start, end, true);
-      navigation.display(seqid, start, end);
+    var seqid = $('#seqid').val();
+    var start = parseNum($('#start').val());
+    var end = parseNum($('#end').val());
+    fetchTracksData(seqid, start, end, true);
+    navigation.display(seqid, start, end);
   });
   
   /**
    * Handle browsing from main form.
    */
-  $("#submit").click(function() {
+  $('#submit').click(function() {
     validateForm(function(){
-      var seqid = $('#seqid').val()
-        , start = parseNum($('#start').val())
-        , end = parseNum($('#end').val());
-        fetchTracksData(seqid, start, end, true);
-        navigation.refresh(seqid, start, end);
+      var seqid = $('#seqid').val();
+      var start = parseNum($('#start').val());
+      var end = parseNum($('#end').val());
+      fetchTracksData(seqid, start, end, true);
+      navigation.refresh(seqid, start, end);
     });
     return false;
   });
@@ -61,19 +61,19 @@ $(document).ready(function() {
    * Makes the tracks divs sortable
    */
   $("#tracks").sortable({
-    placeholder: "ui-state-highlight"
+    placeholder: 'ui-state-highlight'
   , forcePlaceholderSize: true
   , opacity: 0.8
-  , cursor: "move"
+  , cursor: 'move'
   });
-  $("#tracks").disableSelection();
+  $('#tracks').disableSelection();
 
   /**
    * Handle history navigation
    */
   window.onpopstate = function(event) {
     var state = event.state;
-    if (state){
+    if (state) {
       fetchTracksData(state.seqid, state.start, state.end, false);
       navigation.refresh(state.seqid, state.start, state.end);
     }
@@ -92,23 +92,23 @@ $(document).ready(function() {
  * @param {Number} start
  * @param {Number} end
  */
-var fetchTracksData = function(seqid, start, end, updatehistory){
-  var nf = new PHP_JS().number_format
-    , trackselector = $('#trackselector :checked')
-    , tracksIDs = []
-    , trackID
-    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  trackselector.each(function(i){
+var fetchTracksData = function(seqid, start, end, updatehistory) {
+  var nf = new PHP_JS().number_format;
+  var trackselector = $('#trackselector :checked');
+  var tracksIDs = [];
+  var trackID;
+  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  trackselector.each(function(i) {
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
   });
-  tracksIDs.forEach(function(trackid){
+  tracksIDs.forEach(function(trackid) {
     if (   seqid !== previous.seqid
         || previous.tracks === []
         || previous.pos === 0
         || previous.tracks.indexOf(trackid) === -1
         || previous.pos !== (start+1)*end) {
-      requestTrackData(reqURL, seqid, start, end, trackid, function(track){
+      requestTrackData(reqURL, seqid, start, end, trackid, function(track) {
         if (!tracks[trackid]){
           tracks[trackid] = new Track(track, 1101, 50);
           tracks[trackid].display(start, end);
@@ -118,13 +118,13 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
       });
     }
   });
-  previous.tracks.forEach(function(ptrack){
-    if (tracksIDs.indexOf(ptrack) === -1){
+  previous.tracks.forEach(function(ptrack) {
+    if (tracksIDs.indexOf(ptrack) === -1) {
       tracks[ptrack].empty();
       delete tracks[ptrack];
     }
   });
-  if (updatehistory){
+  if (updatehistory) {
     window.history.pushState({
       seqid: seqid
     , start: start
@@ -137,8 +137,8 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
   previous.tracks = tracksIDs;
   previous.pos = (start+1)*end;
   previous.seqid = seqid;
-  $("#start").val(nf(start));
-  $("#end").val(nf(end));
+  $('#start').val(nf(start));
+  $('#end').val(nf(end));
 };
 
 /**
@@ -153,7 +153,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory){
  * @param {Function} callback
  * @api private
  */
-var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
+var requestTrackData = function(reqURL, seqid, start, end, trackID, callback) {
   $.ajax({
     type: "POST"
   , url: reqURL
@@ -177,8 +177,8 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback){
  * @param {Function} callback
  * @api private
  */
-var getSeqidMetadata = function(seqid, callback){
-  if (!localStorage[seqid+"metadata"]){
+var getSeqidMetadata = function(seqid, callback) {
+  if (!localStorage[seqid+"metadata"]) {
     var reqURL = '/'
       + window.location.href.split('/').slice(3, 5).join('/')
       + '/' + seqid + ".json";
@@ -203,9 +203,9 @@ var getSeqidMetadata = function(seqid, callback){
  *
  * @param {Function} callback
  */
-var getGlobalStyle = function(callback){
+var getGlobalStyle = function(callback) {
   var reqURL = '/globalconfig.json';
-  if (!localStorage["globalconfig"]){
+  if (!localStorage["globalconfig"]) {
     $.ajax({
       type: "GET"
     , url: reqURL
@@ -226,24 +226,24 @@ var getGlobalStyle = function(callback){
  *
  * @param {Function} callback
  */
-var validateForm = function(callback){
-  var nf = new PHP_JS().number_format
-    , seqid = $("#seqid").val()
-    , start = parseNum($("#start").val())
-    , end = parseNum($("#end").val())
-    , okSeqid = seqid != 'seqid'
-    , okStart = !isNaN(start)
-    , okEnd = !isNaN(end)
-    , temp = 0;
-  if (start > end){
+var validateForm = function(callback) {
+  var nf = new PHP_JS().number_format;
+  var seqid = $("#seqid").val();
+  var start = parseNum($("#start").val());
+  var end = parseNum($("#end").val());
+  var okSeqid = seqid != 'seqid';
+  var okStart = !isNaN(start);
+  var okEnd = !isNaN(end);
+  var temp = 0;
+  if (start > end) {
     temp = end;
     end = start;
     start = temp;
   }
-  if (okSeqid && okStart && okEnd){
-    sanitizeInputPos(start, end, function(start, end){
-      $("#start").val(nf(start));
-      $("#end").val(nf(end));
+  if (okSeqid && okStart && okEnd) {
+    sanitizeInputPos(start, end, function(start, end) {
+      $('#start').val(nf(start));
+      $('#end').val(nf(end));
       callback(true);
     });
   }
@@ -257,8 +257,8 @@ var validateForm = function(callback){
  * @param {Number} end
  * @param {Function} callback
  */
-var sanitizeInputPos = function(start, end, callback){
-  getSeqidMetadata($("#seqid").val(), function(seqidMD){
+var sanitizeInputPos = function(start, end, callback) {
+  getSeqidMetadata($('#seqid').val(), function(seqidMD) {
     start = Math.max(0, start)
     end = Math.min(seqidMD.length, end);
     callback(start, end);
@@ -270,22 +270,22 @@ var sanitizeInputPos = function(start, end, callback){
  * 
  * @param {Object} element
  */
-var clearPrompt = function(element){
-  if ($(element).val() == $(element).attr("name")) {
-    $(element).val("");
+var clearPrompt = function(element) {
+  if ($(element).val() == $(element).attr('name')) {
+    $(element).val('');
   }
-}
+};
 
 /**
  * Set prompt for field
  *
  * @param {Object} element
  */
-var setPrompt = function(element){
-  if ($(element).val() == "") {
-    $(element).val($(element).attr("name"));
+var setPrompt = function(element) {
+  if ($(element).val() == '') {
+    $(element).val($(element).attr('name'));
   }
-}
+};
 
 /**
  * Convert a formated number to an integer.
@@ -294,18 +294,17 @@ var setPrompt = function(element){
  * @param {String} str_num
  * @return {Number}
  */
-var parseNum = function(str_num){
+var parseNum = function(str_num) {
   var nf = new PHP_JS().number_format;
   parsedNum = parseInt(nf(str_num, 0, '.', ''), 10);
-  if (parseInt(str_num, 10) != 0){
-    if (parsedNum != 0){
+  if (parseInt(str_num, 10) !== 0){
+    if (parsedNum !== 0){
       return parseInt(nf(str_num, 0, '.', ''), 10);
     }
     return NaN;
   }
   return 0;
-}
-
+};
 
 
 
@@ -315,13 +314,13 @@ var parseNum = function(str_num){
  * @param {Object} dropdown
  * @return {Boolean}
  */
-var OnSelect = function(dropdown){
-  var index  = dropdown.selectedIndex
+var OnSelect = function(dropdown) {
+  var index = dropdown.selectedIndex
     , selected = dropdown.options[index]
     , baseURL = '/browse/' + selected.value;
-  if (selected.value != 'Select a dataset'){
+  if (selected.value != 'Select a dataset') {
     top.location.href = baseURL;
     return true;
   }
   return false;
-}
+};

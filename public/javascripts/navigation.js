@@ -1,11 +1,11 @@
 /**
  * Class emcapsulating navigation elements
  */
-var Navigation = function(){
-  this.overviewNavigation = new OverviewNavigation(this, "overviewnavigation", 1101, 50);
-  this.ratioZoom = new RatioZoom(this, "ratiozoom", 1101, 50);
-  this.zoomNavigation = new ZoomNavigation(this, "zoomnavigation", 1101, 50);
-  this.separator = new Separator(this,  "separator", 1101, 15);
+var Navigation = function() {
+  this.overviewNavigation = new OverviewNavigation(this, 'overviewnavigation', 1101, 50);
+  this.ratioZoom = new RatioZoom(this, 'ratiozoom', 1101, 50);
+  this.zoomNavigation = new ZoomNavigation(this, 'zoomnavigation', 1101, 50);
+  this.separator = new Separator(this,  'separator', 1101, 15);
 };
 
 /**
@@ -18,8 +18,8 @@ var Navigation = function(){
  */
 Navigation.prototype.display = function(seqid, start, end) {
   var self = this;
-  getGlobalStyle(function(style){
-    getSeqidMetadata(seqid, function(meta){
+  getGlobalStyle(function(style) {
+    getSeqidMetadata(seqid, function(meta) {
       self.overviewNavigation.display(start, end, meta, style);
       self.ratioZoom.display(self.overviewNavigation.selected, style);
       self.zoomNavigation.display(start, end, meta, style);
@@ -36,10 +36,10 @@ Navigation.prototype.display = function(seqid, start, end) {
  * @param {Object} metadata
  * @param {Object} style
  */
-Navigation.prototype.refresh = function(seqid, start, end){
+Navigation.prototype.refresh = function(seqid, start, end) {
   var self = this;
-  getGlobalStyle(function(style){
-    getSeqidMetadata(seqid, function(meta){
+  getGlobalStyle(function(style) {
+    getSeqidMetadata(seqid, function(meta) {
       self.overviewNavigation.refresh(start, end, meta, style);
       self.ratioZoom.refresh(self.overviewNavigation.selected, style);
       self.zoomNavigation.refresh(start, end, meta, style);
@@ -58,7 +58,7 @@ Navigation.prototype.refresh = function(seqid, start, end){
  * @param {Number} width
  * @param {Number} height
  */
-var OverviewNavigation = function(container, anchor, width, height){
+var OverviewNavigation = function(container, anchor, width, height) {
   this.container = container;
   this.anchor = anchor;
   this.width = width;
@@ -80,7 +80,7 @@ var OverviewNavigation = function(container, anchor, width, height){
  * @param {Object} style
  * @see OverviewNavigation.draw()
  */
-OverviewNavigation.prototype.display = function(start, end, meta, style){
+OverviewNavigation.prototype.display = function(start, end, meta, style) {
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
   self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
@@ -96,11 +96,11 @@ OverviewNavigation.prototype.display = function(start, end, meta, style){
  * @param {Object} metadata
  * @param {Object} style
  */
-OverviewNavigation.prototype.draw = function(start, end, meta, style){
+OverviewNavigation.prototype.draw = function(start, end, meta, style) {
   var self = this;
   self.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
   self.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
-  self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end){
+  self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end) {
     fetchTracksData(meta._id, start, end, true);
     self.container.refresh(meta._id, start, end);
   });
@@ -115,7 +115,7 @@ OverviewNavigation.prototype.draw = function(start, end, meta, style){
  * This only removes the potentially modified elements,
  * that is the ruler and the selected area.
  */
-OverviewNavigation.prototype.clear = function(){
+OverviewNavigation.prototype.clear = function() {
   var self = this;
   self.ruler.remove();
   self.selectableArea.remove();
@@ -150,7 +150,7 @@ OverviewNavigation.prototype.refresh = function(start, end, meta, style){
  * @param {Number} width
  * @param {Number} height
  */
-var ZoomNavigation = function(container, anchor, width, height){
+var ZoomNavigation = function(container, anchor, width, height) {
   this.container = container;
   this.anchor = anchor;
   this.width = width;
@@ -185,10 +185,10 @@ ZoomNavigation.prototype.display = function(start, end, meta, style) {
  * @param {Number} end
  * @param {Object} style
  */
-ZoomNavigation.prototype.draw = function(start, end, meta, style){
+ZoomNavigation.prototype.draw = function(start, end, meta, style) {
   var self = this;
   self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
-  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end){
+  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end) {
     fetchTracksData(meta._id, start, end, true);
     self.container.refresh(meta._id, start, end);
   });
@@ -218,11 +218,11 @@ ZoomNavigation.prototype.clear = function(){
  * @see ZoomNavigation.clear()
  * @see ZoomNavigation.draw()
  */
-ZoomNavigation.prototype.refresh = function(start, end, meta, style){
+ZoomNavigation.prototype.refresh = function(start, end, meta, style) {
   var self = this;
   self.clear();
   self.draw(start, end, meta, style);
-}
+};
 
 
 
@@ -235,7 +235,7 @@ ZoomNavigation.prototype.refresh = function(start, end, meta, style){
  * @param {Number} width
  * @param {Number} height
  */
-var RatioZoom = function(container, anchor, width, height){
+var RatioZoom = function(container, anchor, width, height) {
   this.container = container;
   this.anchor = anchor;
   this.width = width;
@@ -253,7 +253,7 @@ var RatioZoom = function(container, anchor, width, height){
  * @param {Object} style
  * @see RatioZoom.draw()
  */
-RatioZoom.prototype.display = function(cur_span, style){
+RatioZoom.prototype.display = function(cur_span, style) {
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
   self.ratio = self.canvas.set();
@@ -268,7 +268,7 @@ RatioZoom.prototype.display = function(cur_span, style){
  * @param {Array} current_span
  * @param {Object} style
  */
-RatioZoom.prototype.draw = function(cur_span, style){
+RatioZoom.prototype.draw = function(cur_span, style) {
   var self = this;
   self.ratio = self.canvas.drawRatio(cur_span, style);
   self.bgrules.toBack();
@@ -279,7 +279,7 @@ RatioZoom.prototype.draw = function(cur_span, style){
  * This only removes the potentially modified elements,
  * that is the ratio lines.
  */
-RatioZoom.prototype.clear = function(){
+RatioZoom.prototype.clear = function() {
   var self = this;
   self.ratio.remove();
 };
@@ -293,7 +293,7 @@ RatioZoom.prototype.clear = function(){
  * @see RatioZoom.clear()
  * @see RatioZoom.draw()
  */
-RatioZoom.prototype.refresh = function(cur_span, style){
+RatioZoom.prototype.refresh = function(cur_span, style) {
   var self = this;
   self.clear();
   self.draw(cur_span, style);
@@ -309,7 +309,7 @@ RatioZoom.prototype.refresh = function(cur_span, style){
  * @param {Number} width
  * @param {Number} height
  */
-var Separator = function(container, anchor, width, height){
+var Separator = function(container, anchor, width, height) {
   this.container = container;
   this.anchor = anchor;
   this.width = width;
@@ -323,7 +323,7 @@ var Separator = function(container, anchor, width, height){
  *
  * @param {Object} style
  */
-Separator.prototype.display = function(style){
+Separator.prototype.display = function(style) {
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
   self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
@@ -341,9 +341,9 @@ Separator.prototype.display = function(style){
  */
 Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
   var nf = new PHP_JS().number_format
-    , view_span = view_end - view_start
-    , view_step = view_span / 5
-    , ruler = this.set();
+  var view_span = view_end - view_start;
+  var view_step = view_span / 5;
+  var ruler = this.set();
   ruler.push(this.lineTo(50, 2*this.height/3, this.width-50, 2*this.height/3).attr(style));
   for (var x = 50.5; x <= this.width-50; x += 40) {
     ruler.push(this.lineTo(x, 2*this.height/3-3, x, 2*this.height/3+3).attr(style));
@@ -362,15 +362,15 @@ Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
  * @param {Object} style
  */
 Raphael.fn.drawRatio = function(cur_span, style) {
-  var sx1 = cur_span.attrs.x
-    , sy1 = 0
-    , sx2 = 50
-    , sy2 = this.height
-    , ex1 = cur_span.attrs.x + cur_span.attrs.width
-    , ey1 = 0
-    , ex2 = this.width - 50
-    , ey2 = this.height,
-    ratio = this.set();
+  var sx1 = cur_span.attrs.x;
+  var sy1 = 0;
+  var sx2 = 50;
+  var sy2 = this.height;
+  var ex1 = cur_span.attrs.x + cur_span.attrs.width;
+  var ey1 = 0;
+  var ex2 = this.width - 50;
+  var ey2 = this.height;
+  var ratio = this.set();
   ratio.push(this.lineTo(sx1, sy1, sx2, sy2).attr(style));
   ratio.push(this.lineTo(ex1, ey1, ex2, ey2).attr(style));
   return ratio;
@@ -386,10 +386,10 @@ Raphael.fn.drawRatio = function(cur_span, style) {
  * @return {SVG}
  */
 Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
-  var view_span = view_end - view_start
-    , rel_start = (((view_start) / tot_length) * (this.width-100)) + 50
-    , rel_end = (((view_end) / tot_length) * (this.width-100)) + 50
-    , rel_doc_length = rel_end - rel_start
+  var view_span = view_end - view_start;
+  var rel_start = (((view_start) / tot_length) * (this.width-100)) + 50;
+  var rel_end = (((view_end) / tot_length) * (this.width-100)) + 50;
+  var rel_doc_length = rel_end - rel_start;
   return this.rect(rel_start, 0, rel_doc_length, this.height, 5).attr(style);
 }
 
@@ -401,12 +401,12 @@ Raphael.fn.currentSpan = function(view_start, view_end, tot_length, style) {
  * @param {Object} style
  */
 Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
-  var gs, ge
-    , view_span = view_end - view_start
-    , a = this.rect(0, 0, this.width, this.height).attr({
+  var gs, ge;
+  var view_span = view_end - view_start;
+  var a = this.rect(0, 0, this.width, this.height).attr({
         'fill-opacity': 0,
         'stroke-opacity': 0,
-        fill: "#eee"
+        fill: '#eee'
       });
   a.drag(
     // Mouse move
@@ -429,8 +429,8 @@ Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
         e.offsetX = e.clientX - $(e.target).position().left;
       }
       gs = Math.floor((((e.offsetX-50)/(this.paper.width-100)) * view_span) + view_start);
-      this.selector = this.paper.rect(e.offsetX, 0, 1, this.attr("height"), 5).attr(style); 
-      this.selector.ox = this.selector.attr("x");
+      this.selector = this.paper.rect(e.offsetX, 0, 1, this.attr('height'), 5).attr(style); 
+      this.selector.ox = this.selector.attr('x');
     },
     // Mouse up
     function(e) {
@@ -445,14 +445,14 @@ Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
       this.selector.remove();
       // Span selection
       if (goto_start != goto_end) {
-        sanitizeInputPos(goto_start, goto_end, function(start, end){
+        sanitizeInputPos(goto_start, goto_end, function(start, end) {
           callback(start, end);
         });
       }
       // Location click
       else {
         var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
-        sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end){
+        sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end) {
           callback(start, end);
         });
       }
