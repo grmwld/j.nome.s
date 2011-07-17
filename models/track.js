@@ -37,7 +37,7 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   , start: { $lt: end }
   , end: { $gt: start }
   }).toArray(function(err, docs) {
-    if (self.metadata.type === 'profile' && docs.length > 2000) {
+    if (self.metadata.type === 'profile') {
       callback(null, {
         metadata: self.metadata
       , data: cutils.processProfile(docs)

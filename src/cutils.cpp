@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <v8.h>
 #include <node.h>
 
@@ -39,7 +40,7 @@ static Handle<Value> processProfile(const Arguments& args)
     start = input->Get(zero)->ToObject()->Get(kstart)->NumberValue();
     view_start = start;
     view_end = input->Get(Number::New(input_length-1))->ToObject()->Get(kend)->NumberValue();
-    step = (view_end - view_start) / 2000;
+    step = std::min((view_end - view_start) / 2000, (unsigned int)1000);
     output = Array::New(2000);
 
     for (i = 0; i < input_length; ++i)
