@@ -28,6 +28,9 @@ j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervized by A
 
 ### Change log
 
+#### v0.4.4 : 2011-07-17
+* Fixed bug in loadFastaRef.py
+
 #### v0.4.3 : 2011-07-17
 * Improved profile handling performance by caching data.
 
