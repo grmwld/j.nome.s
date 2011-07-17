@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 import sys
 import argparse
@@ -40,7 +40,7 @@ def loadSequences(infile):
             tmp.append(line.strip())
     if tmp:
         yield Sequence(
-                header=tmp[0].strip(),
+                header=tmp[0].strip()[1:],
                 sequence=''.join(tmp[1:]).strip()
         )
 
