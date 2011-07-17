@@ -2,7 +2,7 @@
  * Module dependencies
  */
 var Mongolian = require('mongolian')
-var cutils = require('../lib/cutils');
+var processProfile = require('../lib/cutils').processProfile;
 
 
 /**
@@ -37,17 +37,10 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   , start: { $lt: end }
   , end: { $gt: start }
   }).toArray(function(err, docs) {
-    if (self.metadata.type === 'profile') {
-      callback(null, {
-        metadata: self.metadata
-      , data: cutils.processProfile(docs)
-      });
-    } else {
-      callback(err, {
-        metadata: self.metadata
-      , data: docs
-      });
-    }
+    callback(null, {
+      metadata: self.metadata
+    , data: self.metadata.type === 'profile' ? processProfile(docs) : docs
+    });
   });
 };
 
