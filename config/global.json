@@ -5,6 +5,11 @@
     , "name": "Xentr42"
     , "description": "Xenopus tropicalis genome v4"
     }
+  , "Xentr7": {
+      "file": "Xentr7.json"
+    , "name": "Xentr7"
+    , "description": "Xenopus tropicalis genome v7"
+    }
   }
 , "style": {
     "bgrules": {

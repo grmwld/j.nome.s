@@ -52,7 +52,13 @@ $(document).ready(function() {
       var start = parseNum($('#start').val());
       var end = parseNum($('#end').val());
       fetchTracksData(seqid, start, end, true);
-      navigation.refresh(seqid, start, end);
+      try {
+        navigation.refresh(seqid, start, end);
+      } catch (err) {
+        if (err.arguments[0] === 'remove') {
+          navigation.display(seqid, start, end);
+        }
+      }
     });
     return false;
   });
@@ -178,7 +184,8 @@ var requestTrackData = function(reqURL, seqid, start, end, trackID, callback) {
  * @api private
  */
 var getSeqidMetadata = function(seqid, callback) {
-  if (!localStorage[seqid+"metadata"]) {
+  var dataset = window.location.href.split('/')[4];
+  if (!localStorage[dataset+seqid+"metadata"]) {
     var reqURL = '/'
       + window.location.href.split('/').slice(3, 5).join('/')
       + '/' + seqid + ".json";
@@ -188,13 +195,13 @@ var getSeqidMetadata = function(seqid, callback) {
     , dataType: "json"
     , success: function(metadata) {
         if (metadata){
-          localStorage[seqid+"metadata"] = JSON.stringify(metadata);
+          localStorage[dataset+seqid+"metadata"] = JSON.stringify(metadata);
           callback(metadata);
         }
       }
     });
   } else {
-    callback(JSON.parse(localStorage[seqid+"metadata"]));
+    callback(JSON.parse(localStorage[dataset+seqid+"metadata"]));
   }
 }
 
