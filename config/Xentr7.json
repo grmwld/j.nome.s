@@ -1,0 +1,15 @@
+{
+  "dbname": "Xentr7"
+, "tracks": {
+    "gaps": {
+      "id": "gaps"
+    , "name": "gaps"
+    , "description": "Assembly gaps"
+    , "type": "ref"
+    , "style": {
+        "fill": "purple"
+      , "stroke": "purple"
+      }
+    }
+  }
+}
