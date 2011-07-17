@@ -6,25 +6,6 @@ var processProfile = require('../lib/cutils').processProfile;
 
 
 /**
- * Format a profile from an object array to an array of arrays
- * containing the required fields.
- * 
- * @param {Array} docs
- * @return {Array} formated docs
- */
-var formatProfileDocs = function(docs) {
-  var fdocs = [];
-  docs.forEach(function(doc) {
-    fdocs.push([
-      doc.start
-    , doc.end
-    , doc.score
-    ]);
-  });
-  return fdocs;
-};
-
-/**
  * Inserts a processed profile in the database.
  * Fetching from this cached profile is faster than
  * processing the processed profile each time.
@@ -38,13 +19,8 @@ var cacheProfile = function(collection, seqid, step, callback) {
   collection.find({ seqid: seqid }).toArray(function(err, docs) {
     pdocs = processProfile(docs, step);
     pdocs.forEach(function(doc) {
-      collection.insert({
-        seqid: seqid
-        , start: doc[0]
-        , end: doc[1]
-        , score: doc[2]
-        , step: 2000
-      }, function(){});
+      doc.step = step;
+      collection.insert(doc, function(){});
     });
     callback();
   });
@@ -69,24 +45,29 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
     seqid: seqid
   , start: { $lt: end }
   , end: { $gt: start }
-  , step: {$ne: 2000}
-  }
+  , step: { $ne: 2000 }
+  };
+  var sortOrder = {
+    seqid: 1
+  , start: 1
+  , end: 1
+  };
   if (step === 2000) {
     var queryCache = query;
     queryCache.step = 2000;
-    collection.find(queryCache).toArray(function(err, cachedDocs) {
+    collection.find(queryCache).sort(sortOrder).toArray(function(err, cachedDocs) {
       if (cachedDocs.length === 0) {
         cacheProfile(collection, seqid, step, function() {
-          collection.find(queryCache).toArray(function(err, cachedDocs) {
-            callback(err, formatProfileDocs(cachedDocs));
+          collection.find(queryCache).sort(sortOrder).toArray(function(err, cachedDocs) {
+            callback(err, cachedDocs);
           });
         });
       } else {
-        callback(err, formatProfileDocs(cachedDocs));
+        callback(err, cachedDocs);
       }
     });
   } else {
-    collection.find(query).toArray(function(err, docs) {
+    collection.find(query).sort(sortOrder).toArray(function(err, docs) {
       callback(err, processProfile(docs, step));
     });
   }
