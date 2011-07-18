@@ -1,3 +1,4 @@
+#include <sstream>
 #include <algorithm>
 #include <v8.h>
 #include <node.h>
@@ -26,13 +27,25 @@ static Handle<Value> processProfile(const Arguments& args)
     unsigned int start;
     unsigned int i;
     unsigned int j;
+    std::stringstream ss_msg;
     
-    if (!args[0]->IsArray())
+    if (args.Length() != 2)
     {
-        return ThrowException(Exception::Error(String::New("Argument should be an array.")));
+        ss_msg << "processProfile() takes exactly 2 arguments (" << args.Length() << " given)";
+        return ThrowException(Exception::Error(String::New(ss_msg.str().c_str())));
+    }
+    if (!(args[0]->IsArray() && args[1]->IsNumber()))
+    {
+        return ThrowException(Exception::Error(String::New("Wrong argument type. Should be <Array>, <Number>.")));
     }
 
     input = Local<Array>(Array::Cast(*args[0]));
+
+    if (input->Length() == 0)
+    {
+        return Array::New();
+    }
+
     step = args[1]->ToNumber()->NumberValue();
     vseqid = input->Get(Number::New(0))->ToObject()->Get(kseqid)->ToString();
     input_length = input->Length();
