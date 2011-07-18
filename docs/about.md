@@ -28,6 +28,10 @@ j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Av
 
 ### Change log
 
+#### v0.4.6 : 2011-07-18
+* Corrected typos.
+* Fixed bug causing the app to crash if an empty array is passed to processProfile().
+
 #### v0.4.5 : 2011-07-17
 * Fixed bug when submitting parameters via the form from a blank page.
 * Fixed bug in seqid metadata fetching when switching dataset.
