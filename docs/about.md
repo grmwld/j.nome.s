@@ -24,7 +24,7 @@ efficient way to respectively store and access huge amount of data.
 
 ### Who
 
-j.nome.is is an ongoing project initiated by Alexis GRIMALDI and supervised by Avetis KAZARIAN.
+j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Avetis KAZARIAN.
 
 ### Change log
 
