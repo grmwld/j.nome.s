@@ -28,6 +28,10 @@ j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Av
 
 ### Change log
 
+#### v0.4.7 : 2011-07-19
+* Improved profile caching mechanism to play well with huge references (> 10M).
+* Better looking selection rectangle.
+
 #### v0.4.6 : 2011-07-18
 * Corrected typos.
 * Fixed bug causing the app to crash if an empty array is passed to processProfile().
