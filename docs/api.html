@@ -138,6 +138,10 @@ efficient way to respectively store and access huge amount of data.</p>
 
 <h3>Change log</h3>
 
+<h4>v0.4.7 : 2011-07-19</h4>
+
+<ul><li>Improved profile caching mechanism to play well with huge references (&gt; 10M).</li><li>Better looking selection rectangle.</li></ul>
+
 <h4>v0.4.6 : 2011-07-18</h4>
 
 <ul><li>Corrected typos.</li><li>Fixed bug causing the app to crash if an empty array is passed to processProfile().</li></ul>
@@ -983,6 +987,23 @@ the homepage '/'</p>
 </tr>
 <tr class="code">
 <td class="docs">
+<p>Compute step according to the length of the selected region</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  span</p></li><li><p><strong>return</strong>: <em>Number</em>  step</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="variable">getStep</span> = <span class="keyword">function</span>(<span class="variable">span</span>) {
+  <span class="keyword">if</span> (<span class="variable">span</span> &<span class="variable">lt</span>;= <span class="number integer">1000000</span>) {
+    <span class="keyword">return</span> ~~(<span class="variable">span</span>/<span class="number integer">10000</span>) + <span class="number integer">1</span>;
+  }
+  <span class="keyword">return</span> <span class="class">Math</span>.<span class="variable">pow</span>(<span class="number integer">10</span>, (~~(<span class="class">Math</span>.<span class="variable">log</span>(<span class="variable">span</span>)/<span class="class">Math</span>.<span class="variable">log</span>(<span class="number integer">10</span>)) - <span class="number integer">4</span>)) * <span class="number integer">5</span>;
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
 <p>Inserts a processed profile in the database.
 Fetching from this cached profile is faster than
 processing the processed profile each time.</p>
@@ -1009,7 +1030,7 @@ processing the processed profile each time.</p>
 <p>Function invoked to query a profile track (collection).
 This function takes care of querying the cached profile if
 it exists, or to compute it and cache it if it doesn't.
-If the step used in the profile processing is lower than 2000,
+If the step used in the profile processing is &lt; 500,
 the profile is processed on the fly.</p>
 
 <h2></h2>
@@ -1022,16 +1043,16 @@ the profile is processed on the fly.</p>
     <span class="variable">seqid</span>: <span class="variable">seqid</span>
   , <span class="variable">start</span>: { $<span class="variable">lt</span>: <span class="variable">end</span> }
   , <span class="variable">end</span>: { $<span class="variable">gt</span>: <span class="variable">start</span> }
-  , <span class="variable">step</span>: { $<span class="variable">ne</span>: <span class="number integer">2000</span> }
+  , <span class="variable">step</span>: { $<span class="variable">exists</span>: <span class="variable">false</span> }
   };
   <span class="keyword">var</span> <span class="variable">sortOrder</span> = {
     <span class="variable">seqid</span>: <span class="number integer">1</span>
   , <span class="variable">start</span>: <span class="number integer">1</span>
   , <span class="variable">end</span>: <span class="number integer">1</span>
   };
-  <span class="keyword">if</span> (<span class="variable">step</span> === <span class="number integer">2000</span>) {
+  <span class="keyword">if</span> (<span class="variable">step</span> % <span class="number integer">500</span> === <span class="number integer">0</span>) {
     <span class="keyword">var</span> <span class="variable">queryCache</span> = <span class="variable">query</span>;
-    <span class="variable">queryCache</span>.<span class="variable">step</span> = <span class="number integer">2000</span>;
+    <span class="variable">queryCache</span>.<span class="variable">step</span> = <span class="variable">step</span>;
     <span class="variable">collection</span>.<span class="variable">find</span>(<span class="variable">queryCache</span>).<span class="variable">sort</span>(<span class="variable">sortOrder</span>).<span class="variable">toArray</span>(<span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">cachedDocs</span>) {
       <span class="keyword">if</span> (<span class="variable">cachedDocs</span>.<span class="variable">length</span> === <span class="number integer">0</span>) {
         <span class="variable">cacheProfile</span>(<span class="variable">collection</span>, <span class="variable">seqid</span>, <span class="variable">step</span>, <span class="keyword">function</span>() {
@@ -1100,7 +1121,7 @@ the profile is processed on the fly.</p>
   <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
   <span class="keyword">var</span> <span class="variable">start</span> = ~~<span class="variable">start</span>;
   <span class="keyword">var</span> <span class="variable">end</span> = ~~<span class="variable">end</span>;
-  <span class="keyword">var</span> <span class="variable">step</span> = ~~(<span class="class">Math</span>.<span class="variable">min</span>((<span class="variable">end</span>-<span class="variable">start</span>)/<span class="number integer">2000</span>+<span class="number integer">1</span>, <span class="number integer">2000</span>));
+  <span class="keyword">var</span> <span class="variable">step</span> = <span class="variable">getStep</span>(<span class="variable">end</span> - <span class="variable">start</span>);
   <span class="keyword">var</span> <span class="variable">query</span> = <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'profile'</span> ? <span class="variable">queryProfile</span> : <span class="variable">queryRef</span>;
   <span class="variable">query</span>(<span class="variable">self</span>.<span class="variable">collection</span>, <span class="variable">seqid</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">step</span>, <span class="keyword">function</span>(<span class="variable">err</span>, <span class="variable">docs</span>) {
     <span class="variable">callback</span>(<span class="variable">err</span>, {
@@ -1508,38 +1529,6 @@ Returns NaN if the formated number cannot be parsed.</p>
     <span class="keyword">return</span> <span class="variable">true</span>;
   }
   <span class="keyword">return</span> <span class="variable">false</span>;
-};
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="./public/javascripts/rulersUI.js"><a href="#">rulersUI</a></h2></td><td>./public/javascripts/rulersUI.js</td></tr><tr class="code">
-<td class="docs">
-<p>Draw a line from (x1;y1) to (x2;y2)</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  x1</p></li><li><p><strong>param</strong>: <em>Number</em>  y1</p></li><li><p><strong>param</strong>: <em>Number</em>  x2</p></li><li><p><strong>param</strong>: <em>Number</em>  y2</p></li><li><p><strong>return</strong>: <em>SVG</em> </p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">lineTo</span> = <span class="keyword">function</span>(<span class="variable">x1</span>, <span class="variable">y1</span>, <span class="variable">x2</span>, <span class="variable">y2</span>) {
-  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">path</span>(&<span class="variable">quot</span>;<span class="class">M</span>&<span class="variable">quot</span>; + <span class="variable">x1</span> + &<span class="variable">quot</span>; &<span class="variable">quot</span>; + <span class="variable">y1</span> + &<span class="variable">quot</span>;<span class="class">L</span>&<span class="variable">quot</span>; + <span class="variable">x2</span> + &<span class="variable">quot</span>; &<span class="variable">quot</span>; + <span class="variable">y2</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Draw the background rules</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  step</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawBgRules</span> = <span class="keyword">function</span>(<span class="variable">step</span>, <span class="variable">style</span>) {
-  <span class="keyword">var</span> <span class="variable">rules</span> = <span class="this">this</span>.<span class="variable">set</span>();
-  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">x</span> = <span class="number float">0.5</span>; <span class="variable">x</span> &<span class="variable">lt</span>;= <span class="this">this</span>.<span class="variable">width</span>; <span class="variable">x</span> += <span class="variable">step</span>){
-    <span class="variable">rules</span>.<span class="variable">push</span>(<span class="this">this</span>.<span class="variable">lineTo</span>(<span class="variable">x</span>, <span class="number integer">0</span>, <span class="variable">x</span>, <span class="this">this</span>.<span class="variable">height</span>).<span class="variable">attr</span>(<span class="variable">style</span>).<span class="variable">toBack</span>());
-  }
-  <span class="keyword">return</span> <span class="variable">rules</span>;
 };
 </code></pre>
 </td>
@@ -1991,7 +1980,7 @@ This calls the clear() and draw() methods back-to-back</p>
   <span class="keyword">var</span> <span class="variable">rel_start</span> = (((<span class="variable">view_start</span>) / <span class="variable">tot_length</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
   <span class="keyword">var</span> <span class="variable">rel_end</span> = (((<span class="variable">view_end</span>) / <span class="variable">tot_length</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
   <span class="keyword">var</span> <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>;
-  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">0</span>, <span class="variable">rel_doc_length</span>, <span class="this">this</span>.<span class="variable">height</span>, <span class="number integer">5</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">1</span>, <span class="variable">rel_doc_length</span>, <span class="this">this</span>.<span class="variable">height</span>-<span class="number integer">2</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
 }</code></pre>
 </td>
 </tr>
@@ -2033,7 +2022,7 @@ This calls the clear() and draw() methods back-to-back</p>
         <span class="variable">e</span>.<span class="variable">offsetX</span> = <span class="variable">e</span>.<span class="variable">clientX</span> - $(<span class="variable">e</span>.<span class="variable">target</span>).<span class="variable">position</span>().<span class="variable">left</span>;
       }
       <span class="variable">gs</span> = <span class="class">Math</span>.<span class="variable">floor</span>((((<span class="variable">e</span>.<span class="variable">offsetX</span>-<span class="number integer">50</span>)/(<span class="this">this</span>.<span class="variable">paper</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) * <span class="variable">view_span</span>) + <span class="variable">view_start</span>);
-      <span class="this">this</span>.<span class="variable">selector</span> = <span class="this">this</span>.<span class="variable">paper</span>.<span class="variable">rect</span>(<span class="variable">e</span>.<span class="variable">offsetX</span>, <span class="number integer">0</span>, <span class="number integer">1</span>, <span class="this">this</span>.<span class="variable">attr</span>(<span class="string">'height'</span>), <span class="number integer">5</span>).<span class="variable">attr</span>(<span class="variable">style</span>); 
+      <span class="this">this</span>.<span class="variable">selector</span> = <span class="this">this</span>.<span class="variable">paper</span>.<span class="variable">rect</span>(<span class="variable">e</span>.<span class="variable">offsetX</span>, <span class="number integer">1</span>, <span class="number integer">1</span>, <span class="this">this</span>.<span class="variable">attr</span>(<span class="string">'height'</span>)-<span class="number integer">2</span>).<span class="variable">attr</span>(<span class="variable">style</span>); 
       <span class="this">this</span>.<span class="variable">selector</span>.<span class="variable">ox</span> = <span class="this">this</span>.<span class="variable">selector</span>.<span class="variable">attr</span>(<span class="string">'x'</span>);
     },
     <span class="comment">// Mouse up</span>
@@ -2064,6 +2053,38 @@ This calls the clear() and draw() methods back-to-back</p>
   );
   <span class="keyword">return</span> <span class="variable">a</span>;
 }
+</code></pre>
+</td>
+</tr><tr class="filename"><td><h2 id="./public/javascripts/rulersUI.js"><a href="#">rulersUI</a></h2></td><td>./public/javascripts/rulersUI.js</td></tr><tr class="code">
+<td class="docs">
+<p>Draw a line from (x1;y1) to (x2;y2)</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  x1</p></li><li><p><strong>param</strong>: <em>Number</em>  y1</p></li><li><p><strong>param</strong>: <em>Number</em>  x2</p></li><li><p><strong>param</strong>: <em>Number</em>  y2</p></li><li><p><strong>return</strong>: <em>SVG</em> </p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">lineTo</span> = <span class="keyword">function</span>(<span class="variable">x1</span>, <span class="variable">y1</span>, <span class="variable">x2</span>, <span class="variable">y2</span>) {
+  <span class="keyword">return</span> <span class="this">this</span>.<span class="variable">path</span>(&<span class="variable">quot</span>;<span class="class">M</span>&<span class="variable">quot</span>; + <span class="variable">x1</span> + &<span class="variable">quot</span>; &<span class="variable">quot</span>; + <span class="variable">y1</span> + &<span class="variable">quot</span>;<span class="class">L</span>&<span class="variable">quot</span>; + <span class="variable">x2</span> + &<span class="variable">quot</span>; &<span class="variable">quot</span>; + <span class="variable">y2</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the background rules</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  step</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawBgRules</span> = <span class="keyword">function</span>(<span class="variable">step</span>, <span class="variable">style</span>) {
+  <span class="keyword">var</span> <span class="variable">rules</span> = <span class="this">this</span>.<span class="variable">set</span>();
+  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">x</span> = <span class="number float">0.5</span>; <span class="variable">x</span> &<span class="variable">lt</span>;= <span class="this">this</span>.<span class="variable">width</span>; <span class="variable">x</span> += <span class="variable">step</span>){
+    <span class="variable">rules</span>.<span class="variable">push</span>(<span class="this">this</span>.<span class="variable">lineTo</span>(<span class="variable">x</span>, <span class="number integer">0</span>, <span class="variable">x</span>, <span class="this">this</span>.<span class="variable">height</span>).<span class="variable">attr</span>(<span class="variable">style</span>).<span class="variable">toBack</span>());
+  }
+  <span class="keyword">return</span> <span class="variable">rules</span>;
+};
 </code></pre>
 </td>
 </tr><tr class="filename"><td><h2 id="./public/javascripts/tracks.js"><a href="#">tracks</a></h2></td><td>./public/javascripts/tracks.js</td></tr><tr class="code">

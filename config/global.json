@@ -21,12 +21,12 @@
   , "selectedspan": {
       "fill": "#00ABFA"
     , "fill-opacity": 0.2
-    , "stroke-width": 2
+    , "stroke-width": 1
     }
   , "selectionspan": {
       "fill": "#00ABFA"
     , "fill-opacity": 0.3
-    , "stroke-width": 2
+    , "stroke-width": 1
     }
   }
 }

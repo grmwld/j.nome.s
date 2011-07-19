@@ -6,6 +6,19 @@ var processProfile = require('../lib/cutils').processProfile;
 
 
 /**
+ * Compute step according to the length of the selected region
+ *
+ * @param {Number} span
+ * @return {Number} step
+ */
+var getStep = function(span) {
+  if (span <= 1000000) {
+    return ~~(span/10000) + 1;
+  }
+  return Math.pow(10, (~~(Math.log(span)/Math.log(10)) - 4)) * 5;
+};
+
+/**
  * Inserts a processed profile in the database.
  * Fetching from this cached profile is faster than
  * processing the processed profile each time.
@@ -30,7 +43,7 @@ var cacheProfile = function(collection, seqid, step, callback) {
  * Function invoked to query a profile track (collection).
  * This function takes care of querying the cached profile if
  * it exists, or to compute it and cache it if it doesn't.
- * If the step used in the profile processing is lower than 2000,
+ * If the step used in the profile processing is < 500,
  * the profile is processed on the fly.
  *
  * @param {MongolianCollection} col
@@ -45,16 +58,16 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
     seqid: seqid
   , start: { $lt: end }
   , end: { $gt: start }
-  , step: { $ne: 2000 }
+  , step: { $exists: false }
   };
   var sortOrder = {
     seqid: 1
   , start: 1
   , end: 1
   };
-  if (step === 2000) {
+  if (step % 500 === 0) {
     var queryCache = query;
-    queryCache.step = 2000;
+    queryCache.step = step;
     collection.find(queryCache).sort(sortOrder).toArray(function(err, cachedDocs) {
       if (cachedDocs.length === 0) {
         cacheProfile(collection, seqid, step, function() {
@@ -120,7 +133,7 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var self = this;
   var start = ~~start;
   var end = ~~end;
-  var step = ~~(Math.min((end-start)/2000+1, 2000));
+  var step = getStep(end - start);
   var query = self.metadata.type === 'profile' ? queryProfile : queryRef;
   query(self.collection, seqid, start, end, step, function(err, docs) {
     callback(err, {
