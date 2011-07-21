@@ -21,6 +21,14 @@
       , "stroke": "#00afba"
       }
     }
+  , "SL001_R00078_RXL001_1_F3": {
+      "id": "SL001_R00078_RXL001_1_F3"
+    , "name": "RNASeq RXL001"
+    , "description": "RNASeq Limb"
+    , "type": "profile"
+    , "style": {
+      }
+    }
   , "IXT010_aa_cov": {
       "id": "IXT010_aa_cov"
     , "name": "IXT010_coverage"
