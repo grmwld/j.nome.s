@@ -135,7 +135,7 @@ Track.prototype.drawProfile = function(start, end) {
     }).hoverColumn(
       function(){
         this.popups = self.canvas.set();
-        this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])).insertBefore(this));
+        this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])+'').insertBefore(this));
       },
       function() {
         this.popups && this.popups.remove();

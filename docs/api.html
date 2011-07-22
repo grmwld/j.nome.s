@@ -138,6 +138,10 @@ efficient way to respectively store and access huge amount of data.</p>
 
 <h3>Change log</h3>
 
+<h4>v0.4.8 : 2011-07-22</h4>
+
+<ul><li>Fixed bug in profiles if Y values = 0.</li></ul>
+
 <h4>v0.4.7 : 2011-07-19</h4>
 
 <ul><li>Improved profile caching mechanism to play well with huge references (&gt; 10M).</li><li>Better looking selection rectangle.</li></ul>
@@ -1141,6 +1145,280 @@ the profile is processed on the fly.</p>
 <pre><code><span class="variable">exports</span>.<span class="class">Track</span> = <span class="class">Track</span>;
 </code></pre>
 </td>
+</tr><tr class="filename"><td><h2 id="./public/javascripts/tracks.js"><a href="#">tracks</a></h2></td><td>./public/javascripts/tracks.js</td></tr><tr class="code">
+<td class="docs">
+<p>Class for handling track display</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  track</p></li><li><p><strong>param</strong>: <em>Number</em>  width</p></li><li><p><strong>param</strong>: <em>Number</em>  height</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="keyword">var</span> <span class="class">Track</span> = <span class="keyword">function</span>(<span class="variable">track</span>, <span class="variable">width</span>, <span class="variable">height</span>) {
+  <span class="this">this</span>.<span class="variable">width</span> = <span class="variable">width</span>;
+  <span class="this">this</span>.<span class="variable">height</span> = <span class="variable">height</span>;
+  <span class="this">this</span>.<span class="variable">metadata</span> = <span class="variable">track</span>.<span class="variable">metadata</span>;
+  <span class="this">this</span>.<span class="variable">data</span> = <span class="variable">track</span>.<span class="variable">data</span>;
+  <span class="this">this</span>.<span class="variable">canvas</span> = <span class="variable">undefined</span>;
+  <span class="this">this</span>.<span class="variable">background</span> = <span class="variable">undefined</span>;
+  <span class="this">this</span>.<span class="variable">bgrules</span> = <span class="variable">undefined</span>;
+  <span class="this">this</span>.<span class="variable">documents</span> = <span class="variable">undefined</span>;
+  <span class="this">this</span>.<span class="variable">title</span> = <span class="variable">undefined</span>;
+  <span class="this">this</span>.<span class="variable">div</span> = $(<span class="variable">track</span>\<span class="string">' id=track'</span>+ <span class="this">this</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +<span class="string">'&gt;&lt;/div&gt;'</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Display a track.
+Instanciates and creates the containing elements if they don't exist.</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">display</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="keyword">if</span> ($(<span class="string">'#track'</span>+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>).<span class="variable">length</span> === <span class="number integer">0</span>){
+    $(<span class="string">'#tracks'</span>).<span class="variable">append</span>(<span class="variable">self</span>.<span class="variable">div</span>);
+  }
+  <span class="variable">self</span>.<span class="variable">canvas</span> = <span class="class">Raphael</span>(<span class="string">'track'</span>+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
+  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({
+    <span class="variable">fill</span>: <span class="string">'#fff'</span>
+  , <span class="variable">stroke</span>: <span class="string">'#fff'</span>
+  });
+  <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: <span class="string">'#eee'</span> });
+  <span class="variable">self</span>.<span class="variable">title</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">text</span>(<span class="number integer">3</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({
+    <span class="string">'font-size'</span>: <span class="number integer">14</span>
+  , <span class="string">'font-weight'</span>: <span class="string">'bold'</span>
+  , <span class="string">'text-anchor'</span>: <span class="string">'start'</span>
+  });
+  <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
+  <span class="variable">self</span>.<span class="variable">orderLayers</span>();
+  <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the track's data according to it's type</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocuments</em>
+()</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">draw</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'ref'</span>) {
+    <span class="variable">self</span>.<span class="variable">drawDocuments</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+  }
+  <span class="keyword">else</span> <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'profile'</span>) {
+    <span class="variable">self</span>.<span class="variable">drawProfile</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+  }
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the documents in the track canvas</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocument</em>
+()</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">drawDocuments</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="keyword">var</span> <span class="variable">layers</span> = [];
+  <span class="keyword">var</span> <span class="variable">laidout</span> = <span class="variable">false</span>;
+  <span class="keyword">var</span> <span class="variable">next</span> = <span class="variable">false</span>;
+  <span class="keyword">var</span> <span class="variable">start_overlap</span>;
+  <span class="keyword">var</span> <span class="variable">end_overlap</span>;
+  <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">sort</span>(<span class="keyword">function</span>(<span class="variable">a</span>, <span class="variable">b</span>) {
+    <span class="keyword">return</span> (<span class="variable">b</span>.<span class="variable">end</span> - <span class="variable">b</span>.<span class="variable">start</span>) - (<span class="variable">a</span>.<span class="variable">end</span> - <span class="variable">a</span>.<span class="variable">start</span>);
+  });
+  <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>) {
+    <span class="variable">laidout</span> = <span class="variable">false</span>;
+    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">layers</span>.<span class="variable">length</span>; ++<span class="variable">i</span>) {
+      <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">j</span> = <span class="number integer">0</span>; <span class="variable">j</span> &<span class="variable">lt</span>; <span class="variable">layers</span>[<span class="variable">i</span>].<span class="variable">length</span>; ++<span class="variable">j</span>) {
+        <span class="variable">start_overlap</span> = <span class="variable">doc</span>.<span class="variable">start</span> &<span class="variable">gt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">0</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">start</span> &<span class="variable">lt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">1</span>];
+        <span class="variable">end_overlap</span> = <span class="variable">doc</span>.<span class="variable">end</span> &<span class="variable">gt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">0</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">end</span> &<span class="variable">lt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">1</span>];
+        <span class="keyword">if</span> (<span class="variable">start_overlap</span> || <span class="variable">end_overlap</span>) {
+          <span class="variable">next</span> = <span class="variable">true</span>;
+          <span class="keyword">break</span>;
+        }
+      }
+      <span class="keyword">if</span> (!<span class="variable">next</span>) {
+        <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
+        <span class="variable">layers</span>[<span class="variable">i</span>].<span class="variable">push</span>([<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]);
+        <span class="variable">laidout</span> = <span class="variable">true</span>;
+        <span class="keyword">break</span>;
+      }
+      <span class="variable">next</span> = <span class="variable">false</span>;
+    }
+    <span class="keyword">if</span> (!<span class="variable">laidout</span>) {
+      <span class="keyword">if</span> (<span class="variable">layers</span>.<span class="variable">length</span>) {
+        <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">20</span>);
+      }
+      <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
+      <span class="variable">layers</span>.<span class="variable">push</span>([[<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]]);
+    }
+  });
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw a profile track</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">drawProfile</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="keyword">var</span> <span class="variable">xvals</span> = [];
+  <span class="keyword">var</span> <span class="variable">yvals</span> = [];
+  <span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>;
+  <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">length</span> !== <span class="number integer">0</span>) {
+    <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>) {
+      <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">doc</span>.<span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">doc</span>.<span class="variable">end</span>; <span class="variable">i</span>++) {
+        <span class="variable">xvals</span>.<span class="variable">push</span>(<span class="variable">i</span>);
+        <span class="variable">yvals</span>.<span class="variable">push</span>(<span class="variable">doc</span>.<span class="variable">score</span>);
+      }
+    });
+    <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="number integer">170</span>);
+    <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">g</span>.<span class="variable">linechart</span>(<span class="number integer">25</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">width</span>-<span class="number integer">50</span>, <span class="number integer">170</span>, <span class="variable">xvals</span>, <span class="variable">yvals</span>, {
+      <span class="variable">shade</span>: <span class="variable">true</span>
+    , <span class="variable">gutter</span>: <span class="number integer">25</span>
+    , <span class="variable">axis</span>: <span class="string">'0 0 0 1'</span>
+    }).<span class="variable">hoverColumn</span>(
+      <span class="keyword">function</span>(){
+        <span class="this">this</span>.<span class="variable">popups</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
+        <span class="this">this</span>.<span class="variable">popups</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">g</span>.<span class="variable">popup</span>(<span class="this">this</span>.<span class="variable">x</span>, <span class="this">this</span>.<span class="variable">y</span>[<span class="number integer">0</span>], ~~(<span class="this">this</span>.<span class="variable">values</span>[<span class="number integer">0</span>])+<span class="string">''</span>).<span class="variable">insertBefore</span>(<span class="this">this</span>));
+      },
+      <span class="keyword">function</span>() {
+        <span class="this">this</span>.<span class="variable">popups</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="this">this</span>.<span class="variable">popups</span>.<span class="variable">remove</span>();
+      }
+    );
+  }
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw the documents in the track canvas</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocument</em>
+()</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">orderLayers</span> = <span class="keyword">function</span>() {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">toBack</span>();
+  <span class="variable">self</span>.<span class="variable">title</span>.<span class="variable">toBack</span>();
+  <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">toBack</span>();
+  <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">toBack</span>();
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Resize the track's canvas
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">resize</span> = <span class="keyword">function</span>(<span class="variable">width</span>, <span class="variable">height</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">remove</span>();
+  <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">remove</span>();
+  <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">width</span>, <span class="variable">height</span>);
+  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({
+    <span class="variable">fill</span>: <span class="string">'#fff'</span>
+  , <span class="variable">stroke</span>: <span class="string">'#fff'</span>
+  });
+  <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: <span class="string">'#eee'</span> });
+  <span class="variable">self</span>.<span class="variable">orderLayers</span>();
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Empty the track
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">empty</span> = <span class="keyword">function</span>() {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  $(<span class="string">'#track'</span>+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>).<span class="variable">empty</span>();
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Clears the documents from the track canvas
+ </p>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">clear</span> = <span class="keyword">function</span>() {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">remove</span>();
+  <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Refresh the documents in the track canvas.
+This method first cleans the canvas then draws the new documents</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>param</strong>: <em>Object</em>  data</p></li><li><p><strong>see</strong>: <em>Track</em>
+.clear()</p></li><li><strong>see</strong>: <em>Track</em>
+.draw()</li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">refresh</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">data</span>) {
+  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
+  <span class="variable">self</span>.<span class="variable">clear</span>();
+  <span class="variable">self</span>.<span class="variable">data</span> = <span class="variable">data</span>;
+  <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
+};</code></pre>
+</td>
+</tr>
+<tr class="code">
+<td class="docs">
+<p>Draw a document</p>
+
+<h2></h2>
+
+<ul><li><p><strong>param</strong>: <em>Object</em>  doc</p></li><li><p><strong>param</strong>: <em>Number</em>  view_start</p></li><li><p><strong>param</strong>: <em>Number</em>  view_end</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
+</td>
+<td class="code">
+<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawDocument</span> = <span class="keyword">function</span>(<span class="variable">doc</span>, <span class="variable">view_start</span>, <span class="variable">view_end</span>, <span class="variable">layer</span>, <span class="variable">style</span>) {
+  <span class="keyword">var</span> <span class="variable">view_span</span> = <span class="variable">view_end</span> - <span class="variable">view_start</span>;
+  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>;
+  <span class="keyword">var</span> <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
+  <span class="keyword">var</span> <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
+  <span class="keyword">var</span> <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>;
+  <span class="keyword">var</span> <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">20</span>+<span class="number integer">20</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">10</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
+  <span class="keyword">var</span> <span class="variable">title</span> = [];
+  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="variable">doc</span>) {
+    <span class="variable">title</span>.<span class="variable">push</span>(<span class="variable">i</span> + <span class="string">' : '</span> + <span class="variable">doc</span>[<span class="variable">i</span>]);
+  }
+  <span class="variable">d</span>.<span class="variable">attr</span>({ <span class="variable">title</span>: <span class="variable">title</span>.<span class="variable">join</span>(<span class="string">'\n'</span>) });
+  <span class="keyword">return</span> <span class="variable">d</span>;
+};
+</code></pre>
+</td>
 </tr><tr class="filename"><td><h2 id="./public/javascripts/client.js"><a href="#">client</a></h2></td><td>./public/javascripts/client.js</td></tr><tr class="code">
 <td class="docs">
 <p>Client side javascript</p>
@@ -2084,280 +2362,6 @@ This calls the clear() and draw() methods back-to-back</p>
     <span class="variable">rules</span>.<span class="variable">push</span>(<span class="this">this</span>.<span class="variable">lineTo</span>(<span class="variable">x</span>, <span class="number integer">0</span>, <span class="variable">x</span>, <span class="this">this</span>.<span class="variable">height</span>).<span class="variable">attr</span>(<span class="variable">style</span>).<span class="variable">toBack</span>());
   }
   <span class="keyword">return</span> <span class="variable">rules</span>;
-};
-</code></pre>
-</td>
-</tr><tr class="filename"><td><h2 id="./public/javascripts/tracks.js"><a href="#">tracks</a></h2></td><td>./public/javascripts/tracks.js</td></tr><tr class="code">
-<td class="docs">
-<p>Class for handling track display</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  track</p></li><li><p><strong>param</strong>: <em>Number</em>  width</p></li><li><p><strong>param</strong>: <em>Number</em>  height</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="keyword">var</span> <span class="class">Track</span> = <span class="keyword">function</span>(<span class="variable">track</span>, <span class="variable">width</span>, <span class="variable">height</span>) {
-  <span class="this">this</span>.<span class="variable">width</span> = <span class="variable">width</span>;
-  <span class="this">this</span>.<span class="variable">height</span> = <span class="variable">height</span>;
-  <span class="this">this</span>.<span class="variable">metadata</span> = <span class="variable">track</span>.<span class="variable">metadata</span>;
-  <span class="this">this</span>.<span class="variable">data</span> = <span class="variable">track</span>.<span class="variable">data</span>;
-  <span class="this">this</span>.<span class="variable">canvas</span> = <span class="variable">undefined</span>;
-  <span class="this">this</span>.<span class="variable">background</span> = <span class="variable">undefined</span>;
-  <span class="this">this</span>.<span class="variable">bgrules</span> = <span class="variable">undefined</span>;
-  <span class="this">this</span>.<span class="variable">documents</span> = <span class="variable">undefined</span>;
-  <span class="this">this</span>.<span class="variable">title</span> = <span class="variable">undefined</span>;
-  <span class="this">this</span>.<span class="variable">div</span> = $(<span class="variable">track</span>\<span class="string">' id=track'</span>+ <span class="this">this</span>.<span class="variable">metadata</span>.<span class="variable">id</span> +<span class="string">'&gt;&lt;/div&gt;'</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Display a track.
-Instanciates and creates the containing elements if they don't exist.</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">display</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="keyword">if</span> ($(<span class="string">'#track'</span>+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>).<span class="variable">length</span> === <span class="number integer">0</span>){
-    $(<span class="string">'#tracks'</span>).<span class="variable">append</span>(<span class="variable">self</span>.<span class="variable">div</span>);
-  }
-  <span class="variable">self</span>.<span class="variable">canvas</span> = <span class="class">Raphael</span>(<span class="string">'track'</span>+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>, <span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
-  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({
-    <span class="variable">fill</span>: <span class="string">'#fff'</span>
-  , <span class="variable">stroke</span>: <span class="string">'#fff'</span>
-  });
-  <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: <span class="string">'#eee'</span> });
-  <span class="variable">self</span>.<span class="variable">title</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">text</span>(<span class="number integer">3</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">name</span>).<span class="variable">attr</span>({
-    <span class="string">'font-size'</span>: <span class="number integer">14</span>
-  , <span class="string">'font-weight'</span>: <span class="string">'bold'</span>
-  , <span class="string">'text-anchor'</span>: <span class="string">'start'</span>
-  });
-  <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
-  <span class="variable">self</span>.<span class="variable">orderLayers</span>();
-  <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Draw the track's data according to it's type</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocuments</em>
-()</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">draw</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'ref'</span>) {
-    <span class="variable">self</span>.<span class="variable">drawDocuments</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-  }
-  <span class="keyword">else</span> <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">type</span> === <span class="string">'profile'</span>) {
-    <span class="variable">self</span>.<span class="variable">drawProfile</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-  }
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Draw the documents in the track canvas</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocument</em>
-()</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">drawDocuments</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="keyword">var</span> <span class="variable">layers</span> = [];
-  <span class="keyword">var</span> <span class="variable">laidout</span> = <span class="variable">false</span>;
-  <span class="keyword">var</span> <span class="variable">next</span> = <span class="variable">false</span>;
-  <span class="keyword">var</span> <span class="variable">start_overlap</span>;
-  <span class="keyword">var</span> <span class="variable">end_overlap</span>;
-  <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">sort</span>(<span class="keyword">function</span>(<span class="variable">a</span>, <span class="variable">b</span>) {
-    <span class="keyword">return</span> (<span class="variable">b</span>.<span class="variable">end</span> - <span class="variable">b</span>.<span class="variable">start</span>) - (<span class="variable">a</span>.<span class="variable">end</span> - <span class="variable">a</span>.<span class="variable">start</span>);
-  });
-  <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>) {
-    <span class="variable">laidout</span> = <span class="variable">false</span>;
-    <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">layers</span>.<span class="variable">length</span>; ++<span class="variable">i</span>) {
-      <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">j</span> = <span class="number integer">0</span>; <span class="variable">j</span> &<span class="variable">lt</span>; <span class="variable">layers</span>[<span class="variable">i</span>].<span class="variable">length</span>; ++<span class="variable">j</span>) {
-        <span class="variable">start_overlap</span> = <span class="variable">doc</span>.<span class="variable">start</span> &<span class="variable">gt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">0</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">start</span> &<span class="variable">lt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">1</span>];
-        <span class="variable">end_overlap</span> = <span class="variable">doc</span>.<span class="variable">end</span> &<span class="variable">gt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">0</span>] &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="variable">doc</span>.<span class="variable">end</span> &<span class="variable">lt</span>;= <span class="variable">layers</span>[<span class="variable">i</span>][<span class="variable">j</span>][<span class="number integer">1</span>];
-        <span class="keyword">if</span> (<span class="variable">start_overlap</span> || <span class="variable">end_overlap</span>) {
-          <span class="variable">next</span> = <span class="variable">true</span>;
-          <span class="keyword">break</span>;
-        }
-      }
-      <span class="keyword">if</span> (!<span class="variable">next</span>) {
-        <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
-        <span class="variable">layers</span>[<span class="variable">i</span>].<span class="variable">push</span>([<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]);
-        <span class="variable">laidout</span> = <span class="variable">true</span>;
-        <span class="keyword">break</span>;
-      }
-      <span class="variable">next</span> = <span class="variable">false</span>;
-    }
-    <span class="keyword">if</span> (!<span class="variable">laidout</span>) {
-      <span class="keyword">if</span> (<span class="variable">layers</span>.<span class="variable">length</span>) {
-        <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>+<span class="number integer">20</span>);
-      }
-      <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawDocument</span>(<span class="variable">doc</span>, <span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">i</span>, <span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">style</span>));
-      <span class="variable">layers</span>.<span class="variable">push</span>([[<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">doc</span>.<span class="variable">end</span>]]);
-    }
-  });
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Draw a profile track</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">drawProfile</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>) {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="keyword">var</span> <span class="variable">xvals</span> = [];
-  <span class="keyword">var</span> <span class="variable">yvals</span> = [];
-  <span class="keyword">var</span> <span class="variable">i</span> = <span class="number integer">0</span>;
-  <span class="keyword">if</span> (<span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">length</span> !== <span class="number integer">0</span>) {
-    <span class="variable">self</span>.<span class="variable">data</span>.<span class="variable">forEach</span>(<span class="keyword">function</span>(<span class="variable">doc</span>) {
-      <span class="keyword">for</span> (<span class="variable">i</span> = <span class="variable">doc</span>.<span class="variable">start</span>; <span class="variable">i</span> &<span class="variable">lt</span>; <span class="variable">doc</span>.<span class="variable">end</span>; <span class="variable">i</span>++) {
-        <span class="variable">xvals</span>.<span class="variable">push</span>(<span class="variable">i</span>);
-        <span class="variable">yvals</span>.<span class="variable">push</span>(<span class="variable">doc</span>.<span class="variable">score</span>);
-      }
-    });
-    <span class="variable">self</span>.<span class="variable">resize</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="number integer">170</span>);
-    <span class="variable">self</span>.<span class="variable">documents</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">g</span>.<span class="variable">linechart</span>(<span class="number integer">25</span>, <span class="number integer">5</span>, <span class="variable">self</span>.<span class="variable">width</span>-<span class="number integer">50</span>, <span class="number integer">170</span>, <span class="variable">xvals</span>, <span class="variable">yvals</span>, {
-      <span class="variable">shade</span>: <span class="variable">true</span>
-    , <span class="variable">gutter</span>: <span class="number integer">25</span>
-    , <span class="variable">axis</span>: <span class="string">'0 0 0 1'</span>
-    }).<span class="variable">hoverColumn</span>(
-      <span class="keyword">function</span>(){
-        <span class="this">this</span>.<span class="variable">popups</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">set</span>();
-        <span class="this">this</span>.<span class="variable">popups</span>.<span class="variable">push</span>(<span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">g</span>.<span class="variable">popup</span>(<span class="this">this</span>.<span class="variable">x</span>, <span class="this">this</span>.<span class="variable">y</span>[<span class="number integer">0</span>], ~~(<span class="this">this</span>.<span class="variable">values</span>[<span class="number integer">0</span>])).<span class="variable">insertBefore</span>(<span class="this">this</span>));
-      },
-      <span class="keyword">function</span>() {
-        <span class="this">this</span>.<span class="variable">popups</span> &<span class="variable">amp</span>;&<span class="variable">amp</span>; <span class="this">this</span>.<span class="variable">popups</span>.<span class="variable">remove</span>();
-      }
-    );
-  }
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Draw the documents in the track canvas</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>see</strong>: <em>drawDocument</em>
-()</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">orderLayers</span> = <span class="keyword">function</span>() {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">toBack</span>();
-  <span class="variable">self</span>.<span class="variable">title</span>.<span class="variable">toBack</span>();
-  <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">toBack</span>();
-  <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">toBack</span>();
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Resize the track's canvas
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">resize</span> = <span class="keyword">function</span>(<span class="variable">width</span>, <span class="variable">height</span>) {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">self</span>.<span class="variable">background</span>.<span class="variable">remove</span>();
-  <span class="variable">self</span>.<span class="variable">bgrules</span>.<span class="variable">remove</span>();
-  <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">width</span>, <span class="variable">height</span>);
-  <span class="variable">self</span>.<span class="variable">background</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">rect</span>(<span class="number integer">0</span>, <span class="number integer">0</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">height</span>).<span class="variable">attr</span>({
-    <span class="variable">fill</span>: <span class="string">'#fff'</span>
-  , <span class="variable">stroke</span>: <span class="string">'#fff'</span>
-  });
-  <span class="variable">self</span>.<span class="variable">bgrules</span> = <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">drawBgRules</span>(<span class="number integer">10</span>, { <span class="variable">stroke</span>: <span class="string">'#eee'</span> });
-  <span class="variable">self</span>.<span class="variable">orderLayers</span>();
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Empty the track
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">empty</span> = <span class="keyword">function</span>() {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  $(<span class="string">'#track'</span>+<span class="variable">self</span>.<span class="variable">metadata</span>.<span class="variable">id</span>).<span class="variable">empty</span>();
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Clears the documents from the track canvas
- </p>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">clear</span> = <span class="keyword">function</span>() {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">self</span>.<span class="variable">documents</span>.<span class="variable">remove</span>();
-  <span class="variable">self</span>.<span class="variable">canvas</span>.<span class="variable">setSize</span>(<span class="variable">self</span>.<span class="variable">width</span>, <span class="variable">self</span>.<span class="variable">height</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Refresh the documents in the track canvas.
-This method first cleans the canvas then draws the new documents</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Number</em>  start</p></li><li><p><strong>param</strong>: <em>Number</em>  end</p></li><li><p><strong>param</strong>: <em>Object</em>  data</p></li><li><p><strong>see</strong>: <em>Track</em>
-.clear()</p></li><li><strong>see</strong>: <em>Track</em>
-.draw()</li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Track</span>.<span class="variable">prototype</span>.<span class="variable">refresh</span> = <span class="keyword">function</span>(<span class="variable">start</span>, <span class="variable">end</span>, <span class="variable">data</span>) {
-  <span class="keyword">var</span> <span class="variable">self</span> = <span class="this">this</span>;
-  <span class="variable">self</span>.<span class="variable">clear</span>();
-  <span class="variable">self</span>.<span class="variable">data</span> = <span class="variable">data</span>;
-  <span class="variable">self</span>.<span class="variable">draw</span>(<span class="variable">start</span>, <span class="variable">end</span>);
-};</code></pre>
-</td>
-</tr>
-<tr class="code">
-<td class="docs">
-<p>Draw a document</p>
-
-<h2></h2>
-
-<ul><li><p><strong>param</strong>: <em>Object</em>  doc</p></li><li><p><strong>param</strong>: <em>Number</em>  view_start</p></li><li><p><strong>param</strong>: <em>Number</em>  view_end</p></li><li><p><strong>param</strong>: <em>Object</em>  style</p></li></ul>
-</td>
-<td class="code">
-<pre><code><span class="class">Raphael</span>.<span class="variable">fn</span>.<span class="variable">drawDocument</span> = <span class="keyword">function</span>(<span class="variable">doc</span>, <span class="variable">view_start</span>, <span class="variable">view_end</span>, <span class="variable">layer</span>, <span class="variable">style</span>) {
-  <span class="keyword">var</span> <span class="variable">view_span</span> = <span class="variable">view_end</span> - <span class="variable">view_start</span>;
-  <span class="keyword">var</span> <span class="variable">nf</span> = <span class="keyword">new</span> <span class="class">PHP_JS</span>().<span class="variable">number_format</span>;
-  <span class="keyword">var</span> <span class="variable">rel_start</span> = (((<span class="class">Math</span>.<span class="variable">max</span>(<span class="variable">doc</span>.<span class="variable">start</span>, <span class="variable">view_start</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
-  <span class="keyword">var</span> <span class="variable">rel_end</span> = (((<span class="class">Math</span>.<span class="variable">min</span>(<span class="variable">doc</span>.<span class="variable">end</span>, <span class="variable">view_end</span>) - <span class="variable">view_start</span>) / <span class="variable">view_span</span>) * (<span class="this">this</span>.<span class="variable">width</span>-<span class="number integer">100</span>)) + <span class="number integer">50</span>;
-  <span class="keyword">var</span> <span class="variable">rel_doc_length</span> = <span class="variable">rel_end</span> - <span class="variable">rel_start</span>;
-  <span class="keyword">var</span> <span class="variable">d</span> = <span class="this">this</span>.<span class="variable">rect</span>(<span class="variable">rel_start</span>, <span class="number integer">20</span>+<span class="number integer">20</span>*<span class="variable">layer</span>, <span class="variable">rel_doc_length</span>, <span class="number integer">10</span>).<span class="variable">attr</span>(<span class="variable">style</span>);
-  <span class="keyword">var</span> <span class="variable">title</span> = [];
-  <span class="keyword">for</span> (<span class="keyword">var</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="variable">doc</span>) {
-    <span class="variable">title</span>.<span class="variable">push</span>(<span class="variable">i</span> + <span class="string">' : '</span> + <span class="variable">doc</span>[<span class="variable">i</span>]);
-  }
-  <span class="variable">d</span>.<span class="variable">attr</span>({ <span class="variable">title</span>: <span class="variable">title</span>.<span class="variable">join</span>(<span class="string">'\n'</span>) });
-  <span class="keyword">return</span> <span class="variable">d</span>;
 };
 </code></pre>
 </td>
