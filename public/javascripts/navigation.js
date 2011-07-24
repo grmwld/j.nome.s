@@ -451,7 +451,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
       }
       // Location click
       else {
-        var i_span = Math.floor((parseNum($('#end').val()) - parseNum($('#start').val())) / 2);
+        var i_span = Math.floor(($('#end').val() - $('#start').val()) / 2);
         sanitizeInputPos(goto_start-i_span, goto_end+i_span, function(start, end) {
           callback(start, end);
         });
