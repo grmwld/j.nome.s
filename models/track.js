@@ -115,9 +115,8 @@ var queryRef = function(collection, seqid, start, end, step, callback) {
  * @api public
  */
 var Track = function(db, metadata) {
-  console.log(metadata);
-  this.metadata = metadata;
   this.db = db;
+  this.metadata = metadata;
   this.collection = this.db.collection(metadata.id);
 };
 

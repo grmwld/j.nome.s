@@ -1,7 +1,7 @@
 /**
  * Class for handling track display
  *
- * @param {Object} track
+ * @param {String} trackid
  * @param {Number} width
  * @param {Number} height
  */
@@ -45,14 +45,12 @@ Track.prototype.getTrackMetadata = function(trackid, callback) {
 };
 
 /**
- * Request data of a given track between 2 positions of a seqid.
+ * Request data of the track between 2 positions of a seqid.
  * The callback is triggered with the collected data
  *
- * @param {String} reqURL
  * @param {string} seqid
  * @param {Number} start
  * @param {Number} end
- * @param {String} trackID
  * @param {Function} callback
  * @api private
  */
@@ -110,6 +108,7 @@ Track.prototype.display = function(seqid, start, end) {
 /**
  * Draw the track's data according to it's type
  *
+ * @param {Array} data
  * @param {Number} start
  * @param {Number} end
  * @see drawDocuments()
@@ -127,6 +126,7 @@ Track.prototype.draw = function(data, start, end) {
 /**
  * Draw the documents in the track canvas
  *
+ * @param {Array} data
  * @param {Number} start
  * @param {Number} end
  * @see drawDocument()
@@ -173,16 +173,17 @@ Track.prototype.drawDocuments = function(data, start, end) {
 /**
  * Draw a profile track
  *
+ * @param {Array} data
  * @param {Number} start
  * @param {Number} end
  */
-Track.prototype.drawProfile = function(start, end) {
+Track.prototype.drawProfile = function(data, start, end) {
   var self = this;
   var xvals = [];
   var yvals = [];
   var i = 0;
-  if (self.data.length !== 0) {
-    self.data.forEach(function(doc) {
+  if (data.length !== 0) {
+    data.forEach(function(doc) {
       for (i = doc.start; i < doc.end; i++) {
         xvals.push(i);
         yvals.push(doc.score);
