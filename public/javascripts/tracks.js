@@ -5,32 +5,91 @@
  * @param {Number} width
  * @param {Number} height
  */
-var Track = function(track, width, height) {
-  this.width = width;
-  this.height = height;
-  this.metadata = track.metadata;
-  this.data = track.data;
-  this.canvas = undefined;
-  this.background = undefined;
-  this.bgrules = undefined;
-  this.documents = undefined;
-  this.title = undefined;
-  this.div = $('<div class=\'track\' id=track'+ this.metadata.id +'></div>');
+var Track = function(trackid, width, height) {
+  var self = this;
+  self.getTrackMetadata(trackid, function(metadata) {
+    self.trackid = trackid;
+    self.width = width;
+    self.height = height;
+    self.canvas = undefined;
+    self.background = undefined;
+    self.bgrules = undefined;
+    self.documents = undefined;
+    self.title = undefined;
+    self.div = $('<div class=\'track\' id=track'+ trackid +'></div>');
+    self.metadata = metadata;
+  });
 };
+
+/**
+ * Get the metadata associated to the current track
+ *
+ * @param {String} seqid
+ * @param {Function} callback
+ * @api private
+ */
+Track.prototype.getTrackMetadata = function(trackid, callback) {
+  var self = this;
+  var reqURL = '/'
+    + window.location.href.split('/').slice(3, 5).join('/')
+    + '/track/' + trackid + ".json";
+  $.ajax({
+    type: "GET"
+  , url: reqURL
+  , dataType: "json"
+  , success: function(metadata) {
+      callback(metadata);
+    }
+  , async: false
+  });
+};
+
+/**
+ * Request data of a given track between 2 positions of a seqid.
+ * The callback is triggered with the collected data
+ *
+ * @param {String} reqURL
+ * @param {string} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {String} trackID
+ * @param {Function} callback
+ * @api private
+ */
+Track.prototype.getData = function(seqid, start, end, callback) {
+  var self = this;
+  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  $.ajax({
+    type: "POST"
+  , url: reqURL
+  , data: {
+      seqid: seqid
+    , start: start
+    , end: end
+    , trackID: self.trackid
+    }
+  , dataType: "json"
+  , success: function(data) {
+      callback(data);
+    }
+  });
+};
+
 
 /**
  * Display a track.
  * Instanciates and creates the containing elements if they don't exist.
  *
+ * @param {String} seqid
  * @param {Number} start
  * @param {Number} end
  */
-Track.prototype.display = function(start, end) {
+Track.prototype.display = function(seqid, start, end) {
   var self = this;
-  if ($('#track'+self.metadata.id).length === 0){
+  if ($('#track'+self.trackid).length === 0){
     $('#tracks').append(self.div);
   }
-  self.canvas = Raphael('track'+self.metadata.id, self.width, self.height);
+  self.canvas = Raphael('track'+self.trackid, self.width, self.height);
   self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({
     fill: '#fff'
   , stroke: '#fff'
@@ -43,7 +102,9 @@ Track.prototype.display = function(start, end) {
   });
   self.documents = self.canvas.set();
   self.orderLayers();
-  self.draw(start, end);
+  self.getData(seqid, start, end, function(data) {
+    self.draw(data, start, end);
+  });
 };
 
 /**
@@ -53,13 +114,13 @@ Track.prototype.display = function(start, end) {
  * @param {Number} end
  * @see drawDocuments()
  */
-Track.prototype.draw = function(start, end) {
+Track.prototype.draw = function(data, start, end) {
   var self = this;
   if (self.metadata.type === 'ref') {
-    self.drawDocuments(start, end);
+    self.drawDocuments(data, start, end);
   }
   else if (self.metadata.type === 'profile') {
-    self.drawProfile(start, end);
+    self.drawProfile(data, start, end);
   }
 };
 
@@ -70,17 +131,17 @@ Track.prototype.draw = function(start, end) {
  * @param {Number} end
  * @see drawDocument()
  */
-Track.prototype.drawDocuments = function(start, end) {
+Track.prototype.drawDocuments = function(data, start, end) {
   var self = this;
   var layers = [];
   var laidout = false;
   var next = false;
   var start_overlap;
   var end_overlap;
-  self.data.sort(function(a, b) {
+  data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
-  self.data.forEach(function(doc) {
+  data.forEach(function(doc) {
     laidout = false;
     for (var i = 0; i < layers.length; ++i) {
       for (var j = 0; j < layers[i].length; ++j) {
@@ -202,11 +263,12 @@ Track.prototype.clear = function() {
  * @see Track.clear()
  * @see Track.draw()
  */
-Track.prototype.refresh = function(start, end, data) {
+Track.prototype.refresh = function(seqid, start, end) {
   var self = this;
   self.clear();
-  self.data = data;
-  self.draw(start, end);
+  self.getData(seqid, start, end, function(data) {
+    self.draw(data, start, end);
+  });
 };
 
 

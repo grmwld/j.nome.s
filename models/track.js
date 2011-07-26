@@ -115,6 +115,7 @@ var queryRef = function(collection, seqid, start, end, step, callback) {
  * @api public
  */
 var Track = function(db, metadata) {
+  console.log(metadata);
   this.metadata = metadata;
   this.db = db;
   this.collection = this.db.collection(metadata.id);
@@ -136,10 +137,7 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var step = getStep(end - start);
   var query = self.metadata.type === 'profile' ? queryProfile : queryRef;
   query(self.collection, seqid, start, end, step, function(err, docs) {
-    callback(err, {
-      metadata: self.metadata
-    , data: docs
-    });
+    callback(err, docs);
   });
 };
 
