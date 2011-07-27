@@ -5,9 +5,10 @@ link(rel='stylesheet', href='/stylesheets/browse.css')
 #browse
   form(method='post', name='browse')
     !=partial('fields', { seqid: seqid, start: start, end: end })
-    !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
     .centered
+      input(type='button', value='Select Tracks', id='trigger_trackselector')
       input(type='submit', value='Go', id='submit')
+    !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
 
 #landmarks
   !=partial('landmarks')

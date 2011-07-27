@@ -15,6 +15,15 @@ $(document).ready(function() {
   , pos: 0
   , seqid: ""
   };
+  
+  /**
+   * Toggle a sliding panel for track selection
+   */
+  $('#trackselector').hide();
+  $('#trigger_trackselector').click(function() {
+    $('#trackselector').slideToggle("slow");
+    return false;
+  });
 
   /**
    * Render tracks if parameters of the form are valid.
