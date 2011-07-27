@@ -33,7 +33,7 @@ var route = function(app) {
     , start: 'start'
     , end: 'end'
     , checked: {}
-    , data: ''
+    , data: null
     });
   });
 

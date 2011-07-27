@@ -29,9 +29,8 @@ replace(url, width, height = width)
 button()
   bold-button(glow: blue)
   bshadow(rgba(0,0,0, 0.6), 0px, 0px, 5px)
-  font-size: 14px
-  margin-left: 5px
-  margin-right: 5px
+  font-size: 16px
+  margin: 5px
 
 prettyfont(color)
   color: transparent
@@ -69,14 +68,6 @@ a
 .centered
   text-align: center
 
-#browsefields
-#trackselector
-  margin: 20px
-
-.browsefield
-  margin: 5px
-  font-size: 24px
-  text-align: center
 
 label
   text-align: left
@@ -84,6 +75,11 @@ label
 
 
 // forms
+
+input[type='number']::-webkit-inner-spin-button
+input[type='number']::-webkit-outer-spin-button
+  -webkit-appearance: none
+  margin: 0
 
 input[type='text']
 input[type='number']
