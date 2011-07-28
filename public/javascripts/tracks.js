@@ -8,6 +8,7 @@
 var Track = function(trackid, width, height) {
   var self = this;
   self.getTrackMetadata(trackid, function(metadata) {
+    self.metadata = metadata;
     self.trackid = trackid;
     self.width = width;
     self.height = height;
@@ -17,7 +18,10 @@ var Track = function(trackid, width, height) {
     self.documents = undefined;
     self.title = undefined;
     self.div = $('<div class=\'track\' id=track'+ trackid +'></div>');
-    self.metadata = metadata;
+    self.spinner = $('<div class=\'spinner\' id=spinner'+ trackid +'></div>');
+    [1,2,3,4,5,6,7,8,9,10,11,12].forEach(function(i) {
+      self.spinner.append($('<div class=\'bar' + i + '\'></div>'));
+    });
   });
 };
 
@@ -100,9 +104,7 @@ Track.prototype.display = function(seqid, start, end) {
   });
   self.documents = self.canvas.set();
   self.orderLayers();
-  self.getData(seqid, start, end, function(data) {
-    self.draw(data, start, end);
-  });
+  self.draw(seqid, start, end);
 };
 
 /**
@@ -113,14 +115,18 @@ Track.prototype.display = function(seqid, start, end) {
  * @param {Number} end
  * @see drawDocuments()
  */
-Track.prototype.draw = function(data, start, end) {
+Track.prototype.draw = function(seqid, start, end) {
   var self = this;
-  if (self.metadata.type === 'ref') {
-    self.drawDocuments(data, start, end);
-  }
-  else if (self.metadata.type === 'profile') {
-    self.drawProfile(data, start, end);
-  }
+  $('#track'+self.trackid).append(self.spinner);
+  self.getData(seqid, start, end, function(data) {
+    if (self.metadata.type === 'ref') {
+      self.drawDocuments(data, start, end);
+    }
+    else if (self.metadata.type === 'profile') {
+      self.drawProfile(data, start, end);
+    }
+    $('#spinner'+self.trackid).remove();
+  });
 };
 
 /**
@@ -267,9 +273,7 @@ Track.prototype.clear = function() {
 Track.prototype.refresh = function(seqid, start, end) {
   var self = this;
   self.clear();
-  self.getData(seqid, start, end, function(data) {
-    self.draw(data, start, end);
-  });
+  self.draw(seqid, start, end);
 };
 
 
