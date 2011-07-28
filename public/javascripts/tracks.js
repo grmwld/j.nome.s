@@ -71,6 +71,12 @@ Track.prototype.getData = function(seqid, start, end, callback) {
     , trackID: self.trackid
     }
   , dataType: "json"
+  , beforeSend: function() {
+      $('#track'+self.trackid).append(self.spinner);
+    }
+  , complete: function(data) {
+      $('#spinner'+self.trackid).remove();
+    }
   , success: function(data) {
       callback(data);
     }
@@ -117,7 +123,6 @@ Track.prototype.display = function(seqid, start, end) {
  */
 Track.prototype.draw = function(seqid, start, end) {
   var self = this;
-  $('#track'+self.trackid).append(self.spinner);
   self.getData(seqid, start, end, function(data) {
     if (self.metadata.type === 'ref') {
       self.drawDocuments(data, start, end);
@@ -125,7 +130,6 @@ Track.prototype.draw = function(seqid, start, end) {
     else if (self.metadata.type === 'profile') {
       self.drawProfile(data, start, end);
     }
-    $('#spinner'+self.trackid).remove();
   });
 };
 
