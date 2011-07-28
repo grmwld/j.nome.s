@@ -15,6 +15,15 @@ $(document).ready(function() {
   , pos: 0
   , seqid: ""
   };
+  
+  /**
+   * Toggle a sliding panel for track selection
+   */
+  $('#trackselector').hide();
+  $('#trigger_trackselector').click(function() {
+    $('#trackselector').slideToggle("slow");
+    return false;
+  });
 
   /**
    * Render tracks if parameters of the form are valid.
@@ -80,7 +89,6 @@ $(document).ready(function() {
  * @param {Number} end
  */
 var fetchTracksData = function(seqid, start, end, updatehistory) {
-  var nf = new PHP_JS().number_format;
   var trackselector = $('#trackselector :checked');
   var tracksIDs = [];
   var trackID;
@@ -95,14 +103,12 @@ var fetchTracksData = function(seqid, start, end, updatehistory) {
         || previous.pos === 0
         || previous.tracks.indexOf(trackid) === -1
         || previous.pos !== (start+1)*end) {
-      requestTrackData(reqURL, seqid, start, end, trackid, function(track) {
-        if (!tracks[trackid]){
-          tracks[trackid] = new Track(track, 1101, 50);
-          tracks[trackid].display(start, end);
-        } else {
-          tracks[trackid].refresh(start, end, track.data);
-        }
-      });
+      if (!tracks[trackid]) {
+        tracks[trackid] = new Track(trackid, 1101, 50);
+        tracks[trackid].display(seqid, start, end);
+      } else {
+        tracks[trackid].refresh(seqid, start, end);
+      }
     }
   });
   previous.tracks.forEach(function(ptrack) {

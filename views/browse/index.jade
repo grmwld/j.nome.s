@@ -4,13 +4,15 @@ link(rel='stylesheet', href='/stylesheets/browse.css')
 
 #browse
   form(method='post', name='browse')
-    !=partial('fields', { seqid: seqid, start: start, end: end })
+    #browsefields
+      .centered
+        input(type='button', value='Select Tracks', id='trigger_trackselector')
+        input.browsefield(type='text', name='seqid', id='seqid', placeholder='seqid', required='required', value=seqid)
+        input.browsefield(type='number', name='start', id='start', value=start)
+        input.browsefield(type='number', name='end', id='end', value=end)
+        input(type='submit', value='Submit', id='submit')
+      .centered
     !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
-    .centered
-      input(type='submit', value='Go', id='submit')
-
-#landmarks
-  !=partial('landmarks')
 
 #gui
   #overviewnavigation
@@ -18,3 +20,4 @@ link(rel='stylesheet', href='/stylesheets/browse.css')
   #zoomnavigation
   #separator
   #tracks
+    

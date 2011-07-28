@@ -33,7 +33,7 @@ var route = function(app) {
     , start: 'start'
     , end: 'end'
     , checked: {}
-    , data: ''
+    , data: null
     });
   });
 
@@ -58,6 +58,21 @@ var route = function(app) {
       }
     );
   });
+  
+  /**
+   * Fetches the metadata of a specific track
+   *
+   * Handling this route triggers the dbutils.connect middleware
+   * in order to connect to the mongo database.
+   *
+   * @see dbutils.connect
+   * @handles {Route#GET} /browse/:dataset/:trackid.json
+   */
+  app.get('/browse/:dataset/track/:trackid.:format', dbutils.connect, function(req, res) {
+    if (req.params.format === 'json') {
+      res.send(app._locals.config[req.params.dataset].tracks[req.params.trackid]);
+    }
+  });
 
   /**
    * Fetches the metadata of a specific seqid
@@ -66,7 +81,7 @@ var route = function(app) {
    * in order to connect to the mongo database.
    *
    * @see dbutils.connect
-   * @handles {Route#POST} /browse/:dataset/:seqid.json
+   * @handles {Route#GET} /browse/:dataset/:seqid.json
    */
   app.get('/browse/:dataset/:seqid.:format', dbutils.connect, function(req, res) {
     if (req.params.format === 'json') {
