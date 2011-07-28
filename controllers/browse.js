@@ -29,9 +29,9 @@ var route = function(app) {
     res.render('browse', {
       title: req.params.dataset
     , dataset: req.params.dataset
-    , seqid: 'seqid'
-    , start: 'start'
-    , end: 'end'
+    , seqid: null
+    , start: null
+    , end: null
     , checked: {}
     , data: null
     });
