@@ -200,11 +200,7 @@ Track.prototype.drawProfile = function(data, start, end) {
       }
     });
     self.resize(self.canvas.width, 170);
-    self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, {
-      shade: true
-    , gutter: 25
-    , axis: '0 0 0 1'
-    }).hoverColumn(
+    self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, self.metadata.style).hoverColumn(
       function(){
         this.popups = self.canvas.set();
         this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])+'').insertBefore(this));

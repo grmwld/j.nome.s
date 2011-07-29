@@ -11,6 +11,16 @@
       , "stroke": "purple"
       }
     }
+  , "ensembl_genes": {
+      "id": "ensembl_genes"
+    , "name": "ensembl_genes"
+    , "description": "Gene models from ensembl"
+    , "type": "ref"
+    , "style": {
+        "fill": "#00afba"
+      , "stroke": "#00afba"
+      }
+    }
   , "ucsc_refgene": {
       "id": "ucsc_refgene"
     , "name": "ucsc_genes"
@@ -21,12 +31,32 @@
       , "stroke": "#00afba"
       }
     }
-  , "SL001_R00078_RXL001_12_F3": {
-      "id": "SL001_R00078_RXL001_12_F3"
-    , "name": "RNASeq RXL001"
-    , "description": "RNASeq Limb"
+  , "SL001_R00078_RXL001_12_F3_bioscope": {
+      "id": "SL001_R00078_RXL001_12_F3_bioscope"
+    , "name": "RNASeq RXL001 bio"
+    , "description": "RNASeq Limb mapped by BIOSCOPE"
     , "type": "profile"
     , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "SL001_R00078_RXL001_12_F3": {
+      "id": "SL001_R00078_RXL001_12_F3"
+    , "name": "RNASeq RXL001 bow"
+    , "description": "RNASeq Limb mapped by BOWTIE"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
       }
     }
   , "IXT010_aa_cov": {
@@ -35,6 +65,12 @@
     , "description": "Coverage of the IXT010 gPET dataset"
     , "type": "profile"
     , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
       }
     }
   }
