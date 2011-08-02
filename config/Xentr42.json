@@ -17,8 +17,8 @@
     , "description": "Gene models from ensembl"
     , "type": "ref"
     , "style": {
-        "fill": "#00afba"
-      , "stroke": "#00afba"
+        "fill": "#b83a1e"
+      , "stroke": "#b83a1e"
       }
     }
   , "ucsc_refgene": {
