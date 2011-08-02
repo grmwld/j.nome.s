@@ -1,23 +1,18 @@
-link(rel='stylesheet', href='/stylesheets/browse.css')
-#appnavigation
-  !=partial('appnavigation')
-
-#browse
-  form(method='post', name='browse')
-    #browsefields
-      .centered
-        input(type='button', value='Select Tracks', id='trigger_trackselector')
-        input.browsefield(type='text', name='seqid', id='seqid', placeholder='seqid', required='required', value=seqid)
-        input.browsefield(type='number', name='start', id='start', value=start)
-        input.browsefield(type='number', name='end', id='end', value=end)
-        input(type='submit', value='Submit', id='submit')
-      .centered
-    !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
-
-#gui
-  #overviewnavigation
-  #ratiozoom
-  #zoomnavigation
-  #separator
-  #tracks
-    
+#wrapper
+  #wrapperbrowse
+    #browse
+      form(method='post', name='browse')
+        #browsefields
+          input(type='button', value='Select Tracks', id='trigger_trackselector')
+          input.browsefield(type='text', name='seqid', id='seqid', placeholder='seqid', required='required', value=seqid)
+          input.browsefield(type='number', name='start', id='start', value=start)
+          input.browsefield(type='number', name='end', id='end', value=end)
+          input(type='submit', value='Submit', id='submit')
+        !=partial('trackselector', { tracks: config[dataset].tracks, checked: checked })
+    #gui
+      #overviewnavigation
+      #ratiozoom
+      #zoomnavigation
+      #separator
+      #tracks
+      
