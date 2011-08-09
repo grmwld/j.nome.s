@@ -81,8 +81,10 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
     });
   } else {
     collection.find(query).sort(sortOrder).toArray(function(err, docs) {
-      docs[0].start = start;
-      docs[docs.length-1].end = end;
+      if (docs.length) {
+        docs[0].start = start;
+        docs[docs.length-1].end = end;
+      }
       callback(err, processProfile(docs, step));
     });
   }
