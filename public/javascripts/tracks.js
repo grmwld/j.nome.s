@@ -203,7 +203,7 @@ Track.prototype.drawProfile = function(data, start, end) {
     self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, self.metadata.style).hoverColumn(
       function(){
         this.popups = self.canvas.set();
-        this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])+'').insertBefore(this));
+        this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])+' | '+~~(this.axis)).insertBefore(this));
       },
       function() {
         this.popups && this.popups.remove();

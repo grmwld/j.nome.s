@@ -31,6 +31,20 @@
       , "stroke": "#00afba"
       }
     }
+  , "ChIPSeqRNAPII": {
+      "id": "ChIPSeqRNAPII"
+    , "name": "ChIP-Seq RNA Pol II"
+    , "description": "RNA Pol II ChIP-Seq data from G. Veenstra"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
   , "SL001_R00078_RXL001_12_F3_bioscope": {
       "id": "SL001_R00078_RXL001_12_F3_bioscope"
     , "name": "RNASeq RXL001 bio"
@@ -63,6 +77,34 @@
       "id": "IXT010_aa_cov"
     , "name": "IXT010_coverage"
     , "description": "Coverage of the IXT010 gPET dataset"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "IXT010_span": {
+      "id": "IXT010_span"
+    , "name": "IXT010_span"
+    , "description": "Mean span profile of the IXT010 gPET dataset"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "IXT001Il": {
+      "id": "IXT001Il"
+    , "name": "T3_TR_peak"
+    , "description": "T3 TR binding peaks"
     , "type": "profile"
     , "style": {
         "gutter": 25
