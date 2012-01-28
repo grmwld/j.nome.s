@@ -31,6 +31,44 @@
       , "stroke": "#00afba"
       }
     }
+  , "rnapet_models": {
+      "id": "rnapet_models"
+    , "name": "RNA-PET models"
+    , "description": "Gene models from RNA-PET"
+    , "type": "ref"
+    , "style": {
+        "fill": "hotpink"
+      , "stroke": "hotpink"
+      }
+    }
+  , "rnapol2_T3_scaffold_23": {
+      "id": "rnapol2_T3_scaffold_23"
+    , "name": "ChIP-seq RNA-Pol II TF +T3 scaffold_23"
+    , "description": "RNA-Pol II ChIP-seq on Tailfin, treated by T3 for 24h (test on scaffold_23)"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "rnapol2_T3_scaffold_1": {
+      "id": "rnapol2_T3_scaffold_1"
+    , "name": "ChIP-seq RNA-Pol II TF +T3 scaffold_1"
+    , "description": "RNA-Pol II ChIP-seq on Tailfin, treated by T3 for 24h (test on scaffold_1)"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
   , "ChIPSeqRNAPII": {
       "id": "ChIPSeqRNAPII"
     , "name": "ChIP-Seq RNA Pol II"
