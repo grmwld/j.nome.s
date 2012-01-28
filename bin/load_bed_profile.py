@@ -19,7 +19,6 @@ def importData(infile, database, collection):
     ]
     subprocess.call(' '.join(cmd), shell=True)
 
-
 def ensureIndexes(database, collection):
     connection = pymongo.Connection()
     db = connection[database]
@@ -39,17 +38,35 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description='''
+  ||    Script used to easily load bed profiles.
+  ||
+  ||       The data should be formated as follow:
+  ||
+  ||           scaffold_1      0       26      0
+  ||           scaffold_1      26      80      1
+  ||           scaffold_1      80      130     2
+  ||           scaffold_1      130     157     3
+  ||           scaffold_1      157     259     4
+  ||
+  ||       where columns correspond to (from left to right): seqid, start, end, score
+        '''
+    )
     parser.add_argument(
         '-i', '--infile', dest='infile',
+        required=True,
         help='Input file.'
     )
     parser.add_argument(
         '-d', '--db', dest='database',
+        required=True,
         help='Database to use.'
     )
     parser.add_argument(
         '-c', '--collection', dest='collection',
+        required=True,
         help='Collection to use.'
     )
     main(parser.parse_args())
