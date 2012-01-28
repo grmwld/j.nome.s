@@ -11,13 +11,13 @@
     "node": "v0.4.9"
   },
   "dependencies": {
-    "express": "2.4.2"
-  , "express-trace": "0.0.2"
-  , "async": "0.1.9"
-  , "jade": "0.12.1"
-  , "mongolian": "0.1.10"
-  , "nib": "0.0.8"
-  , "stylus": "0.13.3"
+    "express": "2.4.5"
+  , "express-trace": "0.0.3"
+  , "async": "0.1.15"
+  , "jade": "0.20.0"
+  , "mongolian": "0.1.14"
+  , "nib": "0.3.2"
+  , "stylus": "0.22.6"
   , "markdown-js": "0.0.3"
   },
   "devDependencies": {}
