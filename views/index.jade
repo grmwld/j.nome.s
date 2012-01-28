@@ -1,17 +1,18 @@
-h1= title
-p Welcome to #{title}
-p
-  ul
-    li
-      a(href='/doc') Documentation
-    li
-      a(href='/about') About
-    li
-      a(href='/api') API
-    li
-      p Dataset :
-      form
-          select(name='dataset_select', onchange='OnSelect(this.form.dataset_select)')
-            option(value='selectdataset') Select a dataset
-            - each dataset in config.global.datasets
-              option(value=config[dataset.name].dbname) #{dataset.description}
+#wrapperparagraph
+  h1= title
+  p Welcome to #{title}
+  p
+    ul
+      li
+        a(href='/doc') Documentation
+      li
+        a(href='/about') About
+      li
+        a(href='/api') API
+      li
+        p Dataset :
+        form
+            select(name='dataset_select', onchange='OnSelect(this.form.dataset_select)')
+              option(value='selectdataset') Select a dataset
+              - each dataset in config.global.datasets
+                option(value=config[dataset.name].dbname) #{dataset.description}

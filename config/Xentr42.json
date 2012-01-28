@@ -11,6 +11,16 @@
       , "stroke": "purple"
       }
     }
+  , "ensembl_genes": {
+      "id": "ensembl_genes"
+    , "name": "ensembl_genes"
+    , "description": "Gene models from ensembl"
+    , "type": "ref"
+    , "style": {
+        "fill": "#b83a1e"
+      , "stroke": "#b83a1e"
+      }
+    }
   , "ucsc_refgene": {
       "id": "ucsc_refgene"
     , "name": "ucsc_genes"
@@ -21,12 +31,46 @@
       , "stroke": "#00afba"
       }
     }
-  , "SL001_R00078_RXL001_1_F3": {
-      "id": "SL001_R00078_RXL001_1_F3"
-    , "name": "RNASeq RXL001"
-    , "description": "RNASeq Limb"
+  , "ChIPSeqRNAPII": {
+      "id": "ChIPSeqRNAPII"
+    , "name": "ChIP-Seq RNA Pol II"
+    , "description": "RNA Pol II ChIP-Seq data from G. Veenstra"
     , "type": "profile"
     , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "SL001_R00078_RXL001_12_F3_bioscope": {
+      "id": "SL001_R00078_RXL001_12_F3_bioscope"
+    , "name": "RNASeq RXL001 bio"
+    , "description": "RNASeq Limb mapped by BIOSCOPE"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "SL001_R00078_RXL001_12_F3": {
+      "id": "SL001_R00078_RXL001_12_F3"
+    , "name": "RNASeq RXL001 bow"
+    , "description": "RNASeq Limb mapped by BOWTIE"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
       }
     }
   , "IXT010_aa_cov": {
@@ -35,14 +79,40 @@
     , "description": "Coverage of the IXT010 gPET dataset"
     , "type": "profile"
     , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
       }
     }
-  , "IXT010_bb_cov": {
-      "id": "IXT010_bb_cov"
-    , "name": "IXT010_coverageib"
-    , "description": "Coverage 2 of the IXT010 gPET dataset"
+  , "IXT010_span": {
+      "id": "IXT010_span"
+    , "name": "IXT010_span"
+    , "description": "Mean span profile of the IXT010 gPET dataset"
     , "type": "profile"
     , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "IXT001Il": {
+      "id": "IXT001Il"
+    , "name": "T3_TR_peak"
+    , "description": "T3 TR binding peaks"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
       }
     }
   }

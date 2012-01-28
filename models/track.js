@@ -81,6 +81,10 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
     });
   } else {
     collection.find(query).sort(sortOrder).toArray(function(err, docs) {
+      if (docs.length) {
+        docs[0].start = start;
+        docs[docs.length-1].end = end;
+      }
       callback(err, processProfile(docs, step));
     });
   }
@@ -115,8 +119,8 @@ var queryRef = function(collection, seqid, start, end, step, callback) {
  * @api public
  */
 var Track = function(db, metadata) {
-  this.metadata = metadata;
   this.db = db;
+  this.metadata = metadata;
   this.collection = this.db.collection(metadata.id);
 };
 
@@ -136,10 +140,7 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var step = getStep(end - start);
   var query = self.metadata.type === 'profile' ? queryProfile : queryRef;
   query(self.collection, seqid, start, end, step, function(err, docs) {
-    callback(err, {
-      metadata: self.metadata
-    , data: docs
-    });
+    callback(err, docs);
   });
 };
 

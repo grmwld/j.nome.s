@@ -15,19 +15,15 @@ $(document).ready(function() {
   , pos: 0
   , seqid: ""
   };
-
+  
   /**
-   * Setup dynamic prompt input text-fields.
-   * The default value corresponds to the 'name' attribute
-   * of the input field.
+   * Toggle a sliding panel for track selection
    */
-  $("input[type=text]")
-    .focus(function(){
-      clearPrompt(this);
-    })
-    .blur(function(){
-      setPrompt(this);
-    });
+  $('#trackselector').hide();
+  $('#trigger_trackselector').click(function() {
+    $('#trackselector').slideToggle("slow");
+    return false;
+  });
 
   /**
    * Render tracks if parameters of the form are valid.
@@ -35,10 +31,7 @@ $(document).ready(function() {
    * The text-field inputs for positions are also sanitized for
    * negative or too big values.
    */
-  validateForm(function(){
-    var seqid = $('#seqid').val();
-    var start = parseNum($('#start').val());
-    var end = parseNum($('#end').val());
+  validateForm(function(seqid, start, end) {
     fetchTracksData(seqid, start, end, true);
     navigation.display(seqid, start, end);
   });
@@ -47,10 +40,7 @@ $(document).ready(function() {
    * Handle browsing from main form.
    */
   $('#submit').click(function() {
-    validateForm(function(){
-      var seqid = $('#seqid').val();
-      var start = parseNum($('#start').val());
-      var end = parseNum($('#end').val());
+    validateForm(function(seqid, start, end) {
       fetchTracksData(seqid, start, end, true);
       try {
         navigation.refresh(seqid, start, end);
@@ -99,7 +89,6 @@ $(document).ready(function() {
  * @param {Number} end
  */
 var fetchTracksData = function(seqid, start, end, updatehistory) {
-  var nf = new PHP_JS().number_format;
   var trackselector = $('#trackselector :checked');
   var tracksIDs = [];
   var trackID;
@@ -114,14 +103,12 @@ var fetchTracksData = function(seqid, start, end, updatehistory) {
         || previous.pos === 0
         || previous.tracks.indexOf(trackid) === -1
         || previous.pos !== (start+1)*end) {
-      requestTrackData(reqURL, seqid, start, end, trackid, function(track) {
-        if (!tracks[trackid]){
-          tracks[trackid] = new Track(track, 1101, 50);
-          tracks[trackid].display(start, end);
-        } else {
-          tracks[trackid].refresh(start, end, track.data);
-        }
-      });
+      if (!tracks[trackid]) {
+        tracks[trackid] = new Track(trackid, 1101, 50);
+        tracks[trackid].display(seqid, start, end);
+      } else {
+        tracks[trackid].refresh(seqid, start, end);
+      }
     }
   });
   previous.tracks.forEach(function(ptrack) {
@@ -143,8 +130,8 @@ var fetchTracksData = function(seqid, start, end, updatehistory) {
   previous.tracks = tracksIDs;
   previous.pos = (start+1)*end;
   previous.seqid = seqid;
-  $('#start').val(nf(start));
-  $('#end').val(nf(end));
+  $('#start').val(start);
+  $('#end').val(end);
 };
 
 /**
@@ -234,24 +221,12 @@ var getGlobalStyle = function(callback) {
  * @param {Function} callback
  */
 var validateForm = function(callback) {
-  var nf = new PHP_JS().number_format;
-  var seqid = $("#seqid").val();
-  var start = parseNum($("#start").val());
-  var end = parseNum($("#end").val());
-  var okSeqid = seqid != 'seqid';
-  var okStart = !isNaN(start);
-  var okEnd = !isNaN(end);
-  var temp = 0;
-  if (start > end) {
-    temp = end;
-    end = start;
-    start = temp;
-  }
-  if (okSeqid && okStart && okEnd) {
+  var seqid = $('#seqid').val();
+  var start = $('#start').val();
+  var end = $('#end').val();
+  if (seqid && !(isNaN(start) || isNaN(end))) {
     sanitizeInputPos(start, end, function(start, end) {
-      $('#start').val(nf(start));
-      $('#end').val(nf(end));
-      callback(true);
+      callback(seqid, start, end);
     });
   }
 };
@@ -265,52 +240,19 @@ var validateForm = function(callback) {
  * @param {Function} callback
  */
 var sanitizeInputPos = function(start, end, callback) {
+  var start = start;
+  var end = end;
+  var temp = 0;
+  if (start > end) {
+    temp = end;
+    end = start;
+    start = temp;
+  }
   getSeqidMetadata($('#seqid').val(), function(seqidMD) {
-    start = Math.max(0, start)
+    start = Math.max(0, start);
     end = Math.min(seqidMD.length, end);
     callback(start, end);
   });
-};
-
-/**
- * Clear prompt from field
- * 
- * @param {Object} element
- */
-var clearPrompt = function(element) {
-  if ($(element).val() == $(element).attr('name')) {
-    $(element).val('');
-  }
-};
-
-/**
- * Set prompt for field
- *
- * @param {Object} element
- */
-var setPrompt = function(element) {
-  if ($(element).val() == '') {
-    $(element).val($(element).attr('name'));
-  }
-};
-
-/**
- * Convert a formated number to an integer.
- * Returns NaN if the formated number cannot be parsed.
- *
- * @param {String} str_num
- * @return {Number}
- */
-var parseNum = function(str_num) {
-  var nf = new PHP_JS().number_format;
-  parsedNum = parseInt(nf(str_num, 0, '.', ''), 10);
-  if (parseInt(str_num, 10) !== 0){
-    if (parsedNum !== 0){
-      return parseInt(nf(str_num, 0, '.', ''), 10);
-    }
-    return NaN;
-  }
-  return 0;
 };
 
 
