@@ -287,16 +287,39 @@ Track.prototype.refresh = function(seqid, start, end) {
  * @param {Object} style
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  var view_span = view_end - view_start;
-  var nf = new PHP_JS().number_format;
-  var rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_doc_length = rel_end - rel_start;
-  var d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style);
-  var title = [];
+  var view_span = view_end - view_start
+    , nf = new PHP_JS().number_format
+    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
+    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
+    , rel_doc_length = rel_end - rel_start
+    , tip_length = rel_doc_length > 15 ? 15 : rel_doc_length/1.5
+    , title = []
+    , path = ''
+    , doc_shape = null;
+  if (doc.strand === '+') {
+    path = [
+      'M' + rel_start + ' ' + (20+20*layer)
+    , 'h' + (rel_doc_length - tip_length)
+    , 'l' + tip_length + ' ' + 5
+    , 'l' + (-tip_length) + ' ' + 5
+    , 'h' + (-(rel_doc_length - tip_length))
+    , 'v' + (-10)
+    ].join(' ');
+  }
+  else if (doc.strand === '-') {
+    path = [
+      'M' + (rel_start + tip_length) + ' ' + (20+20*layer)
+    , 'h' + (rel_doc_length - tip_length)
+    , 'v' + 10
+    , 'h' + (-(rel_doc_length - tip_length))
+    , 'l' + (-tip_length) + ' ' + (-5)
+    , 'l' + tip_length + ' ' + (-5)
+    ].join(' ');
+  }
+  doc_shape = this.path(path).attr(style);
   for (var i in doc) {
     title.push(i + ' : ' + doc[i]);
   }
-  d.attr({ title: title.join('\n') });
-  return d;
+  doc_shape.attr({ title: title.join('\n') });
+  return doc_shape;
 };
