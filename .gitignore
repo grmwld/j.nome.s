@@ -4,6 +4,7 @@
 # exclude patterns (uncomment them if you want to use them):
 # *.[oa]
 # *~
+build
 node_modules
 .monitor
 .nodemonignore
@@ -12,3 +13,4 @@ node_modules
 *.html
 *.swp
 *.node
+*.log
