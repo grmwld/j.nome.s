@@ -103,7 +103,7 @@ Track.prototype.display = function(seqid, start, end) {
   , stroke: '#fff'
   });
   self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
-  self.title = self.canvas.text(3, 5, self.metadata.name).attr({
+  self.title = self.canvas.text(3, 7, self.metadata.name).attr({
     'font-size': 14
   , 'font-weight': 'bold'
   , 'text-anchor': 'start'
