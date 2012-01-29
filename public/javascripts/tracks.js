@@ -292,32 +292,10 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
-    , tip_length = rel_doc_length > 15 ? 15 : rel_doc_length/1.5
     , title = []
-    , path = ''
     , doc_shape = null;
   if (doc.strand) {
-    if (doc.strand === '+') {
-      path = [
-        'M' + rel_start + ' ' + (20+20*layer)
-      , 'h' + (rel_doc_length - tip_length)
-      , 'l' + tip_length + ' ' + 5
-      , 'l' + (-tip_length) + ' ' + 5
-      , 'h' + (-(rel_doc_length - tip_length))
-      , 'v' + (-10)
-      ];
-    }
-    else if (doc.strand === '-') {
-      path = [
-        'M' + (rel_start + tip_length) + ' ' + (20+20*layer)
-      , 'h' + (rel_doc_length - tip_length)
-      , 'v' + 10
-      , 'h' + (-(rel_doc_length - tip_length))
-      , 'l' + (-tip_length) + ' ' + (-5)
-      , 'l' + tip_length + ' ' + (-5)
-      ];
-    }
-    doc_shape = this.path(path.join(' '));
+    doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, doc.strand));
   } else {
     doc_shape = this.rect(rel_start, 20+20*layer, rel_doc_length, 10);
   }
@@ -328,3 +306,38 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
   doc_shape.attr(style);
   return doc_shape;
 };
+
+/**
+ * Computes the path necessary to represent an oriented glyph
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} layer
+ * @param {String} strand
+ */
+var traceOrientedGlyph = function(start, end, layer, strand) {
+  var path = null
+    , length = end - start
+    , tip_length = length > 10 ? 10 : length/1.5;
+  if (strand === '+') {
+    path = [
+      'M' + start + ' ' + (20+20*layer)
+    , 'h' + (length - tip_length)
+    , 'l' + tip_length + ' ' + 5
+    , 'l' + (-tip_length) + ' ' + 5
+    , 'h' + (-(length - tip_length))
+    , 'v' + (-10)
+    ];
+  }
+  else if (strand === '-') {
+    path = [
+      'M' + (start + tip_length) + ' ' + (20+20*layer)
+    , 'h' + (length - tip_length)
+    , 'v' + 10
+    , 'h' + (-(length - tip_length))
+    , 'l' + (-tip_length) + ' ' + (-5)
+    , 'l' + tip_length + ' ' + (-5)
+    ];
+  }
+  return path.join(' ');
+}
