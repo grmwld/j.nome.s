@@ -296,30 +296,35 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , title = []
     , path = ''
     , doc_shape = null;
-  if (doc.strand === '+') {
-    path = [
-      'M' + rel_start + ' ' + (20+20*layer)
-    , 'h' + (rel_doc_length - tip_length)
-    , 'l' + tip_length + ' ' + 5
-    , 'l' + (-tip_length) + ' ' + 5
-    , 'h' + (-(rel_doc_length - tip_length))
-    , 'v' + (-10)
-    ].join(' ');
+  if (doc.strand) {
+    if (doc.strand === '+') {
+      path = [
+        'M' + rel_start + ' ' + (20+20*layer)
+      , 'h' + (rel_doc_length - tip_length)
+      , 'l' + tip_length + ' ' + 5
+      , 'l' + (-tip_length) + ' ' + 5
+      , 'h' + (-(rel_doc_length - tip_length))
+      , 'v' + (-10)
+      ];
+    }
+    else if (doc.strand === '-') {
+      path = [
+        'M' + (rel_start + tip_length) + ' ' + (20+20*layer)
+      , 'h' + (rel_doc_length - tip_length)
+      , 'v' + 10
+      , 'h' + (-(rel_doc_length - tip_length))
+      , 'l' + (-tip_length) + ' ' + (-5)
+      , 'l' + tip_length + ' ' + (-5)
+      ];
+    }
+    doc_shape = this.path(path.join(' '));
+  } else {
+    doc_shape = this.rect(rel_start, 20+20*layer, rel_doc_length, 10);
   }
-  else if (doc.strand === '-') {
-    path = [
-      'M' + (rel_start + tip_length) + ' ' + (20+20*layer)
-    , 'h' + (rel_doc_length - tip_length)
-    , 'v' + 10
-    , 'h' + (-(rel_doc_length - tip_length))
-    , 'l' + (-tip_length) + ' ' + (-5)
-    , 'l' + tip_length + ' ' + (-5)
-    ].join(' ');
-  }
-  doc_shape = this.path(path).attr(style);
   for (var i in doc) {
     title.push(i + ' : ' + doc[i]);
   }
   doc_shape.attr({ title: title.join('\n') });
+  doc_shape.attr(style);
   return doc_shape;
 };
