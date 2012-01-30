@@ -103,7 +103,7 @@ Track.prototype.display = function(seqid, start, end) {
   , stroke: '#fff'
   });
   self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
-  self.title = self.canvas.text(3, 5, self.metadata.name).attr({
+  self.title = self.canvas.text(3, 7, self.metadata.name).attr({
     'font-size': 14
   , 'font-weight': 'bold'
   , 'text-anchor': 'start'
@@ -287,16 +287,57 @@ Track.prototype.refresh = function(seqid, start, end) {
  * @param {Object} style
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  var view_span = view_end - view_start;
-  var nf = new PHP_JS().number_format;
-  var rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50;
-  var rel_doc_length = rel_end - rel_start;
-  var d = this.rect(rel_start, 20+20*layer, rel_doc_length, 10).attr(style);
-  var title = [];
+  var view_span = view_end - view_start
+    , nf = new PHP_JS().number_format
+    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
+    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
+    , rel_doc_length = rel_end - rel_start
+    , title = []
+    , doc_shape = null;
+  if (doc.strand) {
+    doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, doc.strand));
+  } else {
+    doc_shape = this.rect(rel_start, 20+20*layer, rel_doc_length, 10);
+  }
   for (var i in doc) {
     title.push(i + ' : ' + doc[i]);
   }
-  d.attr({ title: title.join('\n') });
-  return d;
+  doc_shape.attr({ title: title.join('\n') });
+  doc_shape.attr(style);
+  return doc_shape;
 };
+
+/**
+ * Computes the path necessary to represent an oriented glyph
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} layer
+ * @param {String} strand
+ */
+var traceOrientedGlyph = function(start, end, layer, strand) {
+  var path = null
+    , length = end - start
+    , tip_length = length > 10 ? 10 : length/1.5;
+  if (strand === '+') {
+    path = [
+      'M' + start + ' ' + (20+20*layer)
+    , 'h' + (length - tip_length)
+    , 'l' + tip_length + ' ' + 5
+    , 'l' + (-tip_length) + ' ' + 5
+    , 'h' + (-(length - tip_length))
+    , 'v' + (-10)
+    ];
+  }
+  else if (strand === '-') {
+    path = [
+      'M' + (start + tip_length) + ' ' + (20+20*layer)
+    , 'h' + (length - tip_length)
+    , 'v' + 10
+    , 'h' + (-(length - tip_length))
+    , 'l' + (-tip_length) + ' ' + (-5)
+    , 'l' + tip_length + ' ' + (-5)
+    ];
+  }
+  return path.join(' ');
+}
