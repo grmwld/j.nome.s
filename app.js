@@ -25,7 +25,6 @@ app.configure(function() {
   app.use(express.bodyParser());
   app.use(express.methodOverride());
   app.use(express.cookieParser());
-  app.use(express.session({ secret: 'topsecret' }));
   app.use(stylus.middleware({
     src: __dirname + '/public'
   , compile: function(str, path){

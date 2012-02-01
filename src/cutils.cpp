@@ -50,7 +50,7 @@ static Handle<Value> processProfile(const Arguments& args)
     vseqid = input->Get(Number::New(0))->ToObject()->Get(kseqid)->ToString();
     input_length = input->Length();
     start = input->Get(Number::New(0))->ToObject()->Get(kstart)->NumberValue();
-    output = Array::New(2000);
+    output = Array::New();
 
     for (i = 0; i < input_length; ++i)
     {
