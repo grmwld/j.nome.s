@@ -194,10 +194,8 @@ Track.prototype.drawProfile = function(data, start, end) {
   var i = 0;
   if (data.length !== 0) {
     data.forEach(function(doc) {
-      for (i = doc.start; i < doc.end; i++) {
-        xvals.push(i);
-        yvals.push(doc.score);
-      }
+      xvals.push(~~((doc.start + doc.end) / 2));
+      yvals.push(doc.score);
     });
     self.resize(self.canvas.width, 170);
     self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, self.metadata.style).hoverColumn(
