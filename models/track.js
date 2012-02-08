@@ -100,7 +100,7 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
  * @param {Number} step
  * @param {Function} callback
  */
-var queryRef = function(collection, seqid, start, end, step, callback) {
+var queryRef = function(collection, seqid, start, end, callback) {
   collection.find({
     seqid: seqid
   , start: { $lt: end }
@@ -134,14 +134,23 @@ var Track = function(db, metadata) {
  * @api public
  */
 Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
-  var self = this;
-  var start = ~~start;
-  var end = ~~end;
-  var step = getStep(end - start);
-  var query = self.metadata.type === 'profile' ? queryProfile : queryRef;
-  query(self.collection, seqid, start, end, step, function(err, docs) {
-    callback(err, docs);
-  });
+  var self = this
+    , start = ~~start
+    , end = ~~end
+    , step = getStep(end - start);
+  if (self.metadata.type === 'profile') {
+    queryProfile(self.collection, seqid, start, end, step, function(err, docs) {
+      docs.forEach(function(doc) {
+        delete doc._id;
+      });
+      callback(err, docs);
+    });
+  }
+  else if (self.metadata.type === 'ref') {
+    queryRef(self.collection, seqid, start, end, function(err, docs) {
+      callback(err, docs);
+    });
+  }
 };
 
 
