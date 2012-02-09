@@ -68,10 +68,10 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
   if (step % 500 === 0) {
     var queryCache = query;
     queryCache.step = step;
-    collection.find(queryCache).sort(sortOrder).toArray(function(err, cachedDocs) {
+    collection.find(queryCache, {_id:0}).sort(sortOrder).toArray(function(err, cachedDocs) {
       if (cachedDocs.length === 0) {
         cacheProfile(collection, seqid, step, function() {
-          collection.find(queryCache).sort(sortOrder).toArray(function(err, cachedDocs) {
+          collection.find(queryCache, {_id:0}).sort(sortOrder).toArray(function(err, cachedDocs) {
             callback(err, cachedDocs);
           });
         });
@@ -80,7 +80,7 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
       }
     });
   } else {
-    collection.find(query).sort(sortOrder).toArray(function(err, docs) {
+    collection.find(query, {_id:0}).sort(sortOrder).toArray(function(err, docs) {
       if (docs.length) {
         docs[0].start = start;
         docs[docs.length-1].end = end;
@@ -140,9 +140,6 @@ Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
     , step = getStep(end - start);
   if (self.metadata.type === 'profile') {
     queryProfile(self.collection, seqid, start, end, step, function(err, docs) {
-      docs.forEach(function(doc) {
-        delete doc._id;
-      });
       callback(err, docs);
     });
   }
