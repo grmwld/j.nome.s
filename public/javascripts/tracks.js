@@ -255,6 +255,7 @@ Track.prototype.empty = function() {
 Track.prototype.clear = function() {
   var self = this;
   self.documents.remove();
+  self.documents = self.canvas.set();
   self.canvas.setSize(self.width, self.height);
 };
 
