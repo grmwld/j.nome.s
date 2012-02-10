@@ -198,10 +198,10 @@ Track.prototype.drawProfile = function(data, start, end) {
       yvals.push(doc.score);
     });
     self.resize(self.canvas.width, 170);
-    self.documents = self.canvas.g.linechart(25, 5, self.width-50, 170, xvals, yvals, self.metadata.style).hoverColumn(
+    self.documents = self.canvas.linechart(25, 5, self.width-50, 170, xvals, yvals, self.metadata.style).hoverColumn(
       function(){
         this.popups = self.canvas.set();
-        this.popups.push(self.canvas.g.popup(this.x, this.y[0], ~~(this.values[0])+' | '+~~(this.axis)).insertBefore(this));
+        this.popups.push(self.canvas.popup(this.x, this.y[0], ~~(this.values[0])+' | '+~~(this.axis)).insertBefore(this));
       },
       function() {
         this.popups && this.popups.remove();
