@@ -89,10 +89,10 @@ $(document).ready(function() {
  * @param {Number} end
  */
 var fetchTracksData = function(seqid, start, end, updatehistory) {
-  var trackselector = $('#trackselector :checked');
-  var tracksIDs = [];
-  var trackID;
-  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  var trackselector = $('#trackselector :checked')
+    , tracksIDs = []
+    , trackID
+    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
   trackselector.each(function(i) {
     trackID = $(trackselector[i]).val();
     tracksIDs.push(trackID);
@@ -221,9 +221,9 @@ var getGlobalStyle = function(callback) {
  * @param {Function} callback
  */
 var validateForm = function(callback) {
-  var seqid = $('#seqid').val();
-  var start = $('#start').val();
-  var end = $('#end').val();
+  var seqid = $('#seqid').val()
+    , start = $('#start').val()
+    , end = $('#end').val();
   if (seqid && !(isNaN(start) || isNaN(end))) {
     sanitizeInputPos(start, end, function(start, end) {
       callback(seqid, start, end);
@@ -240,9 +240,9 @@ var validateForm = function(callback) {
  * @param {Function} callback
  */
 var sanitizeInputPos = function(start, end, callback) {
-  var start = start;
-  var end = end;
-  var temp = 0;
+  var start = parseInt(start, 10)
+    , end = parseInt(end, 10)
+    , temp = 0;
   if (start > end) {
     temp = end;
     end = start;
