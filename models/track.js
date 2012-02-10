@@ -65,13 +65,14 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
   , start: 1
   , end: 1
   };
+  var blFields = {_id:0, seqid:0}
   if (step % 500 === 0) {
     var queryCache = query;
     queryCache.step = step;
-    collection.find(queryCache, {_id:0}).sort(sortOrder).toArray(function(err, cachedDocs) {
+    collection.find(queryCache, blFields).sort(sortOrder).toArray(function(err, cachedDocs) {
       if (cachedDocs.length === 0) {
         cacheProfile(collection, seqid, step, function() {
-          collection.find(queryCache, {_id:0}).sort(sortOrder).toArray(function(err, cachedDocs) {
+          collection.find(queryCache, blFields).sort(sortOrder).toArray(function(err, cachedDocs) {
             callback(err, cachedDocs);
           });
         });
@@ -80,10 +81,19 @@ var queryProfile = function(collection, seqid, start, end, step, callback) {
       }
     });
   } else {
-    collection.find(query, {_id:0}).sort(sortOrder).toArray(function(err, docs) {
+    collection.find(query, blFields).sort(sortOrder).toArray(function(err, docs) {
       if (docs.length) {
         docs[0].start = start;
-        docs[docs.length-1].end = end;
+        if (docs[docs.length-1].end > end) {
+          docs[docs.length-1].end = end;
+        }
+        else if (docs[docs.length-1].end < end) {
+          docs.push({
+            start: docs[docs.length-1].end
+          , end: end
+          , score: 0
+          });
+        }
       }
       callback(err, processProfile(docs, step));
     });
