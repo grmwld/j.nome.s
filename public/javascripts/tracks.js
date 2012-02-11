@@ -63,31 +63,37 @@ Track.prototype.getTrackMetadata = function(trackid, callback) {
  * @api private
  */
 Track.prototype.getData = function(seqid, start, end, callback) {
-  var self = this;
-  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  $.ajax({
-    type: "POST"
-  , url: reqURL
-  , data: {
-      seqid: seqid
-    , start: start
-    , end: end
-    , trackID: self.trackid
-    }
-  , dataType: "json"
-  , beforeSend: function() {
-      $('#track'+self.trackid).append(self.spinner);
-    }
-  , complete: function(data) {
-      $('#spinner'+self.trackid).remove();
-    }
-  , success: function(data) {
-      self.seqid = seqid;
-      self.start = start;
-      self.end = end;
-      callback(data);
-    }
-  });
+  var self = this
+    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  if (seqid !== self.seqid || start !== self.start || end !== self.end) {
+    $.ajax({
+      type: "POST"
+    , url: reqURL
+    , data: {
+        seqid: seqid
+      , start: start
+      , end: end
+      , trackID: self.trackid
+      }
+    , dataType: "json"
+    , beforeSend: function() {
+        $('#track'+self.trackid).append(self.spinner);
+      }
+    , complete: function(data) {
+        $('#spinner'+self.trackid).remove();
+      }
+    , success: function(data) {
+        self.seqid = seqid;
+        self.start = start;
+        self.end = end;
+        self.data = data;
+        callback(data);
+      }
+    });
+  }
+  else {
+    callback(self.data);
+  }
 };
 
 
