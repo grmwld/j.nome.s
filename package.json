@@ -2,7 +2,8 @@
   "author": "Alexis GRIMALDI <alexis.grimaldi@gmail.com>",
   "name": "j.nome.s",
   "description": "A lightweight genome browser",
-  "version": "0.5.1",
+  "version": "0.6.0",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "gitosis@bio-software.org:j.nome.s"
@@ -11,7 +12,7 @@
     "node": ">= 0.4.0 < 0.7.0"
   },
   "dependencies": {
-    "express": "2.5.7"
+    "express": "2.5.8"
   , "express-trace": "0.0.3"
   , "async": "0.1.15"
   , "jade": "0.20.0"
