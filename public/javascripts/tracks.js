@@ -17,6 +17,10 @@ var Track = function(trackid, width, height) {
     self.bgrules = undefined;
     self.documents = undefined;
     self.title = undefined;
+    self.seqid = undefined;
+    self.start = undefined;
+    self.end = undefined;
+    self.maxvalue = 0;
     self.div = $('<div class=\'track\' id=track'+ trackid +'></div>');
     self.spinner = $('<div class=\'spinner\' id=spinner'+ trackid +'></div>');
     [1,2,3,4,5,6,7,8,9,10,11,12].forEach(function(i) {
@@ -59,28 +63,37 @@ Track.prototype.getTrackMetadata = function(trackid, callback) {
  * @api private
  */
 Track.prototype.getData = function(seqid, start, end, callback) {
-  var self = this;
-  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  $.ajax({
-    type: "POST"
-  , url: reqURL
-  , data: {
-      seqid: seqid
-    , start: start
-    , end: end
-    , trackID: self.trackid
-    }
-  , dataType: "json"
-  , beforeSend: function() {
-      $('#track'+self.trackid).append(self.spinner);
-    }
-  , complete: function(data) {
-      $('#spinner'+self.trackid).remove();
-    }
-  , success: function(data) {
-      callback(data);
-    }
-  });
+  var self = this
+    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  if (seqid !== self.seqid || start !== self.start || end !== self.end) {
+    $.ajax({
+      type: "POST"
+    , url: reqURL
+    , data: {
+        seqid: seqid
+      , start: start
+      , end: end
+      , trackID: self.trackid
+      }
+    , dataType: "json"
+    , beforeSend: function() {
+        $('#track'+self.trackid).append(self.spinner);
+      }
+    , complete: function(data) {
+        $('#spinner'+self.trackid).remove();
+      }
+    , success: function(data) {
+        self.seqid = seqid;
+        self.start = start;
+        self.end = end;
+        self.data = data;
+        callback(data);
+      }
+    });
+  }
+  else {
+    callback(self.data);
+  }
 };
 
 
@@ -102,6 +115,9 @@ Track.prototype.display = function(seqid, start, end) {
     fill: '#fff'
   , stroke: '#fff'
   });
+  self.background.dblclick(function(x, y) {
+    self.setMaxValue();
+  });
   self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
   self.title = self.canvas.text(3, 7, self.metadata.name).attr({
     'font-size': 14
@@ -114,8 +130,45 @@ Track.prototype.display = function(seqid, start, end) {
 };
 
 /**
- * Draw the track's data according to it's type
+ * Resize the track's canvas
+ */
+Track.prototype.resize = function(width, height) {
+  var self = this;
+  self.background.remove();
+  self.bgrules.remove();
+  self.canvas.setSize(width, height);
+  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({
+    fill: '#fff'
+  , stroke: '#fff'
+  });
+  self.background.dblclick(function(x, y) {
+    self.setMaxValue();
+  });
+  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
+  self.orderLayers();
+};
+
+/**
+ * Manually set the maximum value.
  *
+ * If the dataset contains higher values, the manually specified value is
+ * ignored
+ *
+ * @param {Number} value
+ */
+Track.prototype.setMaxValue = function() {
+  var self = this;
+  apprise("Maximum value (0 = auto) : ", {input: self.maxvalue+''}, function(value) {
+    if (!isNaN(parseInt(value, 10))) {
+      self.maxvalue = value <= 0 ? 0 : value;
+      self.refresh(self.seqid, self.start, self.end);
+    }
+  });
+}
+
+/**
+ * Draw the track's data according to it's type
+ *jquery.min.js
  * @param {Array} data
  * @param {Number} start
  * @param {Number} end
@@ -197,11 +250,20 @@ Track.prototype.drawProfile = function(data, start, end) {
       xvals.push(~~((doc.start + doc.end) / 2));
       yvals.push(doc.score);
     });
-    self.resize(self.canvas.width, 170);
-    self.documents = self.canvas.linechart(25, 5, self.width-50, 170, xvals, yvals, self.metadata.style).hoverColumn(
+    self.resize(self.canvas.width, 150);
+    self.documents = self.canvas.linechart(
+        25, 5,
+        self.width-50, 150,
+        [xvals, [xvals[0]]],
+        [yvals, [self.maxvalue]],
+        self.metadata.style
+    ).hoverColumn(
       function(){
         this.popups = self.canvas.set();
-        this.popups.push(self.canvas.popup(this.x, this.y[0], ~~(this.values[0])+' | '+~~(this.axis)).insertBefore(this));
+        this.popups.push(self.canvas.popup(
+          this.x, this.y[0],
+          ~~(this.values[0])+' | '+~~(this.axis)
+        ).insertBefore(this));
       },
       function() {
         this.popups && this.popups.remove();
@@ -223,22 +285,6 @@ Track.prototype.orderLayers = function() {
   self.title.toBack();
   self.bgrules.toBack();
   self.background.toBack();
-};
-
-/**
- * Resize the track's canvas
- */
-Track.prototype.resize = function(width, height) {
-  var self = this;
-  self.background.remove();
-  self.bgrules.remove();
-  self.canvas.setSize(width, height);
-  self.background = self.canvas.rect(0, 0, self.canvas.width, self.canvas.height).attr({
-    fill: '#fff'
-  , stroke: '#fff'
-  });
-  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
-  self.orderLayers();
 };
 
 /**
