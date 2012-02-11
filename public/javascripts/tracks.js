@@ -153,8 +153,10 @@ Track.prototype.resize = function(width, height) {
 Track.prototype.setMaxValue = function() {
   var self = this;
   value = prompt("Maximum value : ", self.maxvalue);
-  self.maxvalue = value <= 0 ? 0 : value;
-  self.refresh(self.seqid, self.start, self.end);
+  if (value) {
+    self.maxvalue = value <= 0 ? 0 : value;
+    self.refresh(self.seqid, self.start, self.end);
+  }
 }
 
 /**
