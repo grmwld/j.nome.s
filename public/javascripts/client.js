@@ -104,7 +104,8 @@ var fetchTracksData = function(seqid, start, end, updatehistory) {
         || previous.tracks.indexOf(trackid) === -1
         || previous.pos !== (start+1)*end) {
       if (!tracks[trackid]) {
-        tracks[trackid] = new Track(trackid, 1101, 50);
+        tracks[trackid] = TrackBase.factory(trackid, 1101, 50);
+        console.log(tracks[trackid]);
         tracks[trackid].display(seqid, start, end);
       } else {
         tracks[trackid].refresh(seqid, start, end);
@@ -132,35 +133,6 @@ var fetchTracksData = function(seqid, start, end, updatehistory) {
   previous.seqid = seqid;
   $('#start').val(start);
   $('#end').val(end);
-};
-
-/**
- * Request data of a given track between 2 positions of a seqid.
- * The callback is triggered with the collected data
- *
- * @param {String} reqURL
- * @param {string} seqid
- * @param {Number} start
- * @param {Number} end
- * @param {String} trackID
- * @param {Function} callback
- * @api private
- */
-var requestTrackData = function(reqURL, seqid, start, end, trackID, callback) {
-  $.ajax({
-    type: "POST"
-  , url: reqURL
-  , data: {
-      seqid: seqid
-    , start: start
-    , end: end
-    , trackID: trackID
-    }
-  , dataType: "json"
-  , success: function(data) {
-      callback(data);
-    }
-  });
 };
 
 /**
