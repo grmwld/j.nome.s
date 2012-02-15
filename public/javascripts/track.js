@@ -1,31 +1,27 @@
-var Track = (function() {
-
-  var getTrackMetadata = function(trackid, callback) {
-    var reqURL = '/'
-      + window.location.href.split('/').slice(3, 5).join('/')
-      + '/track/' + trackid + ".json";
-    $.ajax({
-      type: "GET"
+var NewTrack = function(trackid, width, height, callback) {
+  var reqURL = '/'
+    + window.location.href.split('/').slice(3, 5).join('/')
+    + '/track/' + trackid + ".json";
+  $.ajax({
+    type: "GET"
     , url: reqURL
     , dataType: "json"
     , success: function(metadata) {
-        callback(metadata);
+      var track = null;
+      if (metadata.type === 'ref') {
+        track = new TrackRef(trackid, width, height, metadata);
       }
-    , async: false
-    });
-  };
-
-  return function(trackid, width, height) {
-    //return new TrackRef(trackid, width, height);
-    getTrackMetadata(trackid, function(metadata) {
-      console.log(metadata);
-      //if (metadata.type === 'ref') {
-        return new TrackRef(trackid, width, height, metadata);
-      //}
-    });
-  };
-
-})();
+      else if (metadata.type === 'profile') {
+        track = new TrackProfile(trackid, width, height, metadata);
+      }
+      else if (metadata.type === 'oriented-profile') {
+        track = new TrackOrientedProfile(trackid, width, height, metadata);
+      }
+      callback(track);
+    }
+    //, async: false
+  });
+};
 
 
 /**
