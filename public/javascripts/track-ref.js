@@ -23,7 +23,7 @@ TrackRef.prototype = new TrackBase;
 TrackRef.prototype.draw = function(seqid, start, end) {
   var self = this;
   self.getData(seqid, start, end, function(data) {
-    self.drawDocuments(data, start, end);
+    self.drawData(data, start, end);
   });
 };
 
@@ -35,7 +35,7 @@ TrackRef.prototype.draw = function(seqid, start, end) {
  * @param {Number} end
  * @see drawDocument()
  */
-TrackRef.prototype.drawDocuments = function(data, start, end) {
+TrackRef.prototype.drawData = function(data, start, end) {
   var self = this;
   var layers = [];
   var laidout = false;

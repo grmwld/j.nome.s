@@ -191,50 +191,7 @@ TrackBase.prototype.setMaxValue = function() {
 }
 
 /**
- * Draw a profile track
- *
- * @param {Array} data
- * @param {Number} start
- * @param {Number} end
- */
-TrackBase.prototype.drawProfile = function(data, start, end) {
-  var self = this;
-  var xvals = [];
-  var yvals = [];
-  var i = 0;
-  if (data.length !== 0) {
-    data.forEach(function(doc) {
-      xvals.push(~~((doc.start + doc.end) / 2));
-      yvals.push(doc.score);
-    });
-    self.resize(self.canvas.width, 150);
-    self.documents = self.canvas.linechart(
-        25, 5,
-        self.width-50, 150,
-        [xvals, [xvals[0]]],
-        [yvals, [self.maxvalue]],
-        self.metadata.style
-    ).hoverColumn(
-      function(){
-        this.popups = self.canvas.set();
-        this.popups.push(self.canvas.popup(
-          this.x, this.y[0],
-          ~~(this.values[0])+' | '+~~(this.axis)
-        ).insertBefore(this));
-      },
-      function() {
-        this.popups && this.popups.remove();
-      }
-    );
-  }
-};
-
-/**
- * Draw the documents in the track canvas
- *
- * @param {Number} start
- * @param {Number} end
- * @see drawDocument()
+ * Order the layers
  */
 TrackBase.prototype.orderLayers = function() {
   var self = this;
