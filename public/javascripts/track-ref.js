@@ -14,11 +14,11 @@ TrackRef.prototype = new TrackBase;
 
 /**
  * Draw the track's data.
- *jquery.min.js
+ *
  * @param {Array} data
  * @param {Number} start
  * @param {Number} end
- * @see drawDocuments()
+ * @see drawData()
  */
 TrackRef.prototype.draw = function(seqid, start, end) {
   var self = this;
@@ -81,6 +81,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
  * @param {Object} doc
  * @param {Number} view_start
  * @param {Number} view_end
+ * @param {Number} layer
  * @param {Object} style
  */
 Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {

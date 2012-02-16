@@ -1,3 +1,12 @@
+/**
+ * Factory function to build appropriate Track objects
+ * based on the metadata
+ *
+ * @param {String} trackid
+ * @param {Number} width
+ * @param {Number} height
+ * @param {Function} callback
+ */
 var NewTrack = function(trackid, width, height, callback) {
   var reqURL = '/'
     + window.location.href.split('/').slice(3, 5).join('/')
@@ -30,6 +39,7 @@ var NewTrack = function(trackid, width, height, callback) {
  * @param {String} trackid
  * @param {Number} width
  * @param {Number} height
+ * @param {Object} metadata
  */
 var TrackBase = function(trackid, width, height, metadata) {
   var self = this;
@@ -52,29 +62,6 @@ var TrackBase = function(trackid, width, height, metadata) {
     self.spinner.append($('<div class=\'bar' + i + '\'></div>'));
   });
 };
-
-/**
- * Get the metadata associated to the current track
- *
- * @param {String} seqid
- * @param {Function} callback
- * @api private
- */
-//TrackBase.prototype.getTrackMetadata = function(trackid, callback) {
-  //var self = this;
-  //var reqURL = '/'
-    //+ window.location.href.split('/').slice(3, 5).join('/')
-    //+ '/track/' + trackid + ".json";
-  //$.ajax({
-    //type: "GET"
-  //, url: reqURL
-  //, dataType: "json"
-  //, success: function(metadata) {
-      //callback(metadata);
-    //}
-  //, async: false
-  //});
-//};
 
 /**
  * Request data of the track between 2 positions of a seqid.
@@ -155,6 +142,9 @@ TrackBase.prototype.display = function(seqid, start, end) {
 
 /**
  * Resize the track's canvas
+ *
+ * @param {Number} width
+ * @param {Number} height
  */
 TrackBase.prototype.resize = function(width, height) {
   var self = this;
@@ -177,8 +167,6 @@ TrackBase.prototype.resize = function(width, height) {
  *
  * If the dataset contains higher values, the manually specified value is
  * ignored
- *
- * @param {Number} value
  */
 TrackBase.prototype.setMaxValue = function() {
   var self = this;

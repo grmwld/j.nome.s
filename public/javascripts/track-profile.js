@@ -1,9 +1,10 @@
 /**
- * Class for handling reference tracks
+ * Class for handling profile tracks
  *
  * @param {String} trackid
  * @param {Number} width
  * @param {Number} height
+ * @param {Object} metadata
  */
 var TrackProfile = function(trackid, width, height, metadata) {
   var self = this;
@@ -14,11 +15,11 @@ TrackProfile.prototype = new TrackBase;
 
 /**
  * Draw the track's data.
- *jquery.min.js
+ *
  * @param {Array} data
  * @param {Number} start
  * @param {Number} end
- * @see drawDocuments()
+ * @see drawData()
  */
 TrackProfile.prototype.draw = function(seqid, start, end) {
   var self = this;
@@ -28,12 +29,11 @@ TrackProfile.prototype.draw = function(seqid, start, end) {
 };
 
 /**
- * Draw the documents in the track canvas
+ * Draw the profile in the track canvas
  *
  * @param {Array} data
  * @param {Number} start
  * @param {Number} end
- * @see drawDocument()
  */
 TrackProfile.prototype.drawData = function(data, start, end) {
   var self = this;
