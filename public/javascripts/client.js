@@ -104,7 +104,7 @@ var fetchTracksData = function(seqid, start, end, updatehistory) {
         || previous.tracks.indexOf(trackid) === -1
         || previous.pos !== (start+1)*end) {
       if (!tracks[trackid]) {
-        NewTrack(trackid, 1101, 50, function(track) {
+        newTrack(trackid, 1101, 50, function(track) {
           tracks[trackid] = track;
           tracks[trackid].display(seqid, start, end);
         });

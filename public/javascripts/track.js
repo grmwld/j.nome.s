@@ -7,7 +7,7 @@
  * @param {Number} height
  * @param {Function} callback
  */
-var NewTrack = function(trackid, width, height, callback) {
+var newTrack = function(trackid, width, height, callback) {
   var reqURL = '/'
     + window.location.href.split('/').slice(3, 5).join('/')
     + '/track/' + trackid + ".json";
