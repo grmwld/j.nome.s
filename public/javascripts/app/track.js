@@ -73,10 +73,14 @@ var TrackBase = function(trackid, width, height, metadata) {
  * @param {Function} callback
  * @api private
  */
-TrackBase.prototype.getData = function(seqid, start, end, callback) {
+TrackBase.prototype.getData = function(seqid, start, end, callback, force) {
+  force = force || false;
   var self = this
     , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  if (seqid !== self.seqid || start !== self.start || end !== self.end) {
+  if (!force && seqid === self.seqid && start === self.start && end === self.end) {
+    callback(self.data);
+  }
+  else {
     $.ajax({
       type: "POST"
     , url: reqURL
@@ -101,9 +105,6 @@ TrackBase.prototype.getData = function(seqid, start, end, callback) {
         callback(data);
       }
     });
-  }
-  else {
-    callback(self.data);
   }
 };
 

@@ -6,12 +6,58 @@
  * @param {Number} height
  * @param {Object} metadata
  */
-var TrackProfile = function(trackid, width, height, metadata) {
+var TrackOrientedProfile = function(trackid, width, height, metadata) {
   var self = this;
-  TrackBase.call(this, trackid, width, height, metadata);
+  TrackOriented.call(this, trackid, width, height, metadata);
 };
 
-TrackProfile.prototype = new TrackBase;
+TrackOrientedProfile.prototype = new TrackProfile;
+
+/**
+ * Request data of the track between 2 positions of a seqid.
+ * The callback is triggered with the collected data
+ *
+ * @param {string} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Function} callback
+ * @api private
+ */
+TrackOrientedProfile.prototype.getData = function(seqid, strand, start, end, callback, force) {
+  force = force || false;
+  var self = this
+    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  if (!force && seqid === self.seqid && start === self.start && end === self.end) {
+    callback(self.data);
+  }
+  else {
+    $.ajax({
+      type: "POST"
+    , url: reqURL
+    , data: {
+        seqid: seqid
+      , strand: strand
+      , start: start
+      , end: end
+      , trackID: self.trackid
+      }
+    , dataType: "json"
+    , beforeSend: function() {
+        $('#track'+self.trackid).append(self.spinner);
+      }
+    , complete: function(data) {
+        $('#spinner'+self.trackid).remove();
+      }
+    , success: function(data) {
+        self.seqid = seqid;
+        self.start = start;
+        self.end = end;
+        self.data = data;
+        callback(data);
+      }
+    });
+  }
+};
 
 /**
  * Draw the track's data.
@@ -21,11 +67,28 @@ TrackProfile.prototype = new TrackBase;
  * @param {Number} end
  * @see drawData()
  */
-TrackProfile.prototype.draw = function(seqid, start, end) {
-  var self = this;
-  self.getData(seqid, start, end, function(data) {
-    self.drawData(data, start, end);
-  });
+TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
+  var self = this
+    , plus_data = []
+    , minus_data = [];
+  var gotData = function() {
+    self.data = plus_data;
+    self.data.push.apply(self.data, minus_data);
+    self.drawData(self.data, start, end);
+  };
+  $
+    .when(
+      self.getData(seqid, '+', start, end, function(data) {
+        plus_data = data;
+      })
+    , self.getData(seqid, '-', start, end, function(data) {
+        minus_data = data;
+      });
+    )
+    .then(
+      gotData();
+    , console.log('failed');
+    );
 };
 
 /**
@@ -35,7 +98,7 @@ TrackProfile.prototype.draw = function(seqid, start, end) {
  * @param {Number} start
  * @param {Number} end
  */
-TrackProfile.prototype.drawData = function(data, start, end) {
+TrackOrientedProfile.prototype.drawData = function(data, start, end) {
   var self = this;
   var xvals = [];
   var yvals = [];
