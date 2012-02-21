@@ -21,5 +21,7 @@
   , "stylus": "0.22.6"
   , "markdown-js": "0.0.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "mocha": "0.12.x"
+  }
 }
