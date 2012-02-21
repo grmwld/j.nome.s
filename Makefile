@@ -46,4 +46,12 @@ install-demo:
 		&& rm -r $(DEMO_DIR) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
+remove-demo:
+	@ echo "$(YELLOW)Uninstalling demo data$(NO_COLOR)" \
+		&& mongo $(DEMO_DB) \
+			--eval "db.dropDatabase()" \
+			--quiet \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
 .PHONY: install-demo test
