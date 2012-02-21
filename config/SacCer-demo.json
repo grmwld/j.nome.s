@@ -11,5 +11,19 @@
       , "stroke": "purple"
       }
     }
+  , "rnaseq": {
+      "id": "rnaseq"
+    , "name": "RNASeq data"
+    , "description": "RNA-Seq data from SRR002051"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
   }
 }

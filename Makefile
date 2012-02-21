@@ -4,10 +4,12 @@ RED=\x1b[31;01m
 YELLOW=\x1b[33;01m
 TEST_DIR = ./test
 DEMO_DIR = $(TEST_DIR)/data
-DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer.EF4.fasta"
-DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer.gene.jff"
+DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II.fasta"
+DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II.egenes.jff"
+DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II.profile"
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"
+DEMO_COL_PROFILE = "rnaseq"
 BIN_SCRIPT = ./bin
 
 test:
@@ -22,7 +24,7 @@ test-acceptance:
 install-demo: $(DEMO) $(BIN_SCRIPT)
 	@ echo "$(YELLOW)Installing demo data$(NO_COLOR)" \
 		&& echo "Unpacking demo data ..." \
-		&& tar xvf $(DEMO_DIR).tar.bz2 \
+		&& tar xvf $(DEMO_DIR).tar.bz2 -C $(TEST_DIR) \
 		&& echo "Loading reference ..." \
 		&& $(BIN_SCRIPT)/load_fasta_reference.py \
 			-i $(DEMO_REF_FASTA) \
@@ -35,8 +37,13 @@ install-demo: $(DEMO) $(BIN_SCRIPT)
 			--file $(DEMO_GENES_JFF) \
 			--drop \
 			--stopOnError \
+		&& $(BIN_SCRIPT)/load_bed_profile.py \
+			-i $(DEMO_PROFILE) \
+			-d $(DEMO_DB) \
+			-c $(DEMO_COL_PROFILE) \
+			--drop \
 		&& echo "Repacking demo data ..." \
-		&& tar cvjf $(DEMO_DIR).tar.bz2 $(DEMO_DIR) \
+		&& tar cvjf data.tar.bz2 -C $(TEST_DIR) data \
 		&& rm -r $(DEMO_DIR) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
