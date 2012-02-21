@@ -2,26 +2,25 @@ NO_COLOR=\x1b[0m
 GREEN=\x1b[32;01m
 RED=\x1b[31;01m
 YELLOW=\x1b[33;01m
+
+BIN_SCRIPT = ./bin
 TEST_DIR = ./test
 DEMO_DIR = $(TEST_DIR)/data
 DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II.fasta"
 DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II.egenes.jff"
 DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II.profile"
+
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"
 DEMO_COL_PROFILE = "rnaseq"
-BIN_SCRIPT = ./bin
+REPORTER="spec"
+
 
 test:
 	@NODE_ENV=test 	./node_modules/.bin/mocha \
 		--reporter $(REPORTER)
 
-test-acceptance:
-			@NODE_ENV=test ./node_modules/.bin/mocha \
-				--reporter spec \
-				test/HTMLDOCSacceptance/*.js
-
-install-demo: $(DEMO) $(BIN_SCRIPT)
+install-demo:
 	@ echo "$(YELLOW)Installing demo data$(NO_COLOR)" \
 		&& echo "Unpacking demo data ..." \
 		&& tar xvf $(DEMO_DIR).tar.bz2 -C $(TEST_DIR) \
@@ -47,11 +46,4 @@ install-demo: $(DEMO) $(BIN_SCRIPT)
 		&& rm -r $(DEMO_DIR) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
-site:
-	rm -fr /tmp/docs \
-		  && cp -fr docs /tmp/docs \
-		    && git cpheckout gh-pages \
-			  && cp -fr /tmp/docs/* . \
-			  && echo "done"
-
-.PHONY: site test test-acceptance install-demo
+.PHONY: install-demo test
