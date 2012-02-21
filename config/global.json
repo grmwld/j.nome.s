@@ -1,14 +1,9 @@
 {
   "datasets": {
-    "Xentr42": {
-      "file": "Xentr42.json"
-    , "name": "Xentr42"
-    , "description": "Xenopus tropicalis genome v4"
-    }
-  , "Xentr7": {
-      "file": "Xentr7.json"
-    , "name": "Xentr7"
-    , "description": "Xenopus tropicalis genome v7"
+    "SacCer-demo": {
+      "file": "SacCer-demo.json"
+    , "name": "SacCer-demo"
+    , "description": "Demo of Saccharomyces cerevisae"
     }
   }
 , "style": {
