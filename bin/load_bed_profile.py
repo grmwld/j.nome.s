@@ -73,7 +73,7 @@ if __name__ == '__main__':
     parser.add_argument(
         '-r', '--drop', dest='drop',
         action='store_true',
-        default=False
+        default=False,
         help="Drop the collection if it already exists."
     )
     main(parser.parse_args())
