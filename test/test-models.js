@@ -54,18 +54,6 @@ describe('Reference', function() {
 
 describe('Track', function() {
 
-  describe('#getStep', function() {
-  });
-  
-  describe('#cacheProfile', function() {
-  });
-
-  describe('#queryProfile', function() {
-  });
-
-  describe('#queryRef', function() {
-  });
-
   describe('#fetchInInterval', function() {
 
     describe('with ref metadata', function() {
