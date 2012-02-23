@@ -25,6 +25,8 @@ test: remove-demo install-demo test-models remove-demo
 test-models:
 	@NODE_ENV=test 	./node_modules/.bin/mocha \
 		--reporter $(REPORTER) \
+		--timeout 10000 \
+		--slow 1000 \
 		$(TEST_MODELS)
 
 
