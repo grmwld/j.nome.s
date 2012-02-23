@@ -68,42 +68,46 @@ describe('Track', function() {
 
   describe('#fetchInInterval', function() {
 
-    it('responds with ref documents if it is a ref track', function(done) {
-      var track = new Track(dataset, {
-        id: 'ensembl_genes'
-      , name: 'Ensembl genes'
-      , description: 'Ensembl genes'
-      , type: 'ref'
-      , style: {
-          fill: 'purple'
-        , stroke: 'purple'
-        } 
-      });
-      track.fetchInInterval('chrI', 30192, 98123, function(err, docs) {
-        expect(err).to.not.exist;
-        expect(docs).to.be.an.instanceof(Array);
-        expect(docs).to.have.length(45);
-        docs.forEach(function(doc) {
-          expect(doc).to.contain.keys([
-            '_id'
-          , 'seqid'
-          , 'source'
-          , 'type'
-          , 'start'
-          , 'end'
-          , 'strand'
-          , 'phase'
-          ])
-          expect(doc.strand).to.match(/\+|\-/);
-          expect(doc.start).to.be.a('number');
-          expect(doc.end).to.be.a('number');
-          expect(doc.start).to.be.below(doc.end);
+    describe('with ref metadata', function() {
+
+      it('responds with ref documents', function(done) {
+        var track = new Track(dataset, {
+          id: 'ensembl_genes'
+        , name: 'Ensembl genes'
+        , description: 'Ensembl genes'
+        , type: 'ref'
+        , style: {
+            fill: 'purple'
+          , stroke: 'purple'
+          } 
         });
-        done();
+        track.fetchInInterval('chrI', 30192, 98123, function(err, docs) {
+          expect(err).to.not.exist;
+          expect(docs).to.be.an.instanceof(Array);
+          expect(docs).to.have.length(45);
+          docs.forEach(function(doc) {
+            expect(doc).to.contain.keys([
+              '_id'
+            , 'seqid'
+            , 'source'
+            , 'type'
+            , 'start'
+            , 'end'
+            , 'strand'
+            , 'phase'
+            ])
+            expect(doc.strand).to.match(/\+|\-/);
+            expect(doc.start).to.be.a('number');
+            expect(doc.end).to.be.a('number');
+            expect(doc.start).to.be.below(doc.end);
+          });
+          done();
+        });
       });
+
     });
 
-    it('responds with profile documents if it is a profile track', function(done) {
+    describe('with profile metadata', function() {
       var track = new Track(dataset, {
         id: 'rnaseq'
       , name: 'RNASeq data'
@@ -118,26 +122,53 @@ describe('Track', function() {
         , axisystep: 4
         }
       });
-      track.fetchInInterval('chrI', 30192, 31123, function(err, docs) {
-        expect(err).to.not.exist;
-        expect(docs).to.be.an.instanceof(Array);
-        expect(docs).to.have.length(931);
-        console.log(docs[1]);
-        docs.forEach(function(doc) {
-          expect(doc).to.contain.keys([
-            'seqid'
-          , 'start'
-          , 'end'
-          , 'score'
-          ])
-          expect(doc.score).to.be.a('number');
-          expect(doc.score).to.not.be.below(0);
-          expect(doc.start).to.be.a('number');
-          expect(doc.end).to.be.a('number');
-          expect(doc.start).to.be.below(doc.end);
+
+      it('responds with profile documents (range < 1,000,000)', function(done) {
+        track.fetchInInterval('chrI', 30192, 31123, function(err, docs) {
+          expect(err).to.not.exist;
+          expect(docs).to.be.an.instanceof(Array);
+          expect(docs).to.have.length(931);
+          docs.forEach(function(doc) {
+            expect(doc).to.contain.keys([
+              'seqid'
+            , 'start'
+            , 'end'
+            , 'score'
+            ])
+            expect(doc.score).to.be.a('number');
+            expect(doc.score).to.not.be.below(0);
+            expect(doc.start).to.be.a('number');
+            expect(doc.end).to.be.a('number');
+            expect(doc.start).to.be.below(doc.end);
+          });
+          done();
         });
-        done();
       });
+    
+      it('responds with profile documents (with a range > 1,000,000)', function(done) {
+        track.fetchInInterval('chrIV', 10192, 1512001, function(err, docs) {
+          expect(err).to.not.exist;
+          expect(docs).to.be.an.instanceof(Array);
+          expect(docs).to.have.length(3005);
+          docs.forEach(function(doc) {
+            expect(doc).to.contain.keys([
+              'step'
+            , 'start'
+            , 'end'
+            , 'score'
+            ])
+            expect(doc.step).to.be.a('number');
+            expect(doc.step%500).to.equal(0);
+            expect(doc.score).to.be.a('number');
+            expect(doc.score).to.not.be.below(0);
+            expect(doc.start).to.be.a('number');
+            expect(doc.end).to.be.a('number');
+            expect(doc.start).to.be.below(doc.end);
+          });
+          done();
+        });
+      });
+
     });
 
   });

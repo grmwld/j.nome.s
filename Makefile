@@ -18,7 +18,7 @@ DEMO_COL_PROFILE = "rnaseq"
 REPORTER = "spec"
 
 
-test: remove-demo install-demo test-models remove-demo
+test: reinstall-demo test-models remove-demo
 	@NODE_ENV=test 	./node_modules/.bin/mocha \
 		--reporter $(REPORTER)
 
@@ -63,5 +63,7 @@ remove-demo:
 			--quiet \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
+reinstall-demo: remove-demo install-demo
 
-.PHONY: test test-models install-demo remove-demo
+
+.PHONY: test test-models install-demo remove-demo reinstall-demo
