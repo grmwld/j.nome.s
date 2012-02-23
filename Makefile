@@ -8,9 +8,9 @@ TEST_DIR = ./test
 TESTS = $(TEST_DIR)/*.js
 TEST_MODELS = $(TEST_DIR)/*models.js
 DEMO_DIR = $(TEST_DIR)/data
-DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II.fasta"
-DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II.egenes.jff"
-DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II.profile"
+DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.fasta"
+DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.genes.jff"
+DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II-III-IV.profile"
 
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"

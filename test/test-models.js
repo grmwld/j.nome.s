@@ -118,10 +118,10 @@ describe('Track', function() {
         , axisystep: 4
         }
       });
-      track.fetchInInterval('chrI', 30192, 35123, function(err, docs) {
+      track.fetchInInterval('chrI', 30192, 31123, function(err, docs) {
         expect(err).to.not.exist;
         expect(docs).to.be.an.instanceof(Array);
-        expect(docs).to.have.length(4931);
+        expect(docs).to.have.length(931);
         console.log(docs[1]);
         docs.forEach(function(doc) {
           expect(doc).to.contain.keys([
