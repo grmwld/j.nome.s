@@ -3,6 +3,8 @@ var expect = require('chai').expect
   , errors = require('../controllers/errors')
   , Reference = require('../models/reference').Reference
   , Track = require('../models/track').Track
+  , TrackRef = require('../models/track').TrackRef
+  , TrackProfile = require('../models/track').TrackProfile
   , processProfile = require('../lib/cutils').processProfile;
 
 var server = new Mongolian({
@@ -57,18 +59,19 @@ describe('Track', function() {
   describe('#fetchInInterval', function() {
 
     describe('with ref metadata', function() {
-
+      var track = new Track(dataset, {
+        id: 'ensembl_genes'
+      , name: 'Ensembl genes'
+      , description: 'Ensembl genes'
+      , type: 'ref'
+      , style: {
+          fill: 'purple'
+        , stroke: 'purple'
+        } 
+      });
+      
       it('responds with ref documents', function(done) {
-        var track = new Track(dataset, {
-          id: 'ensembl_genes'
-        , name: 'Ensembl genes'
-        , description: 'Ensembl genes'
-        , type: 'ref'
-        , style: {
-            fill: 'purple'
-          , stroke: 'purple'
-          } 
-        });
+        expect(track).to.be.an.instanceof(TrackRef);
         track.fetchInInterval('chrI', 30192, 98123, function(err, docs) {
           expect(err).to.not.exist;
           expect(docs).to.be.an.instanceof(Array);
@@ -112,6 +115,7 @@ describe('Track', function() {
       });
 
       it('responds with profile documents (range < 1,000,000)', function(done) {
+        expect(track).to.be.an.instanceof(TrackProfile);
         track.fetchInInterval('chrI', 30192, 31123, function(err, docs) {
           expect(err).to.not.exist;
           expect(docs).to.be.an.instanceof(Array);
@@ -134,6 +138,7 @@ describe('Track', function() {
       });
     
       it('responds with profile documents (with a range > 1,000,000)', function(done) {
+        expect(track).to.be.an.instanceof(TrackProfile);
         track.fetchInInterval('chrIV', 10192, 1512001, function(err, docs) {
           expect(err).to.not.exist;
           expect(docs).to.be.an.instanceof(Array);

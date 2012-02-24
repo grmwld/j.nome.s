@@ -217,3 +217,5 @@ TrackProfile.prototype.fetchInInterval = function(seqid, start, end, callback) {
  * Expose public functions, classes and methods
  */
 exports.Track = Track;
+exports.TrackRef = TrackRef;
+exports.TrackProfile = TrackProfile;
