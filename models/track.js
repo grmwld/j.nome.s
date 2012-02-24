@@ -121,18 +121,44 @@ var queryRef = function(collection, seqid, start, end, callback) {
 };
 
 
+var Track = (function() {
+  return function(db, metadata) {
+    if (metadata.type === 'ref') {
+      return new TrackRef(db, metadata);
+    }
+    else if (metadata.type === 'profile') {
+      return new TrackProfile(db, metadata);
+    }
+  }
+})();
+
+
 /**
- * Class representing a track.
+ * Class representing a Base Track.
  * 
  * @param {String} name
  * @param {String} collection
- * @api public
+ * @api private
  */
-var Track = function(db, metadata) {
+var TrackBase = function(db, metadata) {
   this.db = db;
   this.metadata = metadata;
+};
+
+
+/**
+ * Class representing a Ref Track.
+ *
+ * @param {String} name
+ * @param {String} collection
+ * @api private
+ */
+var TrackRef = function(db, metadata) {
+  TrackBase.call(this, db, metadata);
   this.collection = this.db.collection(metadata.id);
 };
+
+TrackRef.prototype = new TrackBase;
 
 /**
  * Fetch all documents on seqid between 2 positions
@@ -143,23 +169,48 @@ var Track = function(db, metadata) {
  * @param {Function} callback
  * @api public
  */
-Track.prototype.fetchInInterval = function(seqid, start, end, callback) {
+TrackRef.prototype.fetchInInterval = function(seqid, start, end, callback) {
+  var self = this
+    , start = ~~start
+    , end = ~~end
+  queryRef(self.collection, seqid, start, end, function(err, docs) {
+    callback(err, docs);
+  });
+};
+ 
+
+/**
+ * Class representing a Ref Track.
+ *
+ * @param {String} name
+ * @param {String} collection
+ * @api private
+ */
+var TrackProfile = function(db, metadata) {
+  TrackBase.call(this, db, metadata);
+  this.collection = this.db.collection(metadata.id);
+};
+
+TrackProfile.prototype = new TrackBase;
+
+/**
+ * Fetch all documents on seqid between 2 positions
+ *
+ * @param {String} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Function} callback
+ * @api public
+ */
+TrackProfile.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var self = this
     , start = ~~start
     , end = ~~end
     , step = getStep(end - start);
-  if (self.metadata.type === 'profile') {
-    queryProfile(self.collection, seqid, start, end, step, function(err, docs) {
-      callback(err, docs);
-    });
-  }
-  else if (self.metadata.type === 'ref') {
-    queryRef(self.collection, seqid, start, end, function(err, docs) {
-      callback(err, docs);
-    });
-  }
+  queryProfile(self.collection, seqid, start, end, step, function(err, docs) {
+    callback(err, docs);
+  });
 };
-
 
 
 /**
