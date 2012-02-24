@@ -39,86 +39,6 @@ var cacheProfile = function(collection, seqid, step, callback) {
   });
 };
 
-/**
- * Function invoked to query a profile track (collection).
- * This function takes care of querying the cached profile if
- * it exists, or to compute it and cache it if it doesn't.
- * If the step used in the profile processing is < 500,
- * the profile is processed on the fly.
- *
- * @param {MongolianCollection} col
- * @param {String} seqid
- * @param {Number} start
- * @param {Number} end
- * @param {Number} step
- * @param {Function} callback
- */
-var queryProfile = function(collection, seqid, start, end, step, callback) {
-  var query = {
-    seqid: seqid
-  , start: { $lt: end }
-  , end: { $gt: start }
-  , step: { $exists: false }
-  };
-  var sortOrder = {
-    seqid: 1
-  , start: 1
-  , end: 1
-  };
-  var blFields = {_id:0, seqid:0}
-  if (step % 500 === 0) {
-    var queryCache = query;
-    queryCache.step = step;
-    collection.find(queryCache, blFields).sort(sortOrder).toArray(function(err, cachedDocs) {
-      if (cachedDocs.length === 0) {
-        cacheProfile(collection, seqid, step, function() {
-          collection.find(queryCache, blFields).sort(sortOrder).toArray(function(err, cachedDocs) {
-            callback(err, cachedDocs);
-          });
-        });
-      } else {
-        callback(err, cachedDocs);
-      }
-    });
-  } else {
-    collection.find(query, blFields).sort(sortOrder).toArray(function(err, docs) {
-      if (docs.length) {
-        docs[0].start = start;
-        if (docs[docs.length-1].end > end) {
-          docs[docs.length-1].end = end;
-        }
-        else if (docs[docs.length-1].end < end) {
-          docs.push({
-            start: docs[docs.length-1].end
-          , end: end
-          , score: 0
-          });
-        }
-      }
-      callback(err, processProfile(docs, step));
-    });
-  }
-};
-
-/**
- * Function invoked to query a reference track.
- *
- * @param {MongolianCollection} collection
- * @param {String} seqid
- * @param {Number} start
- * @param {Number} end
- * @param {Number} step
- * @param {Function} callback
- */
-var queryRef = function(collection, seqid, start, end, callback) {
-  collection.find({
-    seqid: seqid
-  , start: { $lt: end }
-  , end: { $gt: start }
-  }).toArray(function(err, docs) {
-    callback(err, docs);
-  });
-};
 
 
 var Track = (function() {
@@ -173,7 +93,11 @@ TrackRef.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var self = this
     , start = ~~start
     , end = ~~end
-  queryRef(self.collection, seqid, start, end, function(err, docs) {
+  self.collection.find({
+    seqid: seqid
+  , start: { $lt: end }
+  , end: { $gt: start }
+  }).toArray(function(err, docs) {
     callback(err, docs);
   });
 };
@@ -206,10 +130,51 @@ TrackProfile.prototype.fetchInInterval = function(seqid, start, end, callback) {
   var self = this
     , start = ~~start
     , end = ~~end
-    , step = getStep(end - start);
-  queryProfile(self.collection, seqid, start, end, step, function(err, docs) {
-    callback(err, docs);
-  });
+    , step = getStep(end - start)
+    , query = {
+      seqid: seqid
+    , start: { $lt: end }
+    , end: { $gt: start }
+    , step: { $exists: false }
+    }
+    , sortOrder = {
+      seqid: 1
+    , start: 1
+    , end: 1
+    }
+    , blFields = {_id:0, seqid:0};
+  if (step % 500 === 0) {
+    var queryCache = query;
+    queryCache.step = step;
+    self.collection.find(queryCache, blFields).sort(sortOrder).toArray(function(err, cachedDocs) {
+      if (cachedDocs.length === 0) {
+        cacheProfile(collection, seqid, step, function() {
+          collection.find(queryCache, blFields).sort(sortOrder).toArray(function(err, cachedDocs) {
+            callback(err, cachedDocs);
+          });
+        });
+      } else {
+        callback(err, cachedDocs);
+      }
+    });
+  } else {
+    self.collection.find(query, blFields).sort(sortOrder).toArray(function(err, docs) {
+      if (docs.length) {
+        docs[0].start = start;
+        if (docs[docs.length-1].end > end) {
+          docs[docs.length-1].end = end;
+        }
+        else if (docs[docs.length-1].end < end) {
+          docs.push({
+            start: docs[docs.length-1].end
+          , end: end
+          , score: 0
+          });
+        }
+      }
+      callback(err, processProfile(docs, step));
+    });
+  }
 };
 
 
