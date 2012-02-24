@@ -114,6 +114,12 @@ describe('Track', function() {
         }
       });
 
+      before(function(done) {
+        track.collection.remove({step: {$exists:true}}, function(err, nrows) {
+          done(err);
+        });
+      });
+
       it('responds with profile documents (range < 1,000,000)', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
         track.fetchInInterval('chrI', 30192, 31123, function(err, docs) {
