@@ -30,7 +30,7 @@ var getStep = function(span) {
  */
 var cacheProfile = function(collection, seqid, step, callback) {
   collection.find({ seqid: seqid }).toArray(function(err, docs) {
-    pdocs = processProfile(docs, step);
+    var pdocs = processProfile(docs, step);
     pdocs.forEach(function(doc) {
       doc.step = step;
       collection.insert(doc, function(){});

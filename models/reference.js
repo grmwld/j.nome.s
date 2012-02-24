@@ -35,7 +35,7 @@ Reference.prototype.getMetadata = function(seqid, callback) {
       , uploadDate: doc.uploadDate
       });
     } else {
-      callback(err, null);
+      callback(new NotFound('SeqID ' + seqid + ' does not exist'), null);
     }
   });
 };
