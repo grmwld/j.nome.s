@@ -262,11 +262,11 @@ TrackProfile.prototype.cacheProfile = function(seqid, step, callback) {
  * @api private
  */
 var TrackOrientedProfile = function(db, metadata) {
-  TrackProfile.call(this, db, metadata);
+  TrackBase.call(this, db, metadata);
   this.collection = this.db.collection(metadata.id);
 };
 
-TrackOrientedProfile.prototype = new TrackProfile;
+TrackOrientedProfile.prototype = new TrackBase;
 
 /**
  * Fetch all documents on seqid between 2 positions
@@ -396,7 +396,7 @@ TrackOrientedProfile.prototype.queryCache = function(seqid, strand, start, end, 
  * @param {Number} step
  * @param {Function} callback
  */
-TrackOrientedProfile.prototype.cacheProfile = function(seqid, strand step, callback) {
+TrackOrientedProfile.prototype.cacheProfile = function(seqid, strand, step, callback) {
   var self = this;
   var fields = {_id: 0, start:1, end:1, score:1};
   var query = {
@@ -424,3 +424,4 @@ TrackOrientedProfile.prototype.cacheProfile = function(seqid, strand step, callb
 exports.Track = Track;
 exports.TrackRef = TrackRef;
 exports.TrackProfile = TrackProfile;
+exports.TrackOrientedProfile = TrackOrientedProfile;
