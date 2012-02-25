@@ -68,27 +68,23 @@ TrackOrientedProfile.prototype.getData = function(seqid, strand, start, end, cal
  * @see drawData()
  */
 TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
-  var self = this
-    , plus_data = []
-    , minus_data = [];
-  var gotData = function() {
-    self.data = plus_data;
-    self.data.push.apply(self.data, minus_data);
-    self.drawData(self.data, start, end);
-  };
-  $
-    .when(
+  var self = this;
+  async.parallel({
+    plus: function(callback) {
       self.getData(seqid, '+', start, end, function(data) {
-        plus_data = data;
-      })
-    , self.getData(seqid, '-', start, end, function(data) {
-        minus_data = data;
-      })
-    )
-    .then(
-      gotData()
-    , console.log('failed')
-    );
+        callback(null, data);
+      });
+    },
+    minus: function(callback) {
+      self.getData(seqid, '-', start, end, function(data) {
+        callback(null, data);
+      });
+    }
+  },
+  function(err, data) {
+    console.log(data.plus.slice(0, 10));
+    console.log(data.minus.slice(0, 10));
+  });
 };
 
 /**
