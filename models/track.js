@@ -308,7 +308,7 @@ TrackOrientedProfile.prototype.fetchInInterval = function(seqid, strand, start, 
  */
 TrackOrientedProfile.prototype.query = function(seqid, strand, start, end, step, callback) {
   var self = this;
-  var blFields = {_id:0, seqid:0};
+  var fields = {_id: 0, start:1, end:1, score:1};
   var query = {
         seqid: seqid,
         strand: strand,
@@ -322,7 +322,7 @@ TrackOrientedProfile.prototype.query = function(seqid, strand, start, end, step,
         end: 1
       };
   self.collection
-    .find(query, blFields)
+    .find(query, fields)
     .sort(sortOrder)
     .toArray(function(err, docs) {
       if (docs.length) {
@@ -355,7 +355,7 @@ TrackOrientedProfile.prototype.query = function(seqid, strand, start, end, step,
  */
 TrackOrientedProfile.prototype.queryCache = function(seqid, strand, start, end, step, callback) {
   var self = this;
-  var blFields = {_id:0, seqid:0};
+  var fields = {_id: 0, start:1, end:1, score:1};
   var query = {
         seqid: seqid,
         strand: strand,
@@ -369,13 +369,13 @@ TrackOrientedProfile.prototype.queryCache = function(seqid, strand, start, end, 
         end: 1
       };
   self.collection
-    .find(query, blFields)
+    .find(query, fields)
     .sort(sortOrder)
     .toArray(function(err, cachedDocs) {
       if (cachedDocs.length === 0) {
         self.cacheProfile(seqid, strand, step, function() {
           self.collection
-            .find(query, blFields)
+            .find(query, fields)
             .sort(sortOrder)
             .toArray(function(err, cachedDocs) {
               callback(err, cachedDocs);
@@ -398,6 +398,7 @@ TrackOrientedProfile.prototype.queryCache = function(seqid, strand, start, end, 
  */
 TrackOrientedProfile.prototype.cacheProfile = function(seqid, strand step, callback) {
   var self = this;
+  var fields = {_id: 0, start:1, end:1, score:1};
   var query = {
         seqid: seqid,
         strand: strand
@@ -406,6 +407,7 @@ TrackOrientedProfile.prototype.cacheProfile = function(seqid, strand step, callb
     .find(query)
     .toArray(function(err, docs) {
       processProfile(docs, step).forEach(function(doc) {
+        doc.seqid = seqid;
         doc.step = step;
         doc.strand = strand;
         self.collection.insert(doc, function(){});
