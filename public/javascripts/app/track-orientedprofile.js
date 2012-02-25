@@ -8,7 +8,7 @@
  */
 var TrackOrientedProfile = function(trackid, width, height, metadata) {
   var self = this;
-  TrackOriented.call(this, trackid, width, height, metadata);
+  TrackProfile.call(this, trackid, width, height, metadata);
 };
 
 TrackOrientedProfile.prototype = new TrackProfile;
@@ -83,11 +83,11 @@ TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
       })
     , self.getData(seqid, '-', start, end, function(data) {
         minus_data = data;
-      });
+      })
     )
     .then(
-      gotData();
-    , console.log('failed');
+      gotData()
+    , console.log('failed')
     );
 };
 
