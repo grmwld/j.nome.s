@@ -29,6 +29,9 @@ var Track = (function() {
     else if (metadata.type === 'profile') {
       return new TrackProfile(db, metadata);
     }
+    else if (metadata.type === 'oriented-profile') {
+      return new TrackOrientedProfile(db, metadata);
+    }
   }
 })();
 
@@ -71,7 +74,7 @@ TrackRef.prototype = new TrackBase;
  * @param {Function} callback
  * @api public
  */
-TrackRef.prototype.fetchInInterval = function(seqid, start, end, callback) {
+TrackRef.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
   var self = this
     , start = ~~start
     , end = ~~end;
@@ -96,7 +99,7 @@ TrackRef.prototype.query = function(seqid, start, end, callback) {
 
 
 /**
- * Class representing a Ref Track.
+ * Class representing a Profile Track.
  *
  * @param {String} name
  * @param {String} collection
@@ -119,7 +122,7 @@ TrackProfile.prototype = new TrackBase;
  * @param {Function} callback
  * @api public
  */
-TrackProfile.prototype.fetchInInterval = function(seqid, start, end, callback) {
+TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
   var self = this
     , start = ~~start
     , end = ~~end
@@ -243,6 +246,168 @@ TrackProfile.prototype.cacheProfile = function(seqid, step, callback) {
       processProfile(docs, step).forEach(function(doc) {
         doc.seqid = seqid;
         doc.step = step;
+        self.collection.insert(doc, function(){});
+      });
+      callback();
+    });
+};
+
+
+
+/**
+ * Class representing an Oriented Profile Track.
+ *
+ * @param {String} name
+ * @param {String} collection
+ * @api private
+ */
+var TrackOrientedProfile = function(db, metadata) {
+  TrackProfile.call(this, db, metadata);
+  this.collection = this.db.collection(metadata.id);
+};
+
+TrackOrientedProfile.prototype = new TrackProfile;
+
+/**
+ * Fetch all documents on seqid between 2 positions
+ * will choose automatically between query and queryCache
+ *
+ * @param {String} seqid
+ * @param {String} strand
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Function} callback
+ * @api public
+ */
+TrackOrientedProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
+  var self = this
+    , start = ~~start
+    , end = ~~end
+    , step = getStep(end - start)
+  if (step % 500 === 0) {
+    self.queryCache(seqid, strand, start, end, step, function(err, docs) {
+      callback(err, docs);
+    });
+  } else {
+    self.query(seqid, strand, start, end, step, function(err, docs) {
+      callback(err, docs);
+    });
+  }
+};
+
+/**
+ * Query on raw data and return a processed profile
+ *
+ * @param {String} seqid
+ * @param {String} strand
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} step
+ * @param {Function} callback
+ * @api private
+ */
+TrackOrientedProfile.prototype.query = function(seqid, strand, start, end, step, callback) {
+  var self = this;
+  var blFields = {_id:0, seqid:0};
+  var query = {
+        seqid: seqid,
+        strand: strand,
+        start: { $lt: end },
+        end: { $gt: start },
+        step: { $exists: false }
+      };
+  var sortOrder = {
+        seqid: 1,
+        start: 1,
+        end: 1
+      };
+  self.collection
+    .find(query, blFields)
+    .sort(sortOrder)
+    .toArray(function(err, docs) {
+      if (docs.length) {
+        docs[0].start = start;
+        if (docs[docs.length-1].end > end) {
+          docs[docs.length-1].end = end;
+        }
+        else if (docs[docs.length-1].end < end) {
+          docs.push({
+            start: docs[docs.length-1].end,
+            end: end,
+            score: 0
+          });
+        }
+      }
+      callback(err, processProfile(docs, step));
+    });
+};
+
+/**
+ * Query on cached profiles. If the cache does not exist,
+ * will compute it before.
+ *
+ * @param {String} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} step
+ * @param {Function} callback
+ * @api private
+ */
+TrackOrientedProfile.prototype.queryCache = function(seqid, strand, start, end, step, callback) {
+  var self = this;
+  var blFields = {_id:0, seqid:0};
+  var query = {
+        seqid: seqid,
+        strand: strand,
+        start: { $lt: end },
+        end: { $gt: start },
+        step: step
+      };
+  var sortOrder = {
+        seqid: 1,
+        start: 1,
+        end: 1
+      };
+  self.collection
+    .find(query, blFields)
+    .sort(sortOrder)
+    .toArray(function(err, cachedDocs) {
+      if (cachedDocs.length === 0) {
+        self.cacheProfile(seqid, strand, step, function() {
+          self.collection
+            .find(query, blFields)
+            .sort(sortOrder)
+            .toArray(function(err, cachedDocs) {
+              callback(err, cachedDocs);
+            });
+        });
+      } else {
+        callback(err, cachedDocs);
+      }
+    });
+};
+
+/**
+ * Inserts a processed profile in the database.
+ * Fetching from this cached profile is faster than
+ * processing the processed profile each time.
+ *
+ * @param {String} seqid
+ * @param {Number} step
+ * @param {Function} callback
+ */
+TrackOrientedProfile.prototype.cacheProfile = function(seqid, strand step, callback) {
+  var self = this;
+  var query = {
+        seqid: seqid,
+        strand: strand
+      };
+  self.collection
+    .find(query)
+    .toArray(function(err, docs) {
+      processProfile(docs, step).forEach(function(doc) {
+        doc.step = step;
+        doc.strand = strand;
         self.collection.insert(doc, function(){});
       });
       callback();
