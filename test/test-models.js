@@ -128,7 +128,6 @@ describe('Track', function() {
           expect(docs).to.have.length(931);
           docs.forEach(function(doc) {
             expect(doc).to.contain.keys([
-              'seqid'
             , 'start'
             , 'end'
             , 'score'
@@ -145,19 +144,16 @@ describe('Track', function() {
     
       it('responds with profile documents - cache[OFF] - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrIV', 10192, 1512001, function(err, docs) {
+        track.fetchInInterval('chrIV', 10192, 1112001, function(err, docs) {
           expect(err).to.not.exist;
           expect(docs).to.be.an.instanceof(Array);
-          expect(docs).to.have.length(3005);
+          expect(docs).to.have.length(2205);
           docs.forEach(function(doc) {
             expect(doc).to.contain.keys([
-              'step'
             , 'start'
             , 'end'
             , 'score'
             ])
-            expect(doc.step).to.be.a('number');
-            expect(doc.step%500).to.equal(0);
             expect(doc.score).to.be.a('number');
             expect(doc.score).to.not.be.below(0);
             expect(doc.start).to.be.a('number');
@@ -170,19 +166,16 @@ describe('Track', function() {
 
       it('responds with profile documents - cache[ON] - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrIV', 10192, 1512001, function(err, docs) {
+        track.fetchInInterval('chrIV', 10192, 1112001, function(err, docs) {
           expect(err).to.not.exist;
           expect(docs).to.be.an.instanceof(Array);
-          expect(docs).to.have.length(3005);
+          expect(docs).to.have.length(2205);
           docs.forEach(function(doc) {
             expect(doc).to.contain.keys([
-              'step'
             , 'start'
             , 'end'
             , 'score'
             ])
-            expect(doc.step).to.be.a('number');
-            expect(doc.step%500).to.equal(0);
             expect(doc.score).to.be.a('number');
             expect(doc.score).to.not.be.below(0);
             expect(doc.start).to.be.a('number');

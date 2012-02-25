@@ -147,7 +147,7 @@ TrackProfile.prototype.fetchInInterval = function(seqid, start, end, callback) {
  */
 TrackProfile.prototype.query = function(seqid, start, end, step, callback) {
   var self = this;
-  var blFields = {_id:0, seqid:0};
+  var fields = {_id: 0, start:1, end:1, score:1};
   var query = {
         seqid: seqid,
         start: { $lt: end },
@@ -160,7 +160,7 @@ TrackProfile.prototype.query = function(seqid, start, end, step, callback) {
         end: 1
       };
   self.collection
-    .find(query, blFields)
+    .find(query, fields)
     .sort(sortOrder)
     .toArray(function(err, docs) {
       if (docs.length) {
@@ -193,7 +193,7 @@ TrackProfile.prototype.query = function(seqid, start, end, step, callback) {
  */
 TrackProfile.prototype.queryCache = function(seqid, start, end, step, callback) {
   var self = this;
-  var blFields = {_id:0, seqid:0};
+  var fields = {_id: 0, start:1, end:1, score:1};
   var query = {
         seqid: seqid,
         start: { $lt: end },
@@ -206,13 +206,13 @@ TrackProfile.prototype.queryCache = function(seqid, start, end, step, callback) 
         end: 1
       };
   self.collection
-    .find(query, blFields)
+    .find(query, fields)
     .sort(sortOrder)
     .toArray(function(err, cachedDocs) {
       if (cachedDocs.length === 0) {
         self.cacheProfile(seqid, step, function() {
           self.collection
-            .find(query, blFields)
+            .find(query, fields)
             .sort(sortOrder)
             .toArray(function(err, cachedDocs) {
               callback(err, cachedDocs);
@@ -235,10 +235,13 @@ TrackProfile.prototype.queryCache = function(seqid, start, end, step, callback) 
  */
 TrackProfile.prototype.cacheProfile = function(seqid, step, callback) {
   var self = this;
+  var fields = {_id: 0, start:1, end:1, score:1};
+  var query = { seqid: seqid };
   self.collection
-    .find({ seqid: seqid })
+    .find(query, fields)
     .toArray(function(err, docs) {
       processProfile(docs, step).forEach(function(doc) {
+        doc.seqid = seqid;
         doc.step = step;
         self.collection.insert(doc, function(){});
       });
