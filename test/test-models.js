@@ -82,7 +82,7 @@ describe('Track', function() {
       
       it('responds with ref documents', function(done) {
         expect(track).to.be.an.instanceof(TrackRef);
-        track.fetchInInterval('chrI', null, 30192, 98123, function(err, docs) {
+        track.fetchInInterval('chrI', null, 32289, 98123, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
@@ -136,11 +136,11 @@ describe('Track', function() {
 
       it('responds with profile documents - range < 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrI', null, 30192, 31123, function(err, docs) {
+        track.fetchInInterval('chrI', null, 32289, 33090, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(931);
+            expect(docs).to.have.length(801);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -162,11 +162,11 @@ describe('Track', function() {
     
       it('responds with profile documents - cache[OFF] - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrIV', null, 10192, 1112001, function(err, docs) {
+        track.fetchInInterval('chrIV', null, 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2205);
+            expect(docs).to.have.length(2125);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -188,11 +188,11 @@ describe('Track', function() {
 
       it('responds with profile documents - cache[ON] - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrIV', null, 10192, 1112001, function(err, docs) {
+        track.fetchInInterval('chrIV', null, 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2205);
+            expect(docs).to.have.length(2125);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -238,11 +238,11 @@ describe('Track', function() {
 
       it('responds with profile documents - [plus] - range < 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackOrientedProfile);
-        track.fetchInInterval('chrI', '+', 30192, 31123, function(err, docs) {
+        track.fetchInInterval('chrI', '+', 32289, 33090, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(931);
+            expect(docs).to.have.length(801);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -264,11 +264,11 @@ describe('Track', function() {
 
       it('responds with profile documents - [minus] - range < 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackOrientedProfile);
-        track.fetchInInterval('chrI', '-', 30192, 31123, function(err, docs) {
+        track.fetchInInterval('chrI', '-', 32289, 33090, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(931);
+            expect(docs).to.have.length(801);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -290,10 +290,10 @@ describe('Track', function() {
     
       //it('responds with profile documents - cache[OFF] - range > 1,000,000', function(done) {
         //expect(track).to.be.an.instanceof(TrackProfile);
-        //track.fetchInInterval('chrIV', 10192, 1112001, function(err, docs) {
+        //track.fetchInInterval('chrIV', 50192, 1112001, function(err, docs) {
           //expect(err).to.not.exist;
           //expect(docs).to.be.an.instanceof(Array);
-          //expect(docs).to.have.length(2205);
+          //expect(docs).to.have.length(2125);
           //docs.forEach(function(doc) {
             //expect(doc).to.contain.keys([
             //, 'start'
@@ -312,10 +312,10 @@ describe('Track', function() {
 
       //it('responds with profile documents - cache[ON] - range > 1,000,000', function(done) {
         //expect(track).to.be.an.instanceof(TrackProfile);
-        //track.fetchInInterval('chrIV', 10192, 1112001, function(err, docs) {
+        //track.fetchInInterval('chrIV', 50192, 1112001, function(err, docs) {
           //expect(err).to.not.exist;
           //expect(docs).to.be.an.instanceof(Array);
-          //expect(docs).to.have.length(2205);
+          //expect(docs).to.have.length(2125);
           //docs.forEach(function(doc) {
             //expect(doc).to.contain.keys([
             //, 'start'
