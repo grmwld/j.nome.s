@@ -9,14 +9,20 @@ import pymongo
 
 
 def importData(infile, database, collection, drop=False):
+    nfields = 0
+    with open(infile, 'r') as iin:
+        nfields = len(iin.readline().strip().split('\t'))
     cmd = [
         'mongoimport',
         '-d', database,
         '-c', collection,
         '--type tsv',
-        '-f seqid,start,end,score',
         '--file', infile
     ]
+    if nfields == 5:
+        cmd.append('-f seqid,strand,start,end,score')
+    elif nfields == 4:
+        cmd.append('-f seqid,start,end,score')
     if drop: cmd.append('--drop')
     subprocess.call(' '.join(cmd), shell=True)
 
