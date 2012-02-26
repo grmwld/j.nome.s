@@ -97,11 +97,16 @@ input[type='number']
 input[type='checkbox']
   margin: 5px
 
-button,
-input[type='button'],
+button
+input[type='button']
 input[type='submit']
   button()
 
+button::-moz-focus-inner
+input[type='button']::-moz-focus-inner
+input[type='submit']::-moz-focus-inner
+  padding: 0px !important
+  border: 0px none !important
 
 div.spinner
   position: absolute
@@ -195,7 +200,7 @@ div.spinner div.bar12
 
 .browsefield
   margin: 5px
-  font-size: 24px
+  font-size: 16px
   width: 270px
   text-align: center
 
