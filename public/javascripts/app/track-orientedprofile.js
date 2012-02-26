@@ -82,8 +82,8 @@ TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
     }
   },
   function(err, data) {
-    console.log(data.plus.slice(0, 10));
-    console.log(data.minus.slice(0, 10));
+    self.data = data;
+    self.drawData(data, start, end);
   });
 };
 
@@ -96,32 +96,37 @@ TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
  */
 TrackOrientedProfile.prototype.drawData = function(data, start, end) {
   var self = this;
-  var xvals = [];
-  var yvals = [];
-  var i = 0;
-  if (data.length !== 0) {
-    data.forEach(function(doc) {
-      xvals.push(~~((doc.start + doc.end) / 2));
-      yvals.push(doc.score);
+  var xtvals = [];
+  var xbvals = [];
+  var ytvals = [];
+  var ybvals = [];
+  if (data.plus.length !== 0 && data.minus.length !== 0) {
+    data.plus.forEach(function(doc) {
+      xtvals.push(~~((doc.start + doc.end) / 2));
+      ytvals.push(doc.score);
+    });
+    data.minus.forEach(function(doc) {
+      xbvals.push(~~((doc.start + doc.end) / 2));
+      ybvals.push(-doc.score);
     });
     self.resize(self.canvas.width, 150);
     self.documents = self.canvas.linechart(
         25, 5,
         self.width-50, 150,
-        [xvals, [xvals[0]]],
-        [yvals, [self.maxvalue]],
+        [xtvals, xbvals],
+        [ytvals, ybvals],
         self.metadata.style
     ).hoverColumn(
-      function(){
-        this.popups = self.canvas.set();
-        this.popups.push(self.canvas.popup(
-          this.x, this.y[0],
-          ~~(this.values[0])+' | '+~~(this.axis)
-        ).insertBefore(this));
-      },
-      function() {
-        this.popups && this.popups.remove();
-      }
+      //function(){
+        //this.popups = self.canvas.set();
+        //this.popups.push(self.canvas.popup(
+          //this.x, this.y[0],
+          //~~(this.values[0])+' | '+~~(this.axis)
+        //).insertBefore(this));
+      //},
+      //function() {
+        //this.popups && this.popups.remove();
+      //}
     );
   }
 };
