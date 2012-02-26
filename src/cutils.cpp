@@ -11,7 +11,6 @@ static Handle<Value> processProfile(const Arguments& args)
     Local<String> kstart = String::New("start");
     Local<String> kend = String::New("end");
     Local<String> kscore = String::New("score");
-    Local<String> kseqid = String::New("seqid");
     Local<String> vseqid;
     Local<Array> output;
     Local<Array> input;
@@ -47,7 +46,6 @@ static Handle<Value> processProfile(const Arguments& args)
     }
 
     step = args[1]->ToNumber()->NumberValue();
-    vseqid = input->Get(Number::New(0))->ToObject()->Get(kseqid)->ToString();
     input_length = input->Length();
     start = input->Get(Number::New(0))->ToObject()->Get(kstart)->NumberValue();
     output = Array::New();
@@ -67,7 +65,6 @@ static Handle<Value> processProfile(const Arguments& args)
             if (length == step)
             {
                 point = Object::New();
-                point->Set(kseqid, vseqid);
                 point->Set(kstart, Number::New(start));
                 point->Set(kend, Number::New(start + length));
                 point->Set(kscore, Number::New(score / length));

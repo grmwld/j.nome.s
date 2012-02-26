@@ -45,38 +45,8 @@ def loadSequences(infile):
         )
 
 
-def parseArguments():
-    parser = argparse.ArgumentParser(
-            description='Load in MongoDB a FASTA file containing a reference genome.'
-    )
-    parser.add_argument(
-            '-i', '--infile', dest='infile',
-            type=argparse.FileType( 'r' ),
-            nargs='?',
-            default=sys.stdin,
-            metavar='FILE',
-            help='Input file.'
-    )
-    parser.add_argument(
-            '-d', '--database', dest='database',
-            metavar='DATABASE',
-            help='MongoDB database where the data is stored.'
-    )
-    parser.add_argument(
-            '-D', '--debug', dest='debug',
-            action='store_true',
-            default=False,
-            help='Debug mode.'
-    )
-  
-    return parser.parse_args()
-
-
-
-def main():
+def main(args):
     
-    args = parseArguments()
-
     connection = pymongo.Connection()
     db = connection[args.database]
     fs = gridfs.GridFS(db)
@@ -84,6 +54,9 @@ def main():
     sequences = loadSequences(args.infile)
     
     try:
+
+        if args.drop:
+            connection.drop_database(db)
 
         for seq in sequences:
             if args.debug:
@@ -102,5 +75,33 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(
+            description='Load in MongoDB a FASTA file containing a reference genome.'
+    )
+    parser.add_argument(
+        '-i', '--infile', dest='infile',
+        type=argparse.FileType( 'r' ),
+        nargs='?',
+        default=sys.stdin,
+        metavar='FILE',
+        help='Input file.'
+    )
+    parser.add_argument(
+        '-d', '--database', dest='database',
+        metavar='DATABASE',
+        help='MongoDB database where the data is stored.'
+    )
+    parser.add_argument(
+        '-r', '--drop', dest='drop',
+        action='store_true',
+        default=False,
+        help='Drop the database beforehand'
+    )
+    parser.add_argument(
+        '-D', '--debug', dest='debug',
+        action='store_true',
+        default=False,
+        help='Debug mode.'
+    )
+    main(parser.parse_args())
 

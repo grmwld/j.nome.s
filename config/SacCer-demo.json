@@ -1,0 +1,47 @@
+{
+  "dbname": "SacCer-demo"
+, "tracks": {
+    "ensembl_genes": {
+      "id": "ensembl_genes"
+    , "name": "Ensembl genes"
+    , "description": "Ensembl genes"
+    , "type": "ref"
+    , "style": {
+        "fill": "purple"
+      , "stroke": "purple"
+      }
+    }
+  , "rnaseq": {
+      "id": "rnaseq"
+    , "name": "RNASeq data"
+    , "description": "RNA-Seq data from SRR002051"
+    , "type": "profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
+  , "rnaseq_oriented": {
+      "id": "rnaseq_oriented"
+    , "name": "Oriented RNASeq data"
+    , "description": "Oriented RNA-Seq data from SRR002051"
+    , "type": "oriented-profile"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      , "colors": [
+          "#555599"
+        , "#ffffff"
+        ]
+      }
+    }
+  }
+}

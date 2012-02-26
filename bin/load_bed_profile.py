@@ -8,15 +8,22 @@ import argparse
 import pymongo
 
 
-def importData(infile, database, collection):
+def importData(infile, database, collection, drop=False):
+    nfields = 0
+    with open(infile, 'r') as iin:
+        nfields = len(iin.readline().strip().split('\t'))
     cmd = [
         'mongoimport',
         '-d', database,
         '-c', collection,
         '--type tsv',
-        '-f seqid,start,end,score',
         '--file', infile
     ]
+    if nfields == 5:
+        cmd.append('-f seqid,strand,start,end,score')
+    elif nfields == 4:
+        cmd.append('-f seqid,start,end,score')
+    if drop: cmd.append('--drop')
     subprocess.call(' '.join(cmd), shell=True)
 
 def ensureIndexes(database, collection):
@@ -32,7 +39,7 @@ def ensureIndexes(database, collection):
 
 
 def main(args):
-    importData(args.infile, args.database, args.collection)
+    importData(args.infile, args.database, args.collection, args.drop)
     ensureIndexes(args.database, args.collection)
 
 
@@ -68,5 +75,11 @@ if __name__ == '__main__':
         '-c', '--collection', dest='collection',
         required=True,
         help='Collection to use.'
+    )
+    parser.add_argument(
+        '-r', '--drop', dest='drop',
+        action='store_true',
+        default=False,
+        help="Drop the collection if it already exists."
     )
     main(parser.parse_args())
