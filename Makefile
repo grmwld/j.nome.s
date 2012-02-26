@@ -11,10 +11,12 @@ DEMO_DIR = $(TEST_DIR)/data
 DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.fasta"
 DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.genes.jff"
 DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II-III-IV.profile"
+DEMO_ORIENTED_PROFILE = $(DEMO_DIR)/"SRR002051_oriented_chrI-II-III-IV.profile"
 
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"
 DEMO_COL_PROFILE = "rnaseq"
+DEMO_COL_ORIENTED_PROFILE = "rnaseq_oriented"
 REPORTER = "spec"
 
 
@@ -50,6 +52,11 @@ install-demo:
 			-i $(DEMO_PROFILE) \
 			-d $(DEMO_DB) \
 			-c $(DEMO_COL_PROFILE) \
+			--drop \
+		&& $(BIN_SCRIPT)/load_bed_profile.py \
+			-i $(DEMO_ORIENTED_PROFILE) \
+			-d $(DEMO_DB) \
+			-c $(DEMO_COL_ORIENTED_PROFILE) \
 			--drop \
 		&& echo "Repacking demo data ..." \
 		&& tar cvjf data.tar.bz2 -C $(TEST_DIR) data \

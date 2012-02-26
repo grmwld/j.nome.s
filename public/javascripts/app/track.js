@@ -73,10 +73,14 @@ var TrackBase = function(trackid, width, height, metadata) {
  * @param {Function} callback
  * @api private
  */
-TrackBase.prototype.getData = function(seqid, start, end, callback) {
+TrackBase.prototype.getData = function(seqid, start, end, callback, force) {
+  force = force || false;
   var self = this
     , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
-  if (seqid !== self.seqid || start !== self.start || end !== self.end) {
+  if (!force && seqid === self.seqid && start === self.start && end === self.end) {
+    callback(self.data);
+  }
+  else {
     $.ajax({
       type: "POST"
     , url: reqURL
@@ -102,9 +106,6 @@ TrackBase.prototype.getData = function(seqid, start, end, callback) {
       }
     });
   }
-  else {
-    callback(self.data);
-  }
 };
 
 
@@ -129,7 +130,7 @@ TrackBase.prototype.display = function(seqid, start, end) {
   self.background.dblclick(function(x, y) {
     self.setMaxValue();
   });
-  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
+  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#fff' });
   self.title = self.canvas.text(3, 7, self.metadata.name).attr({
     'font-size': 14
   , 'font-weight': 'bold'
@@ -158,7 +159,7 @@ TrackBase.prototype.resize = function(width, height) {
   self.background.dblclick(function(x, y) {
     self.setMaxValue();
   });
-  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#eee' });
+  self.bgrules = self.canvas.drawBgRules(10, { stroke: '#fff' });
   self.orderLayers();
 };
 

@@ -22,7 +22,7 @@
   , "markdown-js": "0.0.3"
   },
   "devDependencies": {
-    "mocha": "0.12.1"
-  , "chai": "0.3.3"
+    "mocha": "0.13.0"
+  , "chai": "0.3.4"
   }
 }

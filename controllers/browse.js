@@ -51,6 +51,7 @@ var route = function(app) {
     var track = new Track(req.dataset, app._locals.config[req.params.dataset].tracks[req.body.trackID]);
     track.fetchInInterval(
       req.body.seqid
+    , req.body.strand
     , req.body.start
     , req.body.end
     , function(err, data) {
