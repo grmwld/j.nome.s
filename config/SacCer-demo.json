@@ -37,6 +37,10 @@
       , "axis": "0 0 1 1"
       , "axisxstep": 10
       , "axisystep": 4
+      , "colors": [
+          "#555599"
+        , "#ffffff"
+        ]
       }
     }
   }
