@@ -411,6 +411,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
   a.drag(
     // Mouse move
     function(dx, dy, x, y, e) {
+      e.offsetX = e.offsetX ? e.offsetX : e.clientX-$(e.target).position().left;
       if (dx > 0) { 
         this.selector.attr({
           x: this.selector.ox
@@ -425,9 +426,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
     },
     // Mouse down
     function(x, y, e) {
-      if (!e.offsetX) {
-        e.offsetX = e.clientX - $(e.target).position().left;
-      }
+      e.offsetX = e.offsetX ? e.offsetX : e.clientX-$(e.target).position().left;
       gs = Math.floor((((e.offsetX-50)/(this.paper.width-100)) * view_span) + view_start);
       this.selector = this.paper.rect(e.offsetX, 1, 1, this.attr('height')-2).attr(style); 
       this.selector.ox = this.selector.attr('x');
@@ -436,9 +435,7 @@ Raphael.fn.explorableArea = function(view_start, view_end, style, callback) {
     function(e) {
       var goto_start
         , goto_end;
-      if (!e.offsetX) {
-        e.offsetX = e.clientX - $(e.target).position().left;
-      }
+      e.offsetX = e.offsetX ? e.offsetX : e.clientX-$(e.target).position().left;
       ge = Math.floor((((e.offsetX-50)/(this.paper.width-100)) * view_span) + view_start);
       goto_start = Math.min(gs, ge);
       goto_end = Math.max(gs, ge);
