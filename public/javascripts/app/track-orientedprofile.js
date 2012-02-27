@@ -25,10 +25,11 @@ TrackOrientedProfile.prototype = new TrackProfile;
  */
 TrackOrientedProfile.prototype.getData = function(seqid, strand, start, end, callback, force) {
   force = force || false;
-  var self = this
-    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  var self = this;
+  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  var cstrand = strand === '+' ? 'plus' : 'minus';
   if (!force && seqid === self.seqid && start === self.start && end === self.end) {
-    callback(self.data);
+    callback(self.data[cstrand]);
   }
   else {
     $.ajax({
@@ -83,6 +84,7 @@ TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
   },
   function(err, data) {
     self.data = data;
+    console.log(data);
     self.drawData(data, start, end);
   });
 };
