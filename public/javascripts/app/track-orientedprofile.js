@@ -100,6 +100,7 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
   var xbvals = [];
   var ytvals = [];
   var ybvals = [];
+  var myvals = 0;
   if (data.plus.length !== 0 && data.minus.length !== 0) {
     data.plus.forEach(function(doc) {
       xtvals.push(~~((doc.start + doc.end) / 2));
@@ -109,12 +110,13 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
       xbvals.push(~~((doc.start + doc.end) / 2));
       ybvals.push(-doc.score);
     });
+    myval = Math.max.apply(Math, [Math.max.apply(Math, ytvals), -Math.min.apply(Math, ybvals)]);
     self.resize(self.canvas.width, 150);
     self.documents = self.canvas.linechart(
         25, 5,
         self.width-50, 150,
-        [xtvals, xbvals],
-        [ytvals, ybvals],
+        [xtvals, xbvals, [xtvals[0]], [xbvals[0]]],
+        [ytvals, ybvals, [myval], [-myval]],
         self.metadata.style
     ).hoverColumn(
       //function(){

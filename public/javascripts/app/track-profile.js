@@ -45,10 +45,10 @@ TrackProfile.prototype.drawData = function(data, start, end) {
       xvals.push(~~((doc.start + doc.end) / 2));
       yvals.push(doc.score);
     });
-    self.resize(self.canvas.width, 150);
+    self.resize(self.canvas.width, 100);
     self.documents = self.canvas.linechart(
         25, 5,
-        self.width-50, 150,
+        self.width-50, 100,
         [xvals, [xvals[0]]],
         [yvals, [self.maxvalue]],
         self.metadata.style
