@@ -8,7 +8,7 @@
     , "type": "ref"
     , "style": {
         "fill": "purple"
-      , "stroke": "purple"
+      , "stroke": "black"
       }
     }
   , "rnaseq": {
