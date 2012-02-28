@@ -50,6 +50,86 @@ Navigation.prototype.refresh = function(seqid, start, end) {
 
 
 /**
+ * Base view of the seqid
+ * The containing navigation must be specified in order to bind events.
+ *
+ * @param {Function} container
+ * @param {String} anchor
+ * @param {Number} width
+ * @param {Number} height
+ */
+var BaseNavigation = function(container, anchor, width, height) {
+  this.container = container;
+  this.anchor = anchor;
+  this.width = width;
+  this.height = height;
+  this.canvas = undefined;
+  this.bgrules = undefined;
+  this.ruler = undefined;
+  this.selectableArea = undefined;
+};
+
+/**
+ * Display the navigation ruler.
+ * This method instanciates the canvas and draws in it.
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Object} metadata
+ * @param {Object} style
+ * @see BaseNavigation.draw()
+ */
+BaseNavigation.prototype.display = function(start, end, meta, style) {
+  var self = this;
+  self.canvas = Raphael(self.anchor, self.width, self.height);
+  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
+  self.draw(start, end, meta, style);
+};
+
+/**
+ * Actually draw the navigation element.
+ * This method draws in the canvas previously instanciated.
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Object} metadata
+ * @param {Object} style
+ */
+BaseNavigation.prototype.draw = function(start, end, meta, style) {
+  throw new Error('No draw methos implemented');
+};
+
+/**
+ * Clear the element.
+ * This only removes the potentially modified elements,
+ * that is the ruler and the selected area.
+ */
+BaseNavigation.prototype.clear = function() {
+  var self = this;
+  self.ruler.remove();
+  self.selectableArea.remove();
+};
+
+/**
+ * Refresh the view.
+ * This calls the clear() and draw() methods back-to-back
+ *
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Object} metadata
+ * @param {Object} style
+ * @see BaseNavigation.clear()
+ * @see BaseNavigation.draw()
+ */
+BaseNavigation.prototype.refresh = function(start, end, meta, style){
+  var self = this;
+  self.clear();
+  self.draw(start, end, meta, style);
+};
+
+
+
+/**
  * Overview of the seqid
  * The containing navigation must be specified in order to bind events.
  *
@@ -59,33 +139,10 @@ Navigation.prototype.refresh = function(seqid, start, end) {
  * @param {Number} height
  */
 var OverviewNavigation = function(container, anchor, width, height) {
-  this.container = container;
-  this.anchor = anchor;
-  this.width = width;
-  this.height = height;
-  this.canvas = undefined;
-  this.bgrules = undefined;
-  this.ruler = undefined;
+  BaseNavigation.call(this, container, anchor, width, height);
   this.selected = undefined;
-  this.selectableArea = undefined;
 };
-
-/**
- * Display the overview of the seqid.
- * This method instanciates the canvas and draws in it.
- *
- * @param {Number} start
- * @param {Number} end
- * @param {Object} metadata
- * @param {Object} style
- * @see OverviewNavigation.draw()
- */
-OverviewNavigation.prototype.display = function(start, end, meta, style) {
-  var self = this;
-  self.canvas = Raphael(self.anchor, self.width, self.height);
-  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
-  self.draw(start, end, meta, style);
-};
+OverviewNavigation.prototype = new BaseNavigation;
 
 /**
  * Draw the overview of the seqid.
@@ -116,27 +173,8 @@ OverviewNavigation.prototype.draw = function(start, end, meta, style) {
  * that is the ruler and the selected area.
  */
 OverviewNavigation.prototype.clear = function() {
-  var self = this;
-  self.ruler.remove();
-  self.selectableArea.remove();
-  self.selected.remove();
-};
-
-/**
- * Refresh the view.
- * This calls the clear() and draw() methods back-to-back
- *
- * @param {Number} start
- * @param {Number} end
- * @param {Object} metadata
- * @param {Object} style
- * @see OverviewNavigation.clear()
- * @see OverviewNavigation.draw()
- */
-OverviewNavigation.prototype.refresh = function(start, end, meta, style){
-  var self = this;
-  self.clear();
-  self.draw(start, end, meta, style);
+  BaseNavigation.prototype.clear.call(this);
+  this.selected.remove();
 };
 
 
@@ -151,31 +189,9 @@ OverviewNavigation.prototype.refresh = function(start, end, meta, style){
  * @param {Number} height
  */
 var ZoomNavigation = function(container, anchor, width, height) {
-  this.container = container;
-  this.anchor = anchor;
-  this.width = width;
-  this.height = height;
-  this.canvas = undefined;
-  this.bgrules = undefined;
-  this.ruler = undefined;
-  this.selectableArea = undefined;
+  BaseNavigation.call(this, container, anchor, width, height);
 };
-
-/**
- * Display the zoomed view of the seqid.
- * This method instanciates the canvas and draws in it.
- *
- * @param {Number} start
- * @param {Number} end
- * @param {Object} style
- * @see ZoomNavigation.draw()
- */
-ZoomNavigation.prototype.display = function(start, end, meta, style) {
-  var self = this;
-  self.canvas = Raphael(self.anchor, self.width, self.height);
-  self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
-  self.draw(start, end, meta, style);
-};
+ZoomNavigation.prototype = new BaseNavigation;
 
 /**
  * Draw the zoomed view of the seqid.
@@ -195,33 +211,6 @@ ZoomNavigation.prototype.draw = function(start, end, meta, style) {
   self.selectableArea.toBack();
   self.ruler.toBack();
   self.bgrules.toBack();
-};
-
-/**
- * Clear the element.
- * This only removes the potentially modified elements,
- * that is the ruler and the selectable area.
- */
-ZoomNavigation.prototype.clear = function(){
-  var self = this;
-  self.ruler.remove();
-  self.selectableArea.remove();
-};
-
-/**
- * Refresh the view.
- * This calls the clear() and draw() methods back-to-back
- *
- * @param {Number} start
- * @param {Number} end
- * @param {Object} style
- * @see ZoomNavigation.clear()
- * @see ZoomNavigation.draw()
- */
-ZoomNavigation.prototype.refresh = function(start, end, meta, style) {
-  var self = this;
-  self.clear();
-  self.draw(start, end, meta, style);
 };
 
 
