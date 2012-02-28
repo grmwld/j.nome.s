@@ -28,7 +28,6 @@ var newTrack = function(trackid, width, height, callback) {
       }
       callback(track);
     }
-    //, async: false
   });
 };
 
