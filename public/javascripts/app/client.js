@@ -42,12 +42,10 @@ $(document).ready(function() {
   $('#submit').click(function() {
     validateForm(function(seqid, start, end) {
       fetchTracksData(seqid, start, end, true);
-      try {
+      if(navigation.overviewNavigation.canvas) {
         navigation.refresh(seqid, start, end);
-      } catch (err) {
-        if (err.arguments[0] === 'remove') {
-          navigation.display(seqid, start, end);
-        }
+      } else {
+        navigation.display(seqid, start, end);
       }
     });
     return false;

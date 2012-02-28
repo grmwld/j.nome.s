@@ -109,9 +109,7 @@ BaseNavigation.prototype.draw = function(start, end, meta, style) {
 BaseNavigation.prototype.clear = function() {
   var self = this;
   for (ui in self.ui) {
-    try {
-      self.ui[ui].remove();
-    } catch(err) {console.log(err);};
+    self.ui[ui].remove();
   }
 };
 
