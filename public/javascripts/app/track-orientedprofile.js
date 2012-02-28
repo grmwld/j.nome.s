@@ -122,15 +122,16 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
     ).hoverColumn(
       function() {
         this.popups = self.canvas.set();
-        var dir = '';
-        for (var i = 0, ii = this.y.length; i < ii; i++) {
-          dir = i == 0 ? 'up' : 'down';
-          this.popups.push(self.canvas.popup(
-            this.x, this.y[i],
-            ~~(this.values[i])+' | '+~~(this.axis),
-            dir
-          ).insertBefore(this));
-        }
+        this.popups.push(self.canvas.popup(
+          this.x, this.y[0],
+          ~~(this.values[0])+' | '+~~(this.axis),
+          'up'
+        ).insertBefore(this));
+        this.popups.push(self.canvas.popup(
+          this.x, this.y[1],
+          ~~(this.values[1])+' | '+~~(this.axis),
+          'down'
+        ).insertBefore(this));
       },
       function() {
         this.popups && this.popups.remove();
