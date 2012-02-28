@@ -84,7 +84,6 @@ TrackOrientedProfile.prototype.draw = function(seqid, start, end) {
   },
   function(err, data) {
     self.data = data;
-    console.log(data);
     self.drawData(data, start, end);
   });
 };
@@ -121,16 +120,18 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
         [ytvals, ybvals, [myval], [-myval]],
         self.metadata.style
     ).hoverColumn(
-      //function(){
-        //this.popups = self.canvas.set();
-        //this.popups.push(self.canvas.popup(
-          //this.x, this.y[0],
-          //~~(this.values[0])+' | '+~~(this.axis)
-        //).insertBefore(this));
-      //},
-      //function() {
-        //this.popups && this.popups.remove();
-      //}
+      function() {
+        this.popups = self.canvas.set();
+        for (var i = 0, ii = this.y.length; i < ii; i++) {
+          this.popups.push(self.canvas.popup(
+            this.x, this.y[i],
+            ~~(this.values[i])+' | '+~~(this.axis)
+          ).insertBefore(this));
+        }
+      },
+      function() {
+        this.popups && this.popups.remove();
+      }
     );
   }
 };
