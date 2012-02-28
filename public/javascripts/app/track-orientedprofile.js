@@ -25,10 +25,11 @@ TrackOrientedProfile.prototype = new TrackProfile;
  */
 TrackOrientedProfile.prototype.getData = function(seqid, strand, start, end, callback, force) {
   force = force || false;
-  var self = this
-    , reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  var self = this;
+  var reqURL = '/'+ window.location.href.split('/').slice(3, 5).join('/');
+  var cstrand = strand === '+' ? 'plus' : 'minus';
   if (!force && seqid === self.seqid && start === self.start && end === self.end) {
-    callback(self.data);
+    callback(self.data[cstrand]);
   }
   else {
     $.ajax({
@@ -110,7 +111,7 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
       xbvals.push(~~((doc.start + doc.end) / 2));
       ybvals.push(-doc.score);
     });
-    myval = Math.max.apply(Math, [Math.max.apply(Math, ytvals), -Math.min.apply(Math, ybvals)]);
+    myval = Math.max.apply(Math, [self.maxvalue, Math.max.apply(Math, ytvals), -Math.min.apply(Math, ybvals)]);
     self.resize(self.canvas.width, 150);
     self.documents = self.canvas.linechart(
         25, 5,
@@ -119,16 +120,22 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
         [ytvals, ybvals, [myval], [-myval]],
         self.metadata.style
     ).hoverColumn(
-      //function(){
-        //this.popups = self.canvas.set();
-        //this.popups.push(self.canvas.popup(
-          //this.x, this.y[0],
-          //~~(this.values[0])+' | '+~~(this.axis)
-        //).insertBefore(this));
-      //},
-      //function() {
-        //this.popups && this.popups.remove();
-      //}
+      function() {
+        this.popups = self.canvas.set();
+        this.popups.push(self.canvas.popup(
+          this.x, this.y[0],
+          ~~(this.values[0])+' | '+~~(this.axis),
+          'up'
+        ).insertBefore(this));
+        this.popups.push(self.canvas.popup(
+          this.x, this.y[1],
+          ~~(this.values[1])+' | '+~~(this.axis),
+          'down'
+        ).insertBefore(this));
+      },
+      function() {
+        this.popups && this.popups.remove();
+      }
     );
   }
 };
