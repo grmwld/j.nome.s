@@ -21,7 +21,7 @@ Navigation.prototype.display = function(seqid, start, end) {
   getGlobalStyle(function(style) {
     getSeqidMetadata(seqid, function(meta) {
       self.overviewNavigation.display(start, end, meta, style);
-      self.ratioZoom.display(self.overviewNavigation.selected, style);
+      self.ratioZoom.display(self.overviewNavigation.ui.selected, style);
       self.zoomNavigation.display(start, end, meta, style);
       self.separator.display(style);
     });
@@ -41,7 +41,7 @@ Navigation.prototype.refresh = function(seqid, start, end) {
   getGlobalStyle(function(style) {
     getSeqidMetadata(seqid, function(meta) {
       self.overviewNavigation.refresh(start, end, meta, style);
-      self.ratioZoom.refresh(self.overviewNavigation.selected, style);
+      self.ratioZoom.refresh(self.overviewNavigation.ui.selected, style);
       self.zoomNavigation.refresh(start, end, meta, style);
     });
   });
@@ -65,8 +65,10 @@ var BaseNavigation = function(container, anchor, width, height) {
   this.height = height;
   this.canvas = undefined;
   this.bgrules = undefined;
-  this.ruler = undefined;
-  this.selectableArea = undefined;
+  this.ui = {
+    ruler: undefined,
+    selectableArea: undefined
+  }
 };
 
 /**
@@ -106,8 +108,11 @@ BaseNavigation.prototype.draw = function(start, end, meta, style) {
  */
 BaseNavigation.prototype.clear = function() {
   var self = this;
-  self.ruler.remove();
-  self.selectableArea.remove();
+  for (ui in self.ui) {
+    try {
+      self.ui[ui].remove();
+    } catch(err) {console.log(err);};
+  }
 };
 
 /**
@@ -140,7 +145,7 @@ BaseNavigation.prototype.refresh = function(start, end, meta, style){
  */
 var OverviewNavigation = function(container, anchor, width, height) {
   BaseNavigation.call(this, container, anchor, width, height);
-  this.selected = undefined;
+  this.ui.selected = undefined;
 };
 OverviewNavigation.prototype = new BaseNavigation;
 
@@ -155,26 +160,16 @@ OverviewNavigation.prototype = new BaseNavigation;
  */
 OverviewNavigation.prototype.draw = function(start, end, meta, style) {
   var self = this;
-  self.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
-  self.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
-  self.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end) {
+  self.ui.ruler = self.canvas.drawMainRuler(0, meta.length, style.ruler);
+  self.ui.selected = self.canvas.currentSpan(start, end, meta.length, style.selectedspan);
+  self.ui.selectableArea = self.canvas.explorableArea(0, meta.length, style.selectionspan, function(start, end) {
     fetchTracksData(meta._id, start, end, true);
     self.container.refresh(meta._id, start, end);
   });
-  self.selectableArea.toBack();
-  self.selected.toBack();
-  self.ruler.toBack();
+  self.ui.selectableArea.toBack();
+  self.ui.selected.toBack();
+  self.ui.ruler.toBack();
   self.bgrules.toBack();
-};
-
-/**
- * Clear the element.
- * This only removes the potentially modified elements,
- * that is the ruler and the selected area.
- */
-OverviewNavigation.prototype.clear = function() {
-  BaseNavigation.prototype.clear.call(this);
-  this.selected.remove();
 };
 
 
@@ -203,13 +198,13 @@ ZoomNavigation.prototype = new BaseNavigation;
  */
 ZoomNavigation.prototype.draw = function(start, end, meta, style) {
   var self = this;
-  self.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
-  self.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end) {
+  self.ui.ruler = self.canvas.drawMainRuler(start, end, style.ruler);
+  self.ui.selectableArea = self.canvas.explorableArea(start, end, style.selectionspan, function(start, end) {
     fetchTracksData(meta._id, start, end, true);
     self.container.refresh(meta._id, start, end);
   });
-  self.selectableArea.toBack();
-  self.ruler.toBack();
+  self.ui.selectableArea.toBack();
+  self.ui.ruler.toBack();
   self.bgrules.toBack();
 };
 
@@ -225,14 +220,12 @@ ZoomNavigation.prototype.draw = function(start, end, meta, style) {
  * @param {Number} height
  */
 var RatioZoom = function(container, anchor, width, height) {
-  this.container = container;
-  this.anchor = anchor;
-  this.width = width;
-  this.height = height;
-  this.canvas = undefined;
-  this.bgrules = undefined;
-  this.ratio = undefined;
+  BaseNavigation.call(this, container, anchor, width, height);
+  this.ui = {
+    ratio: undefined
+  }
 };
+RatioZoom.prototype = new BaseNavigation;
 
 /**
  * Display the ratio.
@@ -245,8 +238,8 @@ var RatioZoom = function(container, anchor, width, height) {
 RatioZoom.prototype.display = function(cur_span, style) {
   var self = this;
   self.canvas = Raphael(self.anchor, self.width, self.height);
-  self.ratio = self.canvas.set();
   self.bgrules = self.canvas.drawBgRules(10, style.bgrules);
+  self.ui.ratio = self.canvas.set();
   self.draw(cur_span, style);
 };
 
@@ -259,18 +252,8 @@ RatioZoom.prototype.display = function(cur_span, style) {
  */
 RatioZoom.prototype.draw = function(cur_span, style) {
   var self = this;
-  self.ratio = self.canvas.drawRatio(cur_span, style);
+  self.ui.ratio = self.canvas.drawRatio(cur_span, style);
   self.bgrules.toBack();
-};
-
-/**
- * Clear the element.
- * This only removes the potentially modified elements,
- * that is the ratio lines.
- */
-RatioZoom.prototype.clear = function() {
-  var self = this;
-  self.ratio.remove();
 };
 
 /**
