@@ -112,10 +112,10 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
       ybvals.push(-doc.score);
     });
     myval = Math.max.apply(Math, [self.maxvalue, Math.max.apply(Math, ytvals), -Math.min.apply(Math, ybvals)]);
-    self.resize(self.canvas.width, 150);
+    self.resize(self.canvas.width, 140);
     self.documents = self.canvas.linechart(
         25, 5,
-        self.width-50, 150,
+        self.width-50, 140,
         [xtvals, xbvals, [xtvals[0]], [xbvals[0]]],
         [ytvals, ybvals, [myval], [-myval]],
         self.metadata.style
