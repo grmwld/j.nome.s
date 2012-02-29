@@ -12,6 +12,8 @@ var processProfile = require('../lib/cutils').processProfile;
  * @return {Number} step
  */
 var getStep = function(span) {
+  return ~~(span/1000) + 1;
+  // Disable caching for now
   if (span <= 1000000) {
     return ~~(span/10000) + 1;
   }
