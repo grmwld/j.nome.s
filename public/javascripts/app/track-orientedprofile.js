@@ -9,9 +9,21 @@
 var TrackOrientedProfile = function(trackid, width, height, metadata) {
   var self = this;
   TrackProfile.call(this, trackid, width, height, metadata);
+  self.zeroline = null;
 };
 
 TrackOrientedProfile.prototype = new TrackProfile;
+
+/**
+ * Display the track
+ * Calls the parent's method and add a line at y=0
+ */
+TrackOrientedProfile.prototype.display = function(seqid, start, end) {
+  TrackProfile.prototype.display.call(this, seqid, start, end);
+  this.resize(this.canvas.width, 140);
+  this.zeroline = this.canvas.path('M50,'+(this.canvas.height/2+5.5)+'l'+(this.width-100)+',0');
+  this.zeroline.toBack();
+}
 
 /**
  * Request data of the track between 2 positions of a seqid.
@@ -45,6 +57,8 @@ TrackOrientedProfile.prototype.getData = function(seqid, strand, start, end, cal
     , dataType: "json"
     , beforeSend: function() {
         $('#track'+self.trackid).append(self.spinner);
+        try { self.zeroline.toBack(); }
+        catch(err) {}
       }
     , complete: function(data) {
         $('#spinner'+self.trackid).remove();
@@ -112,10 +126,9 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
       ybvals.push(-doc.score);
     });
     myval = Math.max.apply(Math, [self.maxvalue, Math.max.apply(Math, ytvals), -Math.min.apply(Math, ybvals)]);
-    self.resize(self.canvas.width, 150);
     self.documents = self.canvas.linechart(
         25, 5,
-        self.width-50, 150,
+        self.width-50, self.canvas.height,
         [xtvals, xbvals, [xtvals[0]], [xbvals[0]]],
         [ytvals, ybvals, [myval], [-myval]],
         self.metadata.style
@@ -137,6 +150,7 @@ TrackOrientedProfile.prototype.drawData = function(data, start, end) {
         this.popups && this.popups.remove();
       }
     );
+    self.zeroline.toFront();
   }
 };
 

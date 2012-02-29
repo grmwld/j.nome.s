@@ -74,6 +74,15 @@ TrackRef.prototype.drawData = function(data, start, end) {
   });
 };
 
+/**
+ * Clears the documents from the track canvas
+ */
+TrackRef.prototype.clear = function() {
+  TrackBase.prototype.clear.call(this);
+  this.canvas.setSize(this.width, this.height);
+};
+
+
 
 /**
  * Draw a document

@@ -193,18 +193,15 @@ TrackBase.prototype.orderLayers = function() {
  * Empty the track
  */
 TrackBase.prototype.empty = function() {
-  var self = this;
-  $('#track'+self.metadata.id).empty();
+  $('#track'+this.metadata.id).empty();
 };
 
 /**
  * Clears the documents from the track canvas
  */
 TrackBase.prototype.clear = function() {
-  var self = this;
-  self.documents.remove();
-  self.documents = self.canvas.set();
-  self.canvas.setSize(self.width, self.height);
+  this.documents.remove();
+  this.documents = this.canvas.set();
 };
 
 /**
