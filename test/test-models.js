@@ -160,39 +160,13 @@ describe('Track', function() {
         });
       });
     
-      it('responds with profile documents - cache[OFF] - range > 1,000,000', function(done) {
+      it('responds with profile documents - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
         track.fetchInInterval('chrIV', null, 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
-            docs.forEach(function(doc) {
-              expect(doc).to.contain.keys([
-              , 'start'
-              , 'end'
-              , 'score'
-              ])
-              expect(doc.score).to.be.a('number');
-              expect(doc.score).to.not.be.below(0);
-              expect(doc.start).to.be.a('number');
-              expect(doc.end).to.be.a('number');
-              expect(doc.start).to.be.below(doc.end);
-            });
-            done(err);
-          } catch(err) {
-            done(err);
-          }
-        });
-      });
-
-      it('responds with profile documents - cache[ON] - range > 1,000,000', function(done) {
-        expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrIV', null, 50192, 1112001, function(err, docs) {
-          try {
-            expect(err).to.not.exist;
-            expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
+            expect(docs).to.have.length(999);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -288,13 +262,13 @@ describe('Track', function() {
         });
       });
     
-      it('responds with profile documents - plus - cache[OFF] - range > 1,000,000', function(done) {
+      it('responds with profile documents - plus - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackOrientedProfile);
         track.fetchInInterval('chrIV', '+', 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
+            expect(docs).to.have.length(999);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -314,65 +288,13 @@ describe('Track', function() {
         });
       });
 
-      it('responds with profile documents - minus - cache[OFF] - range > 1,000,000', function(done) {
+      it('responds with profile documents - minus - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackOrientedProfile);
         track.fetchInInterval('chrIV', '-', 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
-            docs.forEach(function(doc) {
-              expect(doc).to.contain.keys([
-              , 'start'
-              , 'end'
-              , 'score'
-              ])
-              expect(doc.score).to.be.a('number');
-              expect(doc.score).to.not.be.below(0);
-              expect(doc.start).to.be.a('number');
-              expect(doc.end).to.be.a('number');
-              expect(doc.start).to.be.below(doc.end);
-            });
-            done(err);
-          } catch(err) {
-            done(err);
-          }
-        });
-      });
-
-      it('responds with profile documents - plus - cache[ON] - range > 1,000,000', function(done) {
-        expect(track).to.be.an.instanceof(TrackOrientedProfile);
-        track.fetchInInterval('chrIV', '+', 50192, 1112001, function(err, docs) {
-          try {
-            expect(err).to.not.exist;
-            expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
-            docs.forEach(function(doc) {
-              expect(doc).to.contain.keys([
-              , 'start'
-              , 'end'
-              , 'score'
-              ])
-              expect(doc.score).to.be.a('number');
-              expect(doc.score).to.not.be.below(0);
-              expect(doc.start).to.be.a('number');
-              expect(doc.end).to.be.a('number');
-              expect(doc.start).to.be.below(doc.end);
-            });
-            done(err);
-          } catch(err) {
-            done(err);
-          }
-        });
-      });
-
-      it('responds with profile documents - minus - cache[ON] - range > 1,000,000', function(done) {
-        expect(track).to.be.an.instanceof(TrackOrientedProfile);
-        track.fetchInInterval('chrIV', '-', 50192, 1112001, function(err, docs) {
-          try {
-            expect(err).to.not.exist;
-            expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
+            expect(docs).to.have.length(999);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
