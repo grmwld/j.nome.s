@@ -5,6 +5,7 @@ import os
 import sys
 import argparse
 import json
+import numpy
 from bx.bbi.bigwig_file import BigWigFile
 
 
@@ -13,10 +14,10 @@ class DataPoint:
     def __init__(self, query, index, value):
         self.seqid = query.seqid
         self.index = index
-        self.score = int(value['mean'])
         step = (query.end - query.start) / float(query.nbins)
         self.start = int(query.start + self.index * step)
         self.end = int(self.start + step)
+        self.score = 0 if numpy.isnan(value['mean']) else int(value['mean'])
 
     def __str__(self):
         return '\t'.join(map(str, [
@@ -52,7 +53,6 @@ class BW_Query:
 
     def run(self):
         self.rawdata = self.bwf.query(self.seqid, self.start, self.end, self.nbins)
-        a = self.bwf.query(self.seqid, self.start, self.end, self.nbins)
         self.formatRawData()
 
     def formatRawData(self):
