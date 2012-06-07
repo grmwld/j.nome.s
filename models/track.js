@@ -2,6 +2,7 @@
  * Module dependencies
  */
 var Mongolian = require('mongolian');
+var execFile = require('child_process').execFile;
 var processProfile = require('../lib/cutils').processProfile;
 
 
@@ -129,15 +130,46 @@ TrackProfile.prototype = new TrackBase();
 TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
   var self = this;
   var step = getStep(~~end - ~~start);
-  if (step % 2000 === 0) {
-    self.queryCache(seqid, ~~start, ~~end, step, function(err, docs) {
-      callback(err, docs);
-    });
-  } else {
-    self.query(seqid, ~~start, ~~end, step, function(err, docs) {
+  if (self.metadata.backend === 'bigwig') {
+    self.queryBigWig(seqid, ~~start, ~~end, 1500, function(err, docs) {
       callback(err, docs);
     });
   }
+  else {
+    if (step % 2000 === 0) {
+      self.queryCache(seqid, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    } else {
+      self.query(seqid, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    }
+  }
+};
+
+/**
+ * Query on raw data and return a processed profile
+ *
+ * @param {String} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} step
+ * @param {Function} callback
+ * @api private
+ */
+TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
+  var self = this;
+  child = execFile('./bin/bigwig_query.py', [
+                   '-i' + self.metadata.file,
+                   '-s' + seqid,
+                   '-t' + start,
+                   '-e' + end,
+                   '-n' + nbins
+  ], function(err, stdout, stderr) {
+    //console.log(stdout);
+    //callback(err, docs);
+  });
 };
 
 /**
