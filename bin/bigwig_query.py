@@ -4,6 +4,7 @@
 import os
 import sys
 import argparse
+import json
 from bx.bbi.bigwig_file import BigWigFile
 
 
@@ -26,7 +27,12 @@ class DataPoint:
         ]))
 
     def toJSON(self):
-        return str(self)
+        return json.dumps({
+            #'seqid': self.seqid,
+            'start': self.start,
+            'end': self.end,
+            'score': self.score
+        })
 
 
 
@@ -41,7 +47,8 @@ class BW_Query:
         self.data = []
 
     def __str__(self):
-        return '\n'.join(map(str, self.data))
+        return '\n'.join([point.toJSON() for point in self.data])
+        #return '\n'.join(map(str, self.data))
 
     def run(self):
         self.rawdata = self.bwf.query(self.seqid, self.start, self.end, self.nbins)
