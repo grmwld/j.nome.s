@@ -65,8 +65,6 @@ install-demo:
 			$(DEMO_PROFILE) \
 			$(DEMO_SIZES) \
 			$(DEMO_PROFILE_BIGWIG) \
-		&& echo "Repacking demo data ..." \
-		&& tar cvjf data.tar.bz2 -C $(TEST_DIR) data \
 		&& rm -r $(DEMO_DIR) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
