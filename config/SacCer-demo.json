@@ -6,6 +6,7 @@
     , "name": "Ensembl genes"
     , "description": "Ensembl genes"
     , "type": "ref"
+    , "backend": "json"
     , "style": {
         "fill": "purple"
       , "stroke": "black"
@@ -16,6 +17,7 @@
     , "name": "RNASeq data"
     , "description": "RNA-Seq data from SRR002051"
     , "type": "profile"
+    , "backend": "json"
     , "style": {
         "gutter": 25
       , "shade": true
@@ -30,6 +32,7 @@
     , "name": "Oriented RNASeq data"
     , "description": "Oriented RNA-Seq data from SRR002051"
     , "type": "oriented-profile"
+    , "backend": "json"
     , "style": {
         "gutter": 25
       , "shade": true
@@ -41,6 +44,21 @@
           "#555599"
         , "#ffffff"
         ]
+      }
+    }
+  , "rnaseq_bigwig": {
+      "id": "rnaseq_bigwig"
+    , "name": "RNASeq data (bigwig)"
+    , "description": "RNA-Seq data from SRR002051 (bigwig)"
+    , "type": "profile"
+    , "backend": "bigwig"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
       }
     }
   }
