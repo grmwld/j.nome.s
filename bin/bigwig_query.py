@@ -47,7 +47,7 @@ class BW_Query:
         self.data = []
 
     def __str__(self):
-        return '\n'.join([point.toJSON() for point in self.data])
+        return '['+',\n'.join([point.toJSON() for point in self.data])+']'
         #return '\n'.join(map(str, self.data))
 
     def run(self):
