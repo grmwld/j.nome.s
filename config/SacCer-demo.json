@@ -46,6 +46,22 @@
         ]
       }
     }
+  , "rnaseq_bigwig2": {
+      "id": "rnaseq_bigwig2"
+    , "name": "RNASeq data 2 (bigwig)"
+    , "description": "RNA-Seq data from SRR002051 2 (bigwig)"
+    , "type": "profile"
+    , "backend": "bigwig"
+    , "file": "./store/SRR002051_chrI-II-III-IV.profile2.bw"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
   , "rnaseq_bigwig": {
       "id": "rnaseq_bigwig"
     , "name": "RNASeq data (bigwig)"
