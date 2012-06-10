@@ -21,11 +21,13 @@ def build(bld):
 
 def shutdown():
     if Options.commands['clean']:
-        if exists('./lib/cutils.node'):
-            unlink('./lib/cutils.node')
+        for i in ['./lib/cutils.node', './lib/bigwig.node']:
+            if exists(i):
+                unlink(i)
     else:
-        if exists('./build/default/cutils.node') and not exists('./lib/cutils.node'):
-            symlink('../build/default/cutils.node', './lib/cutils.node')
+        for i in ['cutils.node', 'bigwig.node']:
+            if exists('./build/default/'+i) and not exists('./lib/'+i):
+                symlink('../build/default/'+i, './lib/'+i)
 
 
 
@@ -45,8 +47,9 @@ def build_cutils(bld):
 
 def build_bigwig(bld):
     bld.new_task_gen("cxx", "shlib", "node_addon",
-        includes = './addons/bigwig/inc ../jksrc/kent/src/inc',
-        staticlibpath = ['./addons/bigwig/lib'],
+        includes = 'addons/bigwig/inc',
+        lib = [ 'jkweb' ],
+        libpath = [ 'default/addons/bigwig/lib' ],
         target = 'bigwig',
         source = 'addons/bigwig/src/bigwig.cc',
         cxxflags = [
