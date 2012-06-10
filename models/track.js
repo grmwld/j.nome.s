@@ -4,6 +4,7 @@
 var Mongolian = require('mongolian');
 var execFile = require('child_process').execFile;
 var processProfile = require('../lib/cutils').processProfile;
+var bigwig = require('../lib/bigwig');
 
 
 var emitLines = function(stream) {
@@ -180,15 +181,17 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
  */
 TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
   var self = this;
-  var query = execFile('./bin/bigwig_query.py', [
-                   '-i' + self.metadata.file,
-                   '-s' + seqid,
-                   '-t' + start,
-                   '-e' + end,
-                   '-n' + nbins
-  ], function(err, stdout, stderr) {
-      callback(err, JSON.parse(stdout));
-  });
+  docs = bigwig.summary('./store/SRR002051_chrI-II-III-IV.profile.bw', seqid, start, end, nbins);
+  console.log(docs);
+  //var query = execFile('./bin/bigwig_query.py', 
+                   //'-i' + self.metadata.file,
+                   //'-s' + seqid,
+                   //'-t' + start,
+                   //'-e' + end,
+                   //'-n' + nbins
+  //], function(err, stdout, stderr) {
+      //callback(err, JSON.parse(stdout));
+  //});
 };
 
 /**
