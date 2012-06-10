@@ -180,7 +180,7 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
  */
 TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
   var self = this;
-  docs = bigwig.summary('./store/SRR002051_chrI-II-III-IV.profile.bw', seqid, start, end, nbins);
+  docs = bigwig.summary(self.metadata.file, seqid, start, end, nbins);
   callback(null, docs);
 };
 
