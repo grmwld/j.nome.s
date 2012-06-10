@@ -151,8 +151,7 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
   var self = this;
   var step = getStep(~~end - ~~start);
   if (self.metadata.backend === 'bigwig') {
-    self.queryBigWig(seqid, ~~start, ~~end, Math.min(~~end - ~~start, 2048), function(err, docs) {
-      console.log(docs);
+    self.queryBigWig(seqid, ~~start, ~~end, Math.min(~~end - ~~start, 1024), function(err, docs) {
       callback(err, docs);
     });
   }
@@ -182,16 +181,7 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
 TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
   var self = this;
   docs = bigwig.summary('./store/SRR002051_chrI-II-III-IV.profile.bw', seqid, start, end, nbins);
-  console.log(docs);
-  //var query = execFile('./bin/bigwig_query.py', 
-                   //'-i' + self.metadata.file,
-                   //'-s' + seqid,
-                   //'-t' + start,
-                   //'-e' + end,
-                   //'-n' + nbins
-  //], function(err, stdout, stderr) {
-      //callback(err, JSON.parse(stdout));
-  //});
+  callback(null, docs);
 };
 
 /**
