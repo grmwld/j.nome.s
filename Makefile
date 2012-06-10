@@ -8,11 +8,12 @@ TEST_DIR = ./test
 TESTS = $(TEST_DIR)/*.js
 TEST_MODELS = $(TEST_DIR)/*models.js
 DEMO_DIR = $(TEST_DIR)/data
+DEMO_STORE = $(TEST_DIR)/store
 DEMO_SIZES = $(DEMO_DIR)/"sacCer1.sizes"
 DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.fasta"
 DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.genes.jff"
 DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II-III-IV.profile"
-DEMO_PROFILE_BIGWIG = $(DEMO_DIR)/"SRR002051_chrI-II-III-IV.profile.bw"
+DEMO_PROFILE_BIGWIG = $(DEMO_STORE)/"SRR002051_chrI-II-III-IV.profile.bw"
 DEMO_ORIENTED_PROFILE = $(DEMO_DIR)/"SRR002051_oriented_chrI-II-III-IV.profile"
 
 DEMO_DB = "SacCer-demo"
@@ -61,6 +62,7 @@ install-demo:
 			-d $(DEMO_DB) \
 			-c $(DEMO_COL_ORIENTED_PROFILE) \
 			--drop \
+		&& mkdir $(DEMO_STORE) \
 		&& $(BIN_SCRIPT)/wigToBigWig \
 			$(DEMO_PROFILE) \
 			$(DEMO_SIZES) \
@@ -73,7 +75,8 @@ remove-demo:
 		&& mongo $(DEMO_DB) \
 			--eval "db.dropDatabase()" \
 			--quiet \
-		&& echo "$(GREEN)DONE$(NO_COLOR)"
+		; rm -r $(DEMO_STORE) \
+		; echo "$(GREEN)DONE$(NO_COLOR)"
 
 reinstall-demo: remove-demo install-demo
 
