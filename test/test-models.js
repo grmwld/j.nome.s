@@ -166,7 +166,53 @@ describe('Track', function() {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(999);
+            expect(docs).to.have.length(532);
+            docs.forEach(function(doc) {
+              expect(doc).to.contain.keys([
+              , 'start'
+              , 'end'
+              , 'score'
+              ])
+              expect(doc.score).to.be.a('number');
+              expect(doc.score).to.not.be.below(0);
+              expect(doc.start).to.be.a('number');
+              expect(doc.end).to.be.a('number');
+              expect(doc.start).to.be.below(doc.end);
+            });
+            done(err);
+          } catch(err) {
+            done(err);
+          }
+        });
+      });
+
+    });
+
+    describe('with bigwig profile metadata', function() {
+      var track = new Track(dataset, {
+        id: 'rnaseq-bigwig'
+      , name: 'RNASeq data bigwig'
+      , description: 'RNA-Seq data from SRR002051 (bigwig)'
+      , type: 'profile'
+      , backend: 'bigwig'
+      , file: './test/store/SRR002051_chrI-II-III-IV.profile.bw'
+      , style: {
+          gutter: 25
+        , shade: true
+        , nostroke: true
+        , axis: '0 0 1 1'
+        , axisxstep: 10
+        , axisystep: 4
+        }
+      });
+
+      it('responds with profile documents', function(done) {
+        expect(track).to.be.an.instanceof(TrackProfile);
+        track.fetchInInterval('chrIV', null, 32289, 3933090, function(err, docs) {
+          try {
+            expect(err).to.not.exist;
+            expect(docs).to.be.an.instanceof(Array);
+            expect(docs).to.have.length(1025);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -268,7 +314,7 @@ describe('Track', function() {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(999);
+            expect(docs).to.have.length(532);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -294,7 +340,7 @@ describe('Track', function() {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(999);
+            expect(docs).to.have.length(532);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
