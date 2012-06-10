@@ -2,7 +2,28 @@
  * Module dependencies
  */
 var Mongolian = require('mongolian');
+var execFile = require('child_process').execFile;
 var processProfile = require('../lib/cutils').processProfile;
+var bigwig = require('../lib/bigwig');
+
+
+var emitLines = function(stream) {
+  var backlog = '';
+  stream.on('data', function(data) {
+    backlog += data;
+    var n = backlog.indexOf('\n');
+    while (~n) {
+      stream.emit('line', backlog.substring(0, n));
+      backlog = backlog.substring(n + 1)
+      n = backlog.indexOf('\n')
+    }
+  });
+  stream.on('end', function() {
+    if (backlog) {
+      stream.emit('line', backlog);
+    }
+  });
+};
 
 
 /**
@@ -129,15 +150,38 @@ TrackProfile.prototype = new TrackBase();
 TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
   var self = this;
   var step = getStep(~~end - ~~start);
-  if (step % 2000 === 0) {
-    self.queryCache(seqid, ~~start, ~~end, step, function(err, docs) {
-      callback(err, docs);
-    });
-  } else {
-    self.query(seqid, ~~start, ~~end, step, function(err, docs) {
+  if (self.metadata.backend === 'bigwig') {
+    self.queryBigWig(seqid, ~~start, ~~end, Math.min(~~end - ~~start, 1024), function(err, docs) {
       callback(err, docs);
     });
   }
+  else {
+    if (step % 2000 === 0) {
+      self.queryCache(seqid, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    } else {
+      self.query(seqid, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    }
+  }
+};
+
+/**
+ * Query on raw data and return a processed profile
+ *
+ * @param {String} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} step
+ * @param {Function} callback
+ * @api private
+ */
+TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
+  var self = this;
+  var docs = bigwig.summary(self.metadata.file, seqid, start, end, nbins);
+  callback(null, docs);
 };
 
 /**
