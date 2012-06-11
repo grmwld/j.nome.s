@@ -5,9 +5,9 @@
 #include "linefile.h"
 #include "hash.h"
 #include "localmem.h"
-#include "options.h"
+/*#include "options.h"*/
 #include "sig.h"
-#include "sqlNum.h"
+/*#include "sqlNum.h"*/
 #include "obscure.h"
 #include "dystring.h"
 #include "bPlusTree.h"
@@ -18,7 +18,7 @@
 #include "bbiFile.h"
 #include "bwgInternal.h"
 #include "bigWig.h"
-#include "bigBed.h"
+/*#include "bigBed.h"*/
 
 
 struct bbiFile *bigWigFileOpen(char *fileName)
