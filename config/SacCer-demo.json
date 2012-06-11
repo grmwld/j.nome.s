@@ -68,7 +68,7 @@
     , "description": "RNA-Seq data from SRR002051 (bigwig)"
     , "type": "profile"
     , "backend": "bigwig"
-    , "file": "./store/SRR002051_chrI-II-III-IV.profile.bw"
+    , "file": "./test/store/SRR002051_chrI-II-III-IV.profile.bw"
     , "style": {
         "gutter": 25
       , "shade": true
