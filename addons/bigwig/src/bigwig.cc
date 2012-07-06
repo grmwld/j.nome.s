@@ -12,9 +12,45 @@ extern "C" {
 using namespace v8;
 using namespace node;
 
+struct Baton {
+    uv_work_t request;
+    Persistent<Function> callback;
+    int32_t result;
+};
+
+void bw_work(uv_work_t *req)
+{
+    Baton* baton = static_cast<Baton*>(req->data);
+    baton->result = 1 + 1;
+}
+
+void bw_work_After(uv_work_t *req)
+{
+    HandleScope scope;
+    Baton* baton = static_cast<Baton*>(req->data);
+    Local<Value> argv[] = {
+        Local<Value>::New(Null()),
+        Local<Value>::New(Integer::New(baton->result))
+    };
+    TryCatch try_catch;
+    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    if (try_catch.HasCaught())
+    {
+        node::FatalException(try_catch);
+    }
+    baton->callback.Dispose();
+    delete baton;
+}
+
 static Handle<Value> summary(const Arguments& args)
 {
     HandleScope scope;
+    Baton* baton = new Baton();
+    baton->request.data = baton;
+    Local<Function> callback = Local<Function>::Cast(args[5]);
+    baton->callback = Persistent<Function>::New(callback);
+    uv_queue_work(uv_default_loop(), &baton->request, bw_work, bw_work_After);
+    return Undefined();
 
     Local<String> kstart = String::New("start");
     Local<String> kend = String::New("end");
