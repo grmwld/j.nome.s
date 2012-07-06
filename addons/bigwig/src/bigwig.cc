@@ -1,4 +1,5 @@
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <v8.h>
 #include <node.h>
@@ -48,37 +49,41 @@ static Handle<Value> summary(const Arguments& args)
 
     bin_size = (end - start) / nbins;
 
-    struct bbiFile *bwf = bigWigFileOpen(*bwfname);
-
-    summaryValues = (double *) calloc(nbins, sizeof(double));
-    if (summaryValues == NULL)
+    std::ifstream bwfile(*bwfname);
+    if (bwfile.good())
     {
-        return Null();
-    }
+        struct bbiFile *bwf = bigWigFileOpen(*bwfname);
 
-    bigWigSummaryArray(bwf, *seqid, start, end, bbiSummaryTypeFromString("mean"), nbins, summaryValues);
-    
-    for (unsigned int i = 0 ; i < nbins ; ++i)
-    {
-        lstart = start + (i * bin_size);
-        lend = lstart + bin_size;
+        summaryValues = (double *) calloc(nbins, sizeof(double));
+        if (summaryValues == NULL)
+        {
+            return Null();
+        }
+
+        bigWigSummaryArray(bwf, *seqid, start, end, bbiSummaryTypeFromString("mean"), nbins, summaryValues);
+        
+        for (unsigned int i = 0 ; i < nbins ; ++i)
+        {
+            lstart = start + (i * bin_size);
+            lend = lstart + bin_size;
+            point = Object::New();
+            point->Set(kstart, Number::New(lstart));
+            point->Set(kend, Number::New(lend));
+            point->Set(kscore, Number::New(summaryValues[i]));
+            output->Set(Number::New(output->Length()), point);
+        }
+
+        lstart = lend;
+        lend = end;
         point = Object::New();
         point->Set(kstart, Number::New(lstart));
         point->Set(kend, Number::New(lend));
-        point->Set(kscore, Number::New(summaryValues[i]));
+        point->Set(kscore, Number::New(0));
         output->Set(Number::New(output->Length()), point);
+
+        free(summaryValues);
+        bigWigFileClose(&bwf);
     }
-
-    lstart = lend;
-    lend = end;
-    point = Object::New();
-    point->Set(kstart, Number::New(lstart));
-    point->Set(kend, Number::New(lend));
-    point->Set(kscore, Number::New(0));
-    output->Set(Number::New(output->Length()), point);
-
-    free(summaryValues);
-    bigWigFileClose(&bwf);
     
     return output;
 }
