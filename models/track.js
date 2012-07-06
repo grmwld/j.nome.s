@@ -134,6 +134,8 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
   var step = getStep(~~end - ~~start);
   if (self.metadata.backend === 'bigwig') {
     self.queryBigWig(seqid, ~~start, ~~end, Math.min(~~end - ~~start, 1024), function(err, docs) {
+      console.log('error : ', err);
+      console.log('result : ', docs);
       callback(err, docs);
     });
   }
@@ -162,8 +164,9 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
  */
 TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
   var self = this;
-  var docs = bigwig.summary(self.metadata.file, seqid, start, end, nbins);
-  callback(null, docs);
+  bigwig.summary(self.metadata.file, seqid, start, end, nbins, function(err, docs) {
+    callback(err, docs);
+  });
 };
 
 /**
