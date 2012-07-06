@@ -14,6 +14,8 @@ using namespace node;
 
 static Handle<Value> summary(const Arguments& args)
 {
+    HandleScope scope;
+
     Local<String> kstart = String::New("start");
     Local<String> kend = String::New("end");
     Local<String> kscore = String::New("score");
@@ -31,12 +33,12 @@ static Handle<Value> summary(const Arguments& args)
 
     if (args.Length() != 5)
     {
-        ss_msg << "summary() takes exactly 5 arguments (" << args.Length() << " given)";
+        ss_msg << "summary() takes exactly 6 arguments (" << args.Length() << " given)";
         return ThrowException(Exception::Error(String::New(ss_msg.str().c_str())));
     }
-    if (!(args[0]->IsString() && args[1]->IsString() && args[2]->IsNumber() && args[3]->IsNumber() && args[4]->IsNumber()))
+    if (!(args[0]->IsString() && args[1]->IsString() && args[2]->IsNumber() && args[3]->IsNumber() && args[4]->IsNumber() && args[5]->IsFunction()))
     {
-        return ThrowException(Exception::Error(String::New("Wrong argument type. Should be <String>, <String>, <Number>, <Number>, <Number>.")));
+        return ThrowException(Exception::Error(String::New("Wrong argument type. Should be <String>, <String>, <Number>, <Number>, <Number>, <Function>.")));
     }
     
     String::Utf8Value bwfname(args[0]->ToString());
