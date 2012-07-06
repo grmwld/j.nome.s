@@ -7,24 +7,6 @@ var processProfile = require('../lib/cutils').processProfile;
 var bigwig = require('../lib/bigwig');
 
 
-var emitLines = function(stream) {
-  var backlog = '';
-  stream.on('data', function(data) {
-    backlog += data;
-    var n = backlog.indexOf('\n');
-    while (~n) {
-      stream.emit('line', backlog.substring(0, n));
-      backlog = backlog.substring(n + 1)
-      n = backlog.indexOf('\n')
-    }
-  });
-  stream.on('end', function() {
-    if (backlog) {
-      stream.emit('line', backlog);
-    }
-  });
-};
-
 
 /**
  * Compute step according to the length of the selected region
