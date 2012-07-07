@@ -31,7 +31,7 @@
         'src/addons/bigwig/inc/',
         'src/utils/wigToBigWig/inc/'
       ],
-      'libraries': [ '-lpthread' ],
+      'libraries': [ '-lpthread', '-lz' ],
       'postbuilds': [
         {
           'postbuild_name': 'Copy to ./bin',
@@ -40,8 +40,8 @@
             '${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}',
             '${SRCROOT}bin/wigToBigWig'
           ]
-        },
-      ],
+        }
+      ]
     },
     {
       'target_name': 'jk',
@@ -68,7 +68,7 @@
       ],
       'include_dirs': [
         'src/addons/bigwig/inc/',
-      ],
+      ]
     }
   ]
 }
