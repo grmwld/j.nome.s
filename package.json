@@ -12,16 +12,16 @@
     "node": ">= 0.4.0 < 0.9.0"
   },
   "dependencies": {
-    "express": "2.5.11"
-  , "async": "0.1.22"
-  , "jade": "0.26.3"
+    "express": "2.5.x"
+  , "async": "0.1.x"
+  , "jade": "0.26.x"
   , "mongolian": "0.1.18"
   , "nib": "0.3.2"
-  , "stylus": "0.28"
+  , "stylus": "0.28.x"
   , "markdown-js": "0.0.3"
   },
   "devDependencies": {
-    "mocha": "1.3.0"
-  , "chai": "1.1.0"
+    "mocha": "1.3.x"
+  , "chai": "1.1.x"
   }
 }
