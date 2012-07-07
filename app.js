@@ -43,10 +43,6 @@ app.configure('development', function() {
   console.log('Application started in development mode.');
 });
 
-app.configure('test', function() {
-  console.log('Application started in test mode.');
-});
-
 app.configure('production', function() {
   console.log('Application started in production mode.');
 });

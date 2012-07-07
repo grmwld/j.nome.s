@@ -3,8 +3,8 @@
  */
 var Mongolian = require('mongolian');
 var execFile = require('child_process').execFile;
-var processProfile = require('../lib/cutils').processProfile;
-var bigwig = require('../lib/bigwig');
+var processProfile = require('bindings')('cutils.node').processProfile;
+var bigwig = require('bindings')('bigwig.node');
 
 
 

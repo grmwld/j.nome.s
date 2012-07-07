@@ -6,8 +6,7 @@ var expect = require('chai').expect
   , Track = require('../models/track').Track
   , TrackRef = require('../models/track').TrackRef
   , TrackProfile = require('../models/track').TrackProfile
-  , TrackOrientedProfile = require('../models/track').TrackOrientedProfile
-  , processProfile = require('../lib/cutils').processProfile;
+  , TrackOrientedProfile = require('../models/track').TrackOrientedProfile;
 
 var server = new Mongolian({
   log: {
