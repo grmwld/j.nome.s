@@ -35,23 +35,33 @@ test-models:
 		--slow 1000 \
 		$(TEST_MODELS)
 
-
-install-demo:
+unpack_demo:
 	@ echo "$(YELLOW)Installing demo data$(NO_COLOR)" \
 		&& echo "Unpacking demo data ..." \
 		&& tar xvf $(DEMO_DIR).tar.bz2 -C $(TEST_DIR) \
-		&& echo "Loading reference ..." \
+
+load_reference:
+	@ echo "$(YELLOW)Loading reference ...$(NO_COLOR)" \
 		&& $(BIN_SCRIPT)/load_fasta_reference.py \
 			-i $(DEMO_REF_FASTA) \
 			-d $(DEMO_DB) \
 			--drop \
-		&& echo "Loading annotation ..." \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
+load_annotation:
+	@ echo "$(YELLOW)Loading annotation ...$(NO_COLOR)" \
 		&& mongoimport \
 			-d $(DEMO_DB) \
 			-c $(DEMO_GENE_COL) \
 			--file $(DEMO_GENES_JFF) \
 			--drop \
 			--stopOnError \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
+load_profiles:
+	@ echo "$(YELLOW)Loading profiles ...$(NO_COLOR)" \
 		&& $(BIN_SCRIPT)/load_bed_profile.py \
 			-i $(DEMO_PROFILE) \
 			-d $(DEMO_DB) \
@@ -62,13 +72,19 @@ install-demo:
 			-d $(DEMO_DB) \
 			-c $(DEMO_COL_ORIENTED_PROFILE) \
 			--drop \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
+prepare_bigwigStore:
+	@ echo "$(YELLOW)Preparing bigwig store ...$(NO_COLOR)" \
 		&& mkdir $(DEMO_STORE) \
-		&& $(BIN_SCRIPT)/wigToBigWig \
+		; $(BIN_SCRIPT)/wigToBigWig \
 			$(DEMO_PROFILE) \
 			$(DEMO_SIZES) \
 			$(DEMO_PROFILE_BIGWIG) \
-		&& rm -r $(DEMO_DIR) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+install-demo: unpack_demo load_reference load_annotation load_profiles prepare_bigwigStore
 
 remove-demo:
 	@ echo "$(YELLOW)Uninstalling demo data$(NO_COLOR)" \
@@ -76,6 +92,7 @@ remove-demo:
 			--eval "db.dropDatabase()" \
 			--quiet \
 		; rm -r $(DEMO_STORE) \
+		; rm -r $(DEMO_DIR) \
 		; echo "$(GREEN)DONE$(NO_COLOR)"
 
 reinstall-demo: remove-demo install-demo
