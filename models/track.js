@@ -7,24 +7,6 @@ var processProfile = require('../lib/cutils').processProfile;
 var bigwig = require('../lib/bigwig');
 
 
-var emitLines = function(stream) {
-  var backlog = '';
-  stream.on('data', function(data) {
-    backlog += data;
-    var n = backlog.indexOf('\n');
-    while (~n) {
-      stream.emit('line', backlog.substring(0, n));
-      backlog = backlog.substring(n + 1)
-      n = backlog.indexOf('\n')
-    }
-  });
-  stream.on('end', function() {
-    if (backlog) {
-      stream.emit('line', backlog);
-    }
-  });
-};
-
 
 /**
  * Compute step according to the length of the selected region
@@ -180,8 +162,9 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
  */
 TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
   var self = this;
-  var docs = bigwig.summary(self.metadata.file, seqid, start, end, nbins);
-  callback(null, docs);
+  bigwig.summary(self.metadata.file, seqid, start, end, nbins, function(err, docs) {
+    callback(err, docs);
+  });
 };
 
 /**

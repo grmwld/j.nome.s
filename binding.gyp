@@ -23,6 +23,8 @@
                 "addons/bigwig/src/bwgQuery.c",
                 "addons/bigwig/src/cirTree.c",
                 "addons/bigwig/src/common.c",
+                "addons/bigwig/src/errabort.c",
+                "addons/bigwig/src/hash.c",
                 "addons/bigwig/src/localmem.c",
                 "addons/bigwig/src/memalloc.c",
                 "addons/bigwig/src/udc.c",
