@@ -15,6 +15,18 @@
             ]
         },
         {
+            "target_name": "wigToBigWig",
+            "type": "executable",
+            "sources": [ "src/utils/wigToBigWig/src/wigToBigWig.c" ],
+            "dependencies": [
+                "jk"
+            ],
+            "include_dirs": [
+                'src/addons/bigwig/inc/',
+                'src/utils/wigToBigWig/inc/'
+            ]
+        },
+        {
             "target_name": "jk",
             "type": "static_library",
             "sources": [
@@ -27,6 +39,7 @@
                 "src/addons/bigwig/src/hash.c",
                 "src/addons/bigwig/src/localmem.c",
                 "src/addons/bigwig/src/memalloc.c",
+                "src/addons/bigwig/src/options.c",
                 "src/addons/bigwig/src/udc.c",
                 "src/addons/bigwig/src/verbose.c",
                 "src/addons/bigwig/src/zlibFace.c"
