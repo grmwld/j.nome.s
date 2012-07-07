@@ -12,6 +12,7 @@ extern "C" {
 using namespace v8;
 using namespace node;
 
+
 const char* ToCString(const v8::String::Utf8Value& value) {
     return *value ? *value : "<str conversion failed>";
 }
@@ -20,25 +21,28 @@ const char* ToCString(const v8::String::Utf8Value& value) {
 struct Baton {
     uv_work_t request;
     Persistent<Function> callback;
-    double *summaryValues;
-    char *bwfname;
-    char *seqid;
+    std::string bwfname;
+    std::string seqid;
     unsigned int start;
     unsigned int end;
     unsigned int nbins;
+    unsigned int error_code;
+    double *summaryValues;
 };
 
 
 void bw_work(uv_work_t *req)
 {
     Baton* baton = static_cast<Baton*>(req->data);
-    baton->summaryValues = (double *) calloc(baton->nbins, sizeof(double));
-    if (baton->summaryValues != NULL)
+    if (!baton->error_code)
     {
-        printf(baton->bwfname);
-        struct bbiFile *bwf = bigWigFileOpen(baton->bwfname);
-        bigWigSummaryArray(bwf, (char *)baton->seqid, baton->start, baton->end, bbiSummaryTypeFromString("mean"), baton->nbins, baton->summaryValues);
-        bigWigFileClose(&bwf);
+        baton->summaryValues = (double *) calloc(baton->nbins, sizeof(double));
+        if (baton->summaryValues != NULL)
+        {
+            struct bbiFile *bwf = bigWigFileOpen((char*)baton->bwfname.c_str());
+            bigWigSummaryArray(bwf, (char*)baton->seqid.c_str(), baton->start, baton->end, bbiSummaryTypeFromString("mean"), baton->nbins, baton->summaryValues);
+            bigWigFileClose(&bwf);
+        }
     }
 }
 
@@ -46,51 +50,60 @@ void bw_work(uv_work_t *req)
 void bw_work_After(uv_work_t *req)
 {
     HandleScope scope;
-
     Baton* baton = static_cast<Baton*>(req->data);
+
+    Local<Value> argv[2];
     Local<String> kstart = String::New("start");
     Local<String> kend = String::New("end");
     Local<String> kscore = String::New("score");
-    Local<Array> output;
+    Local<Array> output = Array::New();
     Local<Object> point;
     unsigned int lstart;
     unsigned int lend;
     double bin_size;
 
-    output = Array::New();
-    bin_size = (baton->end - baton->start) / baton->nbins;
-    
-    for (unsigned int i = 0 ; i < baton->nbins ; ++i)
+    if (baton->error_code)
     {
-        lstart = baton->start + (i * bin_size);
-        lend = lstart + bin_size;
+        argv[0] = Local<Value>::New(String::New("Could not process bigwig file"));
+        argv[1] = Local<Value>::New(output);
+        baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+    }
+    else
+    {
+        bin_size = (baton->end - baton->start) / baton->nbins;
+
+        for (unsigned int i = 0 ; i < baton->nbins ; ++i)
+        {
+            lstart = baton->start + (i * bin_size);
+            lend = lstart + bin_size;
+            point = Object::New();
+            point->Set(kstart, Number::New(lstart));
+            point->Set(kend, Number::New(lend));
+            point->Set(kscore, Number::New(baton->summaryValues[i]));
+            output->Set(Number::New(output->Length()), point);
+        }
+
+        lstart = lend;
+        lend = baton->end;
         point = Object::New();
         point->Set(kstart, Number::New(lstart));
         point->Set(kend, Number::New(lend));
-        point->Set(kscore, Number::New(baton->summaryValues[i]));
+        point->Set(kscore, Number::New(0));
         output->Set(Number::New(output->Length()), point);
+
+        argv[0] = Local<Value>::New(Null());
+        argv[1] = Local<Value>::New(output);
+
+        TryCatch try_catch;
+        baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
+        if (try_catch.HasCaught())
+        {
+            node::FatalException(try_catch);
+        }
+
+        free(baton->summaryValues);
     }
 
-    lstart = lend;
-    lend = baton->end;
-    point = Object::New();
-    point->Set(kstart, Number::New(lstart));
-    point->Set(kend, Number::New(lend));
-    point->Set(kscore, Number::New(0));
-    output->Set(Number::New(output->Length()), point);
-    
-    Local<Value> argv[] = {
-        Local<Value>::New(Null()),
-        Local<Value>::New(output)
-    };
-    TryCatch try_catch;
-    baton->callback->Call(Context::GetCurrent()->Global(), 2, argv);
-    if (try_catch.HasCaught())
-    {
-        node::FatalException(try_catch);
-    }
-
-    free(baton->summaryValues);
     baton->callback.Dispose();
     delete baton;
 }
@@ -101,9 +114,6 @@ static Handle<Value> summary(const Arguments& args)
     HandleScope scope;
 
     std::stringstream ss_msg;
-    unsigned int start;
-    unsigned int end;
-    unsigned int nbins;
 
     if (args.Length() != 6)
     {
@@ -117,8 +127,6 @@ static Handle<Value> summary(const Arguments& args)
 
     String::Utf8Value bwfname(args[0]->ToString());
     String::Utf8Value seqid(args[1]->ToString());
-    char *c_bwfname = (char *)ToCString(bwfname);
-    char *c_seqid = (char *)ToCString(seqid);
     
     Baton* baton = new Baton();
     baton->request.data = baton;
@@ -127,13 +135,20 @@ static Handle<Value> summary(const Arguments& args)
     baton->start = args[2]->ToNumber()->NumberValue();
     baton->end = args[3]->ToNumber()->NumberValue();
     baton->nbins = args[4]->ToNumber()->NumberValue();
-    baton->bwfname = c_bwfname;
-    baton->seqid = c_seqid;
-    std::ifstream bwfile(c_bwfname);
+    baton->bwfname.assign(ToCString(bwfname), bwfname.length());
+    baton->seqid.assign(ToCString(seqid), seqid.length());
+
+    std::ifstream bwfile(baton->bwfname.c_str());
     if (bwfile.good())
     {
-        uv_queue_work(uv_default_loop(), &baton->request, bw_work, bw_work_After);
+        baton->error_code = 0;
     }
+    else
+    {
+        baton->error_code = 1;
+    }
+
+    uv_queue_work(uv_default_loop(), &baton->request, bw_work, bw_work_After);
     
     return Undefined();
 }

@@ -134,8 +134,6 @@ TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, cal
   var step = getStep(~~end - ~~start);
   if (self.metadata.backend === 'bigwig') {
     self.queryBigWig(seqid, ~~start, ~~end, Math.min(~~end - ~~start, 1024), function(err, docs) {
-      console.log('error : ', err);
-      console.log('result : ', docs);
       callback(err, docs);
     });
   }
