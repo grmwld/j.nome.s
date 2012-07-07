@@ -78,7 +78,7 @@ load_profiles:
 prepare_bigwigStore:
 	@ echo "$(YELLOW)Preparing bigwig store ...$(NO_COLOR)" \
 		&& mkdir $(DEMO_STORE) \
-		; $(BIN_SCRIPT)/wigToBigWig.node \
+		; $(BIN_SCRIPT)/wigToBigWig \
 			$(DEMO_PROFILE) \
 			$(DEMO_SIZES) \
 			$(DEMO_PROFILE_BIGWIG) \

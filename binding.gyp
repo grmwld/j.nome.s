@@ -25,14 +25,23 @@
     {
       'target_name': 'wigToBigWig',
       'type': 'executable',
-      'product_dir': '../bin/',
       'sources': [ 'src/utils/wigToBigWig/src/wigToBigWig.c' ],
       'dependencies': [ 'jk' ],
       'include_dirs': [
         'src/addons/bigwig/inc/',
         'src/utils/wigToBigWig/inc/'
       ],
-      'libraries': [ '-lpthread' ]
+      'libraries': [ '-lpthread' ],
+      'postbuilds': [
+        {
+          'postbuild_name': 'Copy to ./bin',
+          'action': [
+            'cp',
+            '${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}',
+            '${SRCROOT}bin/wigToBigWig'
+          ]
+        },
+      ],
     },
     {
       'target_name': 'jk',
@@ -53,7 +62,6 @@
         'src/addons/bigwig/src/obscure.c',
         'src/addons/bigwig/src/options.c',
         'src/addons/bigwig/src/sqlNum.c',
-        #'src/addons/bigwig/src/textOut.c',
         'src/addons/bigwig/src/udc.c',
         'src/addons/bigwig/src/verbose.c',
         'src/addons/bigwig/src/zlibFace.c'

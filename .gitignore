@@ -16,3 +16,4 @@ test/store
 *.node
 *.log
 test/data/
+bin/wigToBigWig
