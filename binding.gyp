@@ -5,7 +5,14 @@
       {
         'target_defaults': {
           'xcode_settings': {
-            'OTHER_CFLAGS': [ '-Wno-sign-compare' ]
+            'GCC_OPTIMISATION_LEVEL': '3',
+            'WARNING_CFLAGS': [
+              '-Wno-sign-compare',
+            ],
+            'OTHER_CFLAGS': [
+              '-D_FILE_OFFSET_BITS=64',
+              '-D_LARGEFILE_SOURCE'
+            ]
           }
         }
       }
