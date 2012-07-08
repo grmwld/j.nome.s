@@ -6,8 +6,7 @@ var expect = require('chai').expect
   , Track = require('../models/track').Track
   , TrackRef = require('../models/track').TrackRef
   , TrackProfile = require('../models/track').TrackProfile
-  , TrackOrientedProfile = require('../models/track').TrackOrientedProfile
-  , processProfile = require('../lib/cutils').processProfile;
+  , TrackOrientedProfile = require('../models/track').TrackOrientedProfile;
 
 var server = new Mongolian({
   log: {
@@ -112,6 +111,87 @@ describe('Track', function() {
 
     });
 
+    describe('with bigwig profile metadata', function() {
+      var track = new Track(dataset, {
+        id: 'rnaseq-bigwig'
+      , name: 'RNASeq data bigwig'
+      , description: 'RNA-Seq data from SRR002051 (bigwig)'
+      , type: 'profile'
+      , backend: 'bigwig'
+      , file: './test/store/SRR002051_chrI-II-III-IV.profile.bw'
+      , style: {
+          gutter: 25
+        , shade: true
+        , nostroke: true
+        , axis: '0 0 1 1'
+        , axisxstep: 10
+        , axisystep: 4
+        }
+      });
+
+      it('responds with profile documents', function(done) {
+        expect(track).to.be.an.instanceof(TrackProfile);
+        track.fetchInInterval('chrIV', null, 32289, 3933090, function(err, docs) {
+          try {
+            expect(err).to.not.exist;
+            expect(docs).to.be.an.instanceof(Array);
+            expect(docs).to.have.length(1025);
+            docs.forEach(function(doc) {
+              expect(doc).to.contain.keys([
+              , 'start'
+              , 'end'
+              , 'score'
+              ])
+              expect(doc.score).to.be.a('number');
+              expect(doc.score).to.not.be.below(0);
+              expect(doc.start).to.be.a('number');
+              expect(doc.end).to.be.a('number');
+              expect(doc.start).to.be.below(doc.end);
+            });
+            done(err);
+          } catch(err) {
+            done(err);
+          }
+        });
+      });
+
+    });
+
+    describe('with non-existent bigwig profile metadata', function() {
+      var track = new Track(dataset, {
+        id: 'rnaseq-bigwig'
+      , name: 'RNASeq data bigwig'
+      , description: 'RNA-Seq data from SRR002051 (bigwig)'
+      , type: 'profile'
+      , backend: 'bigwig'
+      , file: './test/store/non-existent.profile.bw'
+      , style: {
+          gutter: 25
+        , shade: true
+        , nostroke: true
+        , axis: '0 0 1 1'
+        , axisxstep: 10
+        , axisystep: 4
+        }
+      });
+
+      it('responds with an empty array', function(done) {
+        expect(track).to.be.an.instanceof(TrackProfile);
+        track.fetchInInterval('chrIV', null, 32289, 3933090, function(err, docs) {
+          try {
+            expect(err).to.be.a('string');
+            expect(err).to.equal('Could not process bigwig file')
+            expect(docs).to.be.an.instanceof(Array);
+            expect(docs).to.have.length(0);
+            done();
+          } catch(err) {
+            done(err);
+          }
+        });
+      });
+
+    });
+
     describe('with profile metadata', function() {
       var track = new Track(dataset, {
         id: 'rnaseq'
@@ -160,39 +240,13 @@ describe('Track', function() {
         });
       });
     
-      it('responds with profile documents - cache[OFF] - range > 1,000,000', function(done) {
+      it('responds with profile documents - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackProfile);
         track.fetchInInterval('chrIV', null, 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
-            docs.forEach(function(doc) {
-              expect(doc).to.contain.keys([
-              , 'start'
-              , 'end'
-              , 'score'
-              ])
-              expect(doc.score).to.be.a('number');
-              expect(doc.score).to.not.be.below(0);
-              expect(doc.start).to.be.a('number');
-              expect(doc.end).to.be.a('number');
-              expect(doc.start).to.be.below(doc.end);
-            });
-            done(err);
-          } catch(err) {
-            done(err);
-          }
-        });
-      });
-
-      it('responds with profile documents - cache[ON] - range > 1,000,000', function(done) {
-        expect(track).to.be.an.instanceof(TrackProfile);
-        track.fetchInInterval('chrIV', null, 50192, 1112001, function(err, docs) {
-          try {
-            expect(err).to.not.exist;
-            expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
+            expect(docs).to.have.length(532);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -288,13 +342,13 @@ describe('Track', function() {
         });
       });
     
-      it('responds with profile documents - plus - cache[OFF] - range > 1,000,000', function(done) {
+      it('responds with profile documents - plus - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackOrientedProfile);
         track.fetchInInterval('chrIV', '+', 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
+            expect(docs).to.have.length(532);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -314,65 +368,13 @@ describe('Track', function() {
         });
       });
 
-      it('responds with profile documents - minus - cache[OFF] - range > 1,000,000', function(done) {
+      it('responds with profile documents - minus - range > 1,000,000', function(done) {
         expect(track).to.be.an.instanceof(TrackOrientedProfile);
         track.fetchInInterval('chrIV', '-', 50192, 1112001, function(err, docs) {
           try {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
-            docs.forEach(function(doc) {
-              expect(doc).to.contain.keys([
-              , 'start'
-              , 'end'
-              , 'score'
-              ])
-              expect(doc.score).to.be.a('number');
-              expect(doc.score).to.not.be.below(0);
-              expect(doc.start).to.be.a('number');
-              expect(doc.end).to.be.a('number');
-              expect(doc.start).to.be.below(doc.end);
-            });
-            done(err);
-          } catch(err) {
-            done(err);
-          }
-        });
-      });
-
-      it('responds with profile documents - plus - cache[ON] - range > 1,000,000', function(done) {
-        expect(track).to.be.an.instanceof(TrackOrientedProfile);
-        track.fetchInInterval('chrIV', '+', 50192, 1112001, function(err, docs) {
-          try {
-            expect(err).to.not.exist;
-            expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
-            docs.forEach(function(doc) {
-              expect(doc).to.contain.keys([
-              , 'start'
-              , 'end'
-              , 'score'
-              ])
-              expect(doc.score).to.be.a('number');
-              expect(doc.score).to.not.be.below(0);
-              expect(doc.start).to.be.a('number');
-              expect(doc.end).to.be.a('number');
-              expect(doc.start).to.be.below(doc.end);
-            });
-            done(err);
-          } catch(err) {
-            done(err);
-          }
-        });
-      });
-
-      it('responds with profile documents - minus - cache[ON] - range > 1,000,000', function(done) {
-        expect(track).to.be.an.instanceof(TrackOrientedProfile);
-        track.fetchInInterval('chrIV', '-', 50192, 1112001, function(err, docs) {
-          try {
-            expect(err).to.not.exist;
-            expect(docs).to.be.an.instanceof(Array);
-            expect(docs).to.have.length(2125);
+            expect(docs).to.have.length(532);
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'

@@ -1,8 +1,11 @@
 /**
  * Module dependencies
  */
-var Mongolian = require('mongolian')
-var processProfile = require('../lib/cutils').processProfile;
+var Mongolian = require('mongolian');
+var execFile = require('child_process').execFile;
+var processProfile = require('bindings')('cutils.node').processProfile;
+var bigwig = require('bindings')('bigwig.node');
+
 
 
 /**
@@ -12,12 +15,16 @@ var processProfile = require('../lib/cutils').processProfile;
  * @return {Number} step
  */
 var getStep = function(span) {
-  return ~~(span/1000) + 1;
-  // Disable caching for now
   if (span <= 1000000) {
-    return ~~(span/10000) + 1;
+    return ~~(span/1000) + 1;
   }
-  return Math.pow(10, (~~(Math.log(span)/Math.log(10)) - 4)) * 5;
+  var step = Math.pow(10, (~~(Math.log(span)/Math.log(10))) - 3) * 2;
+  var midspan = (Math.pow(10, (~~(Math.log(span)/Math.log(10)) + 1)) - Math.pow(10, (~~(Math.log(span)/Math.log(10))))) / 2;
+  if (span < midspan) {
+    return step;
+  } else {
+    return step * 5;
+  }
 };
 
 
@@ -34,7 +41,7 @@ var Track = (function() {
     else if (metadata.type === 'oriented-profile') {
       return new TrackOrientedProfile(db, metadata);
     }
-  }
+  };
 })();
 
 
@@ -65,7 +72,7 @@ var TrackRef = function(db, metadata) {
   this.collection = this.db.collection(metadata.id);
 };
 
-TrackRef.prototype = new TrackBase;
+TrackRef.prototype = new TrackBase();
 
 /**
  * Fetch all documents on seqid between 2 positions
@@ -77,10 +84,8 @@ TrackRef.prototype = new TrackBase;
  * @api public
  */
 TrackRef.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
-  var self = this
-    , start = ~~start
-    , end = ~~end;
-  this.query(seqid, start, end, function(err, docs) {
+  var self = this;
+  this.query(seqid, ~~start, ~~end, function(err, docs) {
     callback(err, docs);
   });
 };
@@ -90,9 +95,9 @@ TrackRef.prototype.fetchInInterval = function(seqid, strand, start, end, callbac
  */
 TrackRef.prototype.query = function(seqid, start, end, callback) {
   this.collection.find({
-    seqid: seqid
-  , start: { $lt: end }
-  , end: { $gt: start }
+    seqid: seqid,
+    start: { $lt: end },
+    end: { $gt: start }
   }).toArray(function(err, docs) {
     callback(err, docs);
   });
@@ -112,7 +117,7 @@ var TrackProfile = function(db, metadata) {
   this.collection = this.db.collection(metadata.id);
 };
 
-TrackProfile.prototype = new TrackBase;
+TrackProfile.prototype = new TrackBase();
 
 /**
  * Fetch all documents on seqid between 2 positions
@@ -125,19 +130,41 @@ TrackProfile.prototype = new TrackBase;
  * @api public
  */
 TrackProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
-  var self = this
-    , start = ~~start
-    , end = ~~end
-    , step = getStep(end - start)
-  if (step % 500 === 0) {
-    self.queryCache(seqid, start, end, step, function(err, docs) {
-      callback(err, docs);
-    });
-  } else {
-    self.query(seqid, start, end, step, function(err, docs) {
+  var self = this;
+  var step = getStep(~~end - ~~start);
+  if (self.metadata.backend === 'bigwig') {
+    self.queryBigWig(seqid, ~~start, ~~end, Math.min(~~end - ~~start, 1024), function(err, docs) {
       callback(err, docs);
     });
   }
+  else {
+    if (step % 2000 === 0) {
+      self.queryCache(seqid, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    } else {
+      self.query(seqid, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    }
+  }
+};
+
+/**
+ * Query on raw data and return a processed profile
+ *
+ * @param {String} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} step
+ * @param {Function} callback
+ * @api private
+ */
+TrackProfile.prototype.queryBigWig = function(seqid, start, end, nbins, callback) {
+  var self = this;
+  bigwig.summary(self.metadata.file, seqid, start, end, nbins, function(err, docs) {
+    callback(err, docs);
+  });
 };
 
 /**
@@ -268,7 +295,7 @@ var TrackOrientedProfile = function(db, metadata) {
   this.collection = this.db.collection(metadata.id);
 };
 
-TrackOrientedProfile.prototype = new TrackBase;
+TrackOrientedProfile.prototype = new TrackBase();
 
 /**
  * Fetch all documents on seqid between 2 positions
@@ -282,16 +309,14 @@ TrackOrientedProfile.prototype = new TrackBase;
  * @api public
  */
 TrackOrientedProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
-  var self = this
-    , start = ~~start
-    , end = ~~end
-    , step = getStep(end - start)
-  if (step % 500 === 0) {
-    self.queryCache(seqid, strand, start, end, step, function(err, docs) {
+  var self = this;
+  var step = getStep(~~end - ~~start);
+  if (step % 2000 === 0) {
+    self.queryCache(seqid, strand, ~~start, ~~end, step, function(err, docs) {
       callback(err, docs);
     });
   } else {
-    self.query(seqid, strand, start, end, step, function(err, docs) {
+    self.query(seqid, strand, ~~start, ~~end, step, function(err, docs) {
       callback(err, docs);
     });
   }

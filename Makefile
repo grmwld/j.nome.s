@@ -8,14 +8,18 @@ TEST_DIR = ./test
 TESTS = $(TEST_DIR)/*.js
 TEST_MODELS = $(TEST_DIR)/*models.js
 DEMO_DIR = $(TEST_DIR)/data
+DEMO_STORE = $(TEST_DIR)/store
+DEMO_SIZES = $(DEMO_DIR)/"sacCer1.sizes"
 DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.fasta"
 DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.genes.jff"
 DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II-III-IV.profile"
+DEMO_PROFILE_BIGWIG = $(DEMO_STORE)/"SRR002051_chrI-II-III-IV.profile.bw"
 DEMO_ORIENTED_PROFILE = $(DEMO_DIR)/"SRR002051_oriented_chrI-II-III-IV.profile"
 
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"
 DEMO_COL_PROFILE = "rnaseq"
+DEMO_COL_PROFILE_BIGWIG = "rnaseq_bigwig"
 DEMO_COL_ORIENTED_PROFILE = "rnaseq_oriented"
 REPORTER = "spec"
 
@@ -31,23 +35,33 @@ test-models:
 		--slow 1000 \
 		$(TEST_MODELS)
 
-
-install-demo:
+unpack_demo:
 	@ echo "$(YELLOW)Installing demo data$(NO_COLOR)" \
 		&& echo "Unpacking demo data ..." \
 		&& tar xvf $(DEMO_DIR).tar.bz2 -C $(TEST_DIR) \
-		&& echo "Loading reference ..." \
+
+load_reference:
+	@ echo "$(YELLOW)Loading reference ...$(NO_COLOR)" \
 		&& $(BIN_SCRIPT)/load_fasta_reference.py \
 			-i $(DEMO_REF_FASTA) \
 			-d $(DEMO_DB) \
 			--drop \
-		&& echo "Loading annotation ..." \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
+load_annotation:
+	@ echo "$(YELLOW)Loading annotation ...$(NO_COLOR)" \
 		&& mongoimport \
 			-d $(DEMO_DB) \
 			-c $(DEMO_GENE_COL) \
 			--file $(DEMO_GENES_JFF) \
 			--drop \
 			--stopOnError \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
+load_profiles:
+	@ echo "$(YELLOW)Loading profiles ...$(NO_COLOR)" \
 		&& $(BIN_SCRIPT)/load_bed_profile.py \
 			-i $(DEMO_PROFILE) \
 			-d $(DEMO_DB) \
@@ -58,17 +72,28 @@ install-demo:
 			-d $(DEMO_DB) \
 			-c $(DEMO_COL_ORIENTED_PROFILE) \
 			--drop \
-		&& echo "Repacking demo data ..." \
-		&& tar cvjf data.tar.bz2 -C $(TEST_DIR) data \
-		&& rm -r $(DEMO_DIR) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+
+prepare_bigwigStore:
+	@ echo "$(YELLOW)Preparing bigwig store ...$(NO_COLOR)" \
+		&& mkdir $(DEMO_STORE) \
+		; $(BIN_SCRIPT)/wigToBigWig \
+			$(DEMO_PROFILE) \
+			$(DEMO_SIZES) \
+			$(DEMO_PROFILE_BIGWIG) \
+		&& echo "$(GREEN)DONE$(NO_COLOR)"
+
+install-demo: unpack_demo load_reference load_annotation load_profiles prepare_bigwigStore
 
 remove-demo:
 	@ echo "$(YELLOW)Uninstalling demo data$(NO_COLOR)" \
 		&& mongo $(DEMO_DB) \
 			--eval "db.dropDatabase()" \
 			--quiet \
-		&& echo "$(GREEN)DONE$(NO_COLOR)"
+		; rm -r $(DEMO_STORE) \
+		; rm -r $(DEMO_DIR) \
+		; echo "$(GREEN)DONE$(NO_COLOR)"
 
 reinstall-demo: remove-demo install-demo
 

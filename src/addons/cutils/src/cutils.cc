@@ -1,0 +1,88 @@
+#include <sstream>
+#include <algorithm>
+#include <v8.h>
+#include <node.h>
+
+using namespace v8;
+using namespace node;
+
+static Handle<Value> processProfile(const Arguments& args)
+{
+    Local<String> kstart = String::New("start");
+    Local<String> kend = String::New("end");
+    Local<String> kscore = String::New("score");
+    Local<String> vseqid;
+    Local<Array> output;
+    Local<Array> input;
+    Local<Object> doc;
+    Local<Object> point;
+    unsigned int length = 0;
+    unsigned int score = 0;
+    unsigned int step;
+    unsigned int input_length;
+    unsigned int doc_start;
+    unsigned int doc_end;
+    unsigned int doc_score;
+    unsigned int start;
+    unsigned int i;
+    unsigned int j;
+    std::stringstream ss_msg;
+    
+    if (args.Length() != 2)
+    {
+        ss_msg << "processProfile() takes exactly 2 arguments (" << args.Length() << " given)";
+        return ThrowException(Exception::Error(String::New(ss_msg.str().c_str())));
+    }
+    if (!(args[0]->IsArray() && args[1]->IsNumber()))
+    {
+        return ThrowException(Exception::Error(String::New("Wrong argument type. Should be <Array>, <Number>.")));
+    }
+
+    input = Local<Array>(Array::Cast(*args[0]));
+
+    if (input->Length() == 0)
+    {
+        return Array::New();
+    }
+
+    step = args[1]->ToNumber()->NumberValue();
+    input_length = input->Length();
+    start = input->Get(Number::New(0))->ToObject()->Get(kstart)->NumberValue();
+    output = Array::New();
+
+    for (i = 0; i < input_length; ++i)
+    {
+        doc = input->Get(Number::New(i))->ToObject();
+        doc_start = doc->Get(kstart)->NumberValue();
+        doc_end = doc->Get(kend)->NumberValue();
+        doc_score = doc->Get(kscore)->NumberValue();
+
+        for (j = doc_start; j < doc_end; ++j)
+        {
+            score += doc_score;
+            length++;
+
+            if (length == step)
+            {
+                point = Object::New();
+                point->Set(kstart, Number::New(start));
+                point->Set(kend, Number::New(start + length));
+                point->Set(kscore, Number::New(score / length));
+                output->Set(Number::New(output->Length()), point);
+                score = 0;
+                start = j;
+                length = 0;
+            }
+        }
+    }
+    return output;
+}
+
+extern "C" {
+    static void init(Handle<Object> target)
+    {
+        NODE_SET_METHOD(target, "processProfile", processProfile);
+    }
+    NODE_MODULE(cutils, init);
+}
+
