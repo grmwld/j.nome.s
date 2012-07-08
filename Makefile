@@ -24,7 +24,7 @@ DEMO_COL_ORIENTED_PROFILE = "rnaseq_oriented"
 REPORTER = "spec"
 
 
-test: reinstall-demo test-models remove-demo
+test: reinstall-demo test-all remove-demo
 	@NODE_ENV=test 	./node_modules/.bin/mocha \
 		--reporter $(REPORTER)
 
@@ -34,6 +34,8 @@ test-models:
 		--timeout 10000 \
 		--slow 1000 \
 		$(TEST_MODELS)
+
+test-all: test-models
 
 unpack_demo:
 	@ echo "$(YELLOW)Installing demo data$(NO_COLOR)" \
@@ -98,4 +100,4 @@ remove-demo:
 reinstall-demo: remove-demo install-demo
 
 
-.PHONY: test test-models install-demo remove-demo reinstall-demo
+.PHONY: test test-all test-models install-demo remove-demo reinstall-demo
