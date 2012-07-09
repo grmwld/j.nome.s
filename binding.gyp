@@ -38,16 +38,9 @@
         {
           'action_name': 'cp WigToBigWig',
           'message': 'Copying wigToBigWig to executables directory',
-          'variables': {
-            'wigToBigWig_BUILT': 'wigToBigWig.node'
-          },
-          'inputs': [ '' ],
-          'outputs': [ '' ],
-          'action': [
-            'cp',
-            '${BUILT_PRODUCTS_DIR}/<(wigToBigWig_BUILT)',
-            '${SRCROOT}bin/wigToBigWig'
-          ]
+          'inputs': [ '<(PRODUCT_DIR)/wigtobigwig.node' ],
+          'outputs': [ '<(module_root_dir)/bin/wigToBigWig' ],
+          'action': [ 'cp', '<@(_inputs)', '<@(_outputs)' ]
         }
       ]
     }

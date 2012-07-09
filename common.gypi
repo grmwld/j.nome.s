@@ -18,7 +18,6 @@
           'Release': {
             'xcode_settings': {
               'GCC_OPTIMISATION_LEVEL': '3',
-              'GCC_WARN_INHIBIT_ALL_WARNINGS': 'YES',
               'GCC_WARN_SIGN_COMPARE': 'NO',
               'OTHER_CFLAGS': [
                 '-D_FILE_OFFSET_BITS=64',
