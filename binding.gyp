@@ -1,5 +1,5 @@
 {
-  'includes': [ 'binding.gypi' ],
+  'includes': [ 'common.gypi' ],
 
   'targets': [
     { # CUTILS
