@@ -44,7 +44,7 @@
           'inputs': [ '' ],
           'outputs': [ '' ],
           'action': [
-            'echo',
+            'cp',
             '${BUILT_PRODUCTS_DIR}/<(wigToBigWig_BUILT)',
             '${SRCROOT}bin/wigToBigWig'
           ]
