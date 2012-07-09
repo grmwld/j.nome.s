@@ -1,5 +1,6 @@
 install:
     - sudo pip install pymongo
+    - npm install
 language: node_js
 node_js:
     - 0.6
