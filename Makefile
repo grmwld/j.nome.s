@@ -5,16 +5,15 @@ YELLOW = \x1b[33;01m
 
 BIN_SCRIPT = ./bin
 TEST_DIR = ./test
-TESTS = $(TEST_DIR)/*.js
-TEST_MODELS = $(TEST_DIR)/*models.js
-DEMO_DIR = $(TEST_DIR)/data
-DEMO_STORE = $(TEST_DIR)/store
-DEMO_SIZES = $(DEMO_DIR)/"sacCer1.sizes"
-DEMO_REF_FASTA = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.fasta"
-DEMO_GENES_JFF = $(DEMO_DIR)/"SacCer_chrI-II-III-IV.genes.jff"
-DEMO_PROFILE = $(DEMO_DIR)/"SRR002051_chrI-II-III-IV.profile"
-DEMO_PROFILE_BIGWIG = $(DEMO_STORE)/"SRR002051_chrI-II-III-IV.profile.bw"
-DEMO_ORIENTED_PROFILE = $(DEMO_DIR)/"SRR002051_oriented_chrI-II-III-IV.profile"
+TEST_MODELS = "$(TEST_DIR)/test-models.js"
+DEMO_DIR = "$(TEST_DIR)/data"
+DEMO_STORE = "$(TEST_DIR)/store"
+DEMO_SIZES = "$(DEMO_DIR)/sacCer1.sizes"
+DEMO_REF_FASTA = "$(DEMO_DIR)/SacCer_chrI-II-III-IV.fasta"
+DEMO_GENES_JFF = "$(DEMO_DIR)/SacCer_chrI-II-III-IV.genes.jff"
+DEMO_PROFILE = "$(DEMO_DIR)/SRR002051_chrI-II-III-IV.profile"
+DEMO_PROFILE_BIGWIG = "$(DEMO_STORE)/SRR002051_chrI-II-III-IV.profile.bw"
+DEMO_ORIENTED_PROFILE = "$(DEMO_DIR)/SRR002051_oriented_chrI-II-III-IV.profile"
 
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"
@@ -25,8 +24,8 @@ REPORTER = "spec"
 
 
 test: reinstall-demo test-all remove-demo
-	@NODE_ENV=test 	./node_modules/.bin/mocha \
-		--reporter $(REPORTER)
+
+test-all: test-models
 
 test-models:
 	@NODE_ENV=test 	./node_modules/.bin/mocha \
@@ -35,7 +34,9 @@ test-models:
 		--slow 1000 \
 		$(TEST_MODELS)
 
-test-all: test-models
+install-demo: unpack_demo load_reference load_annotation load_profiles prepare_bigwigStore
+
+reinstall-demo: remove-demo install-demo
 
 unpack_demo:
 	@ echo "$(YELLOW)Installing demo data$(NO_COLOR)" \
@@ -61,7 +62,6 @@ load_annotation:
 			--stopOnError \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
-
 load_profiles:
 	@ echo "$(YELLOW)Loading profiles ...$(NO_COLOR)" \
 		&& $(BIN_SCRIPT)/load_bed_profile.py \
@@ -86,8 +86,6 @@ prepare_bigwigStore:
 			$(DEMO_PROFILE_BIGWIG) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
-install-demo: unpack_demo load_reference load_annotation load_profiles prepare_bigwigStore
-
 remove-demo:
 	@ echo "$(YELLOW)Uninstalling demo data$(NO_COLOR)" \
 		&& mongo $(DEMO_DB) \
@@ -97,7 +95,6 @@ remove-demo:
 		; rm -r $(DEMO_DIR) \
 		; echo "$(GREEN)DONE$(NO_COLOR)"
 
-reinstall-demo: remove-demo install-demo
 
 
 .PHONY: test test-all test-models install-demo remove-demo reinstall-demo
