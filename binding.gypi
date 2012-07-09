@@ -1,4 +1,70 @@
 {
+  'conditions': [
+    ['OS=="mac"', {
+      'target_defaults': {
+        'configurations': {
+          'Debug': {
+            'xcode_settings': {
+              'GCC_OPTIMISATION_LEVEL': '0',
+              'GCC_GENERATE_DEBUGGING_SYMBOLS': '1',
+              'WARNING_CFLAGS': [
+                '-Wall',
+              ],
+              'OTHER_CFLAGS': [
+                '-D_FILE_OFFSET_BITS=64',
+                '-D_LARGEFILE_SOURCE'
+              ]
+            },
+          'Release': {
+            'xcode_settings': {
+              'GCC_OPTIMISATION_LEVEL': '3',
+              'WARNING_CFLAGS': [
+                '-Wno-sign-compare',
+                '-Wno-array-bounds',
+                '-Wno-unused-variable',
+                '-Wno-unused-but-set-variable'
+              ],
+              'OTHER_CFLAGS': [
+                '-D_FILE_OFFSET_BITS=64',
+                '-D_LARGEFILE_SOURCE'
+              ]
+            },
+          },
+        },
+        }
+      }
+    }],
+    ['OS=="linux"', {
+      'target_defaults': {
+        'configurations': {
+          'Debug': {
+            'defines': [
+              '_FILE_OFFSET_BITS=64',
+              '_LARGEFILE_SOURCE',
+              '_GNU_SOURCE'
+            ],
+            'cflags': [
+              '-Wall'
+            ]
+          },
+          'Release': {
+            'defines': [
+              '_FILE_OFFSET_BITS=64',
+              '_LARGEFILE_SOURCE',
+              '_GNU_SOURCE'
+            ],
+            'cflags': [
+              '-Wno-sign-compare',
+              '-Wno-array-bounds',
+              '-Wno-unused-variable',
+              '-Wno-unused-but-set-variable'
+            ]
+          },
+        },
+      }
+    }]
+  ],
+
   'variables': {
     'jk_files': [
       #'src/vendor/lib/jk/src/aliType.c',

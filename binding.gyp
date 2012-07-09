@@ -1,35 +1,6 @@
 {
   'includes': [ 'binding.gypi' ],
 
-  'conditions': [
-    ['OS=="mac"', {
-      'target_defaults': {
-        'xcode_settings': {
-          'GCC_OPTIMISATION_LEVEL': '3',
-          'WARNING_CFLAGS': [
-            '-Wno-sign-compare',
-            '-Wno-unused-variable'
-          ],
-          'OTHER_CFLAGS': [
-            '-D_FILE_OFFSET_BITS=64',
-            '-D_LARGEFILE_SOURCE'
-          ]
-        }
-      }
-    }],
-    ['OS=="linux"', {
-      'target_defaults': {
-        'defines': [
-          '_FILE_OFFSET_BITS=64',
-          '_LARGEFILE_SOURCE',
-          '_GNU_SOURCE'
-        ],
-        'cflags': [
-        ]
-      }
-    }]
-  ],
-
   'targets': [
     { # CUTILS
       'target_name': 'cutils',
