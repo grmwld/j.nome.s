@@ -144,7 +144,7 @@
       'src/vendor/lib/jk/src/hash.c',
       #'src/vendor/lib/jk/src/histogram.c',
       #'src/vendor/lib/jk/src/hmmPfamParse.c',
-      #'src/vendor/lib/jk/src/hmmstats.c',
+      'src/vendor/lib/jk/src/hmmstats.c',
       #'src/vendor/lib/jk/src/htmlPage.c',
       #'src/vendor/lib/jk/src/htmshell.c',
       'src/vendor/lib/jk/src/https.c',
