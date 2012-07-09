@@ -29,7 +29,7 @@
 #include "portable.h"
 #include "sig.h"
 #include "net.h"
-/*#include "cheapcgi.h"*/
+#include "cheapcgi.h"
 #include "udc.h"
 
 
