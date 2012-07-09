@@ -1,80 +1,47 @@
 {
-  'conditions': [
-    [
-      'OS=="mac"',
-      {
-        'target_defaults': {
-          'xcode_settings': {
-            'GCC_OPTIMISATION_LEVEL': '3',
-            'WARNING_CFLAGS': [
-              '-Wno-sign-compare',
-            ],
-            'OTHER_CFLAGS': [
-              '-D_FILE_OFFSET_BITS=64',
-              '-D_LARGEFILE_SOURCE'
-            ]
-          }
-        }
-      }
-    ]
-  ],
+  'includes': [ 'common.gypi' ],
+
   'targets': [
-    {
+    { # CUTILS
       'target_name': 'cutils',
-      'sources': [ 'src/addons/cutils/src/cutils.cc' ]
+      'sources': [ 'src/node_addons/cutils/src/cutils.cc' ]
     },
-    {
+    { # BIGWIG
       'target_name': 'bigwig',
-      'sources': [ 'src/addons/bigwig/src/bigwig.cc' ],
+      'sources': [ 'src/node_addons/bigwig/src/bigwig.cc' ],
+      'libraries': [ '-lpthread', '-lz', '-lm' ],
       'dependencies': [ 'jk' ],
-      'include_dirs': [ 'src/addons/bigwig/inc/' ]
     },
-    {
-      'target_name': 'wigToBigWig',
+    { # WIGTOBIGWIG
+      'target_name': 'wigtobigwig',
       'type': 'executable',
-      'sources': [ 'src/utils/wigToBigWig/src/wigToBigWig.c' ],
+      'sources': [ 'src/vendor/utils/wigToBigWig/src/wigToBigWig.c' ],
+      'include_dirs': [ 'src/vendor/utils/wigToBigWig/inc/' ],
+      'libraries': [ '-lpthread', '-lz', '-lm' ],
       'dependencies': [ 'jk' ],
-      'include_dirs': [
-        'src/addons/bigwig/inc/',
-        'src/utils/wigToBigWig/inc/'
-      ],
-      'libraries': [ '-lpthread', '-lz' ],
-      'postbuilds': [
-        {
-          'postbuild_name': 'Copy to ./bin',
-          'action': [
-            'cp',
-            '${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}',
-            '${SRCROOT}bin/wigToBigWig'
-          ]
-        }
-      ]
     },
-    {
+    { # JK
       'target_name': 'jk',
       'type': 'static_library',
-      'sources': [
-        'src/addons/bigwig/src/bPlusTree.c',
-        'src/addons/bigwig/src/bbiRead.c',
-        'src/addons/bigwig/src/bbiWrite.c',
-        'src/addons/bigwig/src/bwgCreate.c',
-        'src/addons/bigwig/src/bwgQuery.c',
-        'src/addons/bigwig/src/cirTree.c',
-        'src/addons/bigwig/src/common.c',
-        'src/addons/bigwig/src/errabort.c',
-        'src/addons/bigwig/src/hash.c',
-        'src/addons/bigwig/src/lineFile.c',
-        'src/addons/bigwig/src/localmem.c',
-        'src/addons/bigwig/src/memalloc.c',
-        'src/addons/bigwig/src/obscure.c',
-        'src/addons/bigwig/src/options.c',
-        'src/addons/bigwig/src/sqlNum.c',
-        'src/addons/bigwig/src/udc.c',
-        'src/addons/bigwig/src/verbose.c',
-        'src/addons/bigwig/src/zlibFace.c'
-      ],
-      'include_dirs': [
-        'src/addons/bigwig/inc/',
+      'sources': [ '<@(jk_files)' ],
+      'libraries': [ '-lpthread', '-lz', '-lm' ],
+      'include_dirs': [ 'src/vendor/lib/jk/inc' ],
+      'direct_dependent_settings': {
+        'include_dirs': [ 'src/vendor/lib/jk/inc/' ]
+      },
+    },
+    { # POST-BUILDS
+      'target_name': 'wigtobig-postbuild',
+      'type': 'none',
+      'dependencies': [ 'wigtobigwig' ],
+      'actions': [
+        {
+          'action_name': 'cp WigToBigWig',
+          'message': 'Copying wigToBigWig to executables directory',
+          'inputs': [ '<(PRODUCT_DIR)/wigtobigwig.node' ],
+          'outputs': [ '<(module_root_dir)/bin/wigToBigWig' ],
+          'action': [ 'cp', '<@(_inputs)', '<@(_outputs)' ]
+        }
       ]
     }
   ]
