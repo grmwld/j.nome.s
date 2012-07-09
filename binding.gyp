@@ -13,22 +13,12 @@
       'dependencies': [ 'jk' ],
     },
     { # WIGTOBIGWIG
-      'target_name': 'wigToBigWig',
+      'target_name': 'wigtobigwig',
       'type': 'executable',
       'sources': [ 'src/vendor/utils/wigToBigWig/src/wigToBigWig.c' ],
       'include_dirs': [ 'src/vendor/utils/wigToBigWig/inc/' ],
       'libraries': [ '-lpthread', '-lz', '-lm' ],
       'dependencies': [ 'jk' ],
-      'postbuilds': [
-        {
-          'postbuild_name': 'Copy to ./bin',
-          'action': [
-            'cp',
-            '${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}',
-            '${SRCROOT}bin/wigToBigWig'
-          ]
-        }
-      ]
     },
     { # JK
       'target_name': 'jk',
@@ -39,6 +29,27 @@
       'direct_dependent_settings': {
         'include_dirs': [ 'src/vendor/lib/jk/inc/' ]
       },
+    },
+    { # POST-BUILDS
+      'target_name': 'wigtobig-postbuild',
+      'type': 'none',
+      'dependencies': [ 'wigtobigwig' ],
+      'actions': [
+        {
+          'action_name': 'cp WigToBigWig',
+          'message': 'Copying wigToBigWig to executables directory',
+          'variables': {
+            'wigToBigWig_BUILT': 'wigToBigWig.node'
+          },
+          'inputs': [ '' ],
+          'outputs': [ '' ],
+          'action': [
+            'echo',
+            '${BUILT_PRODUCTS_DIR}/<(wigToBigWig_BUILT)',
+            '${SRCROOT}bin/wigToBigWig'
+          ]
+        }
+      ]
     }
   ]
 }
