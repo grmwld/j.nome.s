@@ -33,19 +33,19 @@
   'targets': [
     { # CUTILS
       'target_name': 'cutils',
-      'sources': [ 'src/addons/cutils/src/cutils.cc' ]
+      'sources': [ 'src/node_addons/cutils/src/cutils.cc' ]
     },
     { # BIGWIG
       'target_name': 'bigwig',
-      'sources': [ 'src/addons/bigwig/src/bigwig.cc' ],
+      'sources': [ 'src/node_addons/bigwig/src/bigwig.cc' ],
       'libraries': [ '-lpthread', '-lz', '-lm' ],
       'dependencies': [ 'jk' ],
     },
     { # WIGTOBIGWIG
       'target_name': 'wigToBigWig',
       'type': 'executable',
-      'sources': [ 'src/utils/wigToBigWig/src/wigToBigWig.c' ],
-      'include_dirs': [ 'src/utils/wigToBigWig/inc/' ],
+      'sources': [ 'src/vendor/utils/wigToBigWig/src/wigToBigWig.c' ],
+      'include_dirs': [ 'src/vendor/utils/wigToBigWig/inc/' ],
       'libraries': [ '-lpthread', '-lz', '-lm' ],
       'dependencies': [ 'jk' ],
       'postbuilds': [
@@ -64,9 +64,9 @@
       'type': 'static_library',
       'sources': [ '<@(jk_files)' ],
       'libraries': [ '-lpthread', '-lz', '-lm' ],
-      'include_dirs': ['src/addons/bigwig/inc'],
+      'include_dirs': [ 'src/vendor/lib/jk/inc' ],
       'direct_dependent_settings': {
-        'include_dirs': [ 'src/addons/bigwig/inc/' ]
+        'include_dirs': [ 'src/vendor/lib/jk/inc/' ]
       },
     }
   ]
