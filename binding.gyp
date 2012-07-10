@@ -10,7 +10,7 @@
       'target_name': 'bigwig',
       'sources': [ 'src/node_addons/bigwig/src/bigwig.cc' ],
       'libraries': [ '-lpthread', '-lz', '-lm' ],
-      'dependencies': [ 'jk' ],
+      'dependencies': [ 'jk', 'jk_interfaces' ],
     },
     { # WIGTOBIGWIG
       'target_name': 'wigtobigwig',
@@ -20,6 +20,17 @@
       'libraries': [ '-lpthread', '-lz', '-lm' ],
       'dependencies': [ 'jk' ],
     },
+    { # JK_INTERFACES
+      'target_name': 'jk_interfaces',
+      'type': 'static_library',
+      'sources': [ 'src/node_addons/bigwig/src/jk_interfaces.c' ],
+      'libraries': [ '-lpthread', '-lz', '-lm' ],
+      'dependencies': [ 'jk' ],
+      'include_dirs': [ 'src/node_addons/bigwig/inc/' ],
+      'direct_dependent_settings': {
+        'include_dirs': [ 'src/node_addons/bigwig/inc/' ]
+      },
+    },
     { # JK
       'target_name': 'jk',
       'type': 'static_library',
@@ -28,6 +39,11 @@
       'include_dirs': [ 'src/vendor/lib/jk/inc' ],
       'direct_dependent_settings': {
         'include_dirs': [ 'src/vendor/lib/jk/inc/' ]
+      },
+      'cflags!': [ '-Wall' ],
+      'cflags': [ '-w' ],
+      'xcode_settings': {
+        'GCC_WARN_INHIBIT_ALL_WARNING': 'YES',
       },
     },
     { # POST-BUILDS

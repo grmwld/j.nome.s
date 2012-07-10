@@ -7,6 +7,7 @@
 extern "C" {
     #include "common.h"
     #include "bigWig.h"
+    #include "jk_interfaces.h"
 }
 
 using namespace v8;
@@ -39,8 +40,8 @@ void bw_work(uv_work_t *req)
         baton->summaryValues = (double *) calloc(baton->nbins, sizeof(double));
         if (baton->summaryValues != NULL)
         {
-            struct bbiFile *bwf = bigWigFileOpen((char*)baton->bwfname.c_str());
-            bigWigSummaryArray(bwf, (char*)baton->seqid.c_str(), baton->start, baton->end, bbiSummaryTypeFromString("mean"), baton->nbins, baton->summaryValues);
+            struct bbiFile *bwf = I_bigWigFileOpen((const char*)baton->bwfname.c_str());
+            I_bigWigSummaryArray(bwf, (const char*)baton->seqid.c_str(), baton->start, baton->end, I_bbiSummaryTypeFromString("mean"), baton->nbins, baton->summaryValues);
             bigWigFileClose(&bwf);
         }
     }
@@ -58,9 +59,9 @@ void bw_work_After(uv_work_t *req)
     Local<String> kscore = String::New("score");
     Local<Array> output = Array::New();
     Local<Object> point;
-    unsigned int lstart;
-    unsigned int lend;
-    double bin_size;
+    unsigned int lstart = 0;
+    unsigned int lend = 0;
+    double bin_size = 0;
 
     if (baton->error_code)
     {
