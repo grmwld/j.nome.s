@@ -311,15 +311,40 @@ TrackOrientedProfile.prototype = new TrackBase();
 TrackOrientedProfile.prototype.fetchInInterval = function(seqid, strand, start, end, callback) {
   var self = this;
   var step = getStep(~~end - ~~start);
-  if (step % 2000 === 0) {
-    self.queryCache(seqid, strand, ~~start, ~~end, step, function(err, docs) {
-      callback(err, docs);
-    });
-  } else {
-    self.query(seqid, strand, ~~start, ~~end, step, function(err, docs) {
+  if (self.metadata.backend === 'bigwig') {
+    self.queryBigWig(seqid, strand, ~~start, ~~end, Math.min(~~end - ~~start, 1024), function(err, docs) {
       callback(err, docs);
     });
   }
+  else {
+    if (step % 2000 === 0) {
+      self.queryCache(seqid, strand, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    } else {
+      self.query(seqid, strand, ~~start, ~~end, step, function(err, docs) {
+        callback(err, docs);
+      });
+    }
+  }
+};
+
+/**
+ * Query on raw data and return a processed profile
+ *
+ * @param {String} seqid
+ * @param {Number} start
+ * @param {Number} end
+ * @param {Number} step
+ * @param {Function} callback
+ * @api private
+ */
+TrackOrientedProfile.prototype.queryBigWig = function(seqid, strand, start, end, nbins, callback) {
+  var self = this;
+  var cstrand = strand === '+' ? 'plus_strand' : 'minus_strand';
+  bigwig.summary(self.metadata.files[cstrand], seqid, start, end, nbins, function(err, docs) {
+    callback(err, docs);
+  });
 };
 
 /**
