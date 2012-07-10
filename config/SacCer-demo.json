@@ -69,8 +69,9 @@
     , "type": "oriented-profile"
     , "backend": "bigwig"
     , "files": {
-        "./test/store/SRR002051_top_chrI-II-III-IV.profile.bw"
-      , "./test/store/SRR002051_bottom_chrI-II-III-IV.profile.bw"
+        "plus_strand": "./test/store/oriented/SRR002051_top_chrI-II-III-IV.profile.bw"
+      , "minus_strand": "./test/store/oriented/SRR002051_bottom_chrI-II-III-IV.profile.bw"
+    }
     , "style": {
         "gutter": 25
       , "shade": true
