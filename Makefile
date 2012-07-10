@@ -12,8 +12,13 @@ DEMO_SIZES = "$(DEMO_DIR)/sacCer1.sizes"
 DEMO_REF_FASTA = "$(DEMO_DIR)/SacCer_chrI-II-III-IV.fasta"
 DEMO_GENES_JFF = "$(DEMO_DIR)/SacCer_chrI-II-III-IV.genes.jff"
 DEMO_PROFILE = "$(DEMO_DIR)/SRR002051_chrI-II-III-IV.profile"
+DEMO_PROFILE_TOP = "$(DEMO_DIR)/SRR002051_top_chrI-II-III-IV.profile"
+DEMO_PROFILE_BOTTOM = "$(DEMO_DIR)/SRR002051_bottom_chrI-II-III-IV.profile"
 DEMO_PROFILE_BIGWIG = "$(DEMO_STORE)/SRR002051_chrI-II-III-IV.profile.bw"
 DEMO_ORIENTED_PROFILE = "$(DEMO_DIR)/SRR002051_oriented_chrI-II-III-IV.profile"
+DEMO_ORIENTED_PROFILE_BIGWIG = "$(DEMO_STORE)/oriented"
+DEMO_ORIENTED_PROFILE_BIGWIG_TOP = "$(DEMO_ORIENTED_PROFILE_BIGWIG)/SRR002051_top_chrI-II-III-IV.profile.bw"
+DEMO_ORIENTED_PROFILE_BIGWIG_BOTTOM = "$(DEMO_ORIENTED_PROFILE_BIGWIG)/SRR002051_bottom_chrI-II-III-IV.profile.bw"
 
 DEMO_DB = "SacCer-demo"
 DEMO_GENE_COL = "ensembl_genes"
@@ -76,7 +81,6 @@ load_profiles:
 			--drop \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
-
 prepare_bigwigStore:
 	@ echo "$(YELLOW)Preparing bigwig store ...$(NO_COLOR)" \
 		&& mkdir $(DEMO_STORE) \
@@ -84,6 +88,15 @@ prepare_bigwigStore:
 			$(DEMO_PROFILE) \
 			$(DEMO_SIZES) \
 			$(DEMO_PROFILE_BIGWIG) \
+		&& mkdir $(DEMO_ORIENTED_PROFILE_BIGWIG) \
+		; $(BIN_SCRIPT)/wigToBigWig \
+			$(DEMO_PROFILE_TOP) \
+			$(DEMO_SIZES) \
+			$(DEMO_ORIENTED_PROFILE_BIGWIG_TOP) \
+		&& $(BIN_SCRIPT)/wigToBigWig \
+			$(DEMO_PROFILE_BOTTOM) \
+			$(DEMO_SIZES) \
+			$(DEMO_ORIENTED_PROFILE_BIGWIG_BOTTOM) \
 		&& echo "$(GREEN)DONE$(NO_COLOR)"
 
 remove-demo:
