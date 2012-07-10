@@ -62,5 +62,23 @@
       , "axisystep": 4
       }
     }
+  , "rnaseq_bigwig_oriented": {
+      "id": "rnaseq_bigwig_oriented"
+    , "name": "Oriented RNASeq data (bigwig)"
+    , "description": "Oriented RNA-Seq data from SRR002051 (bigwig)"
+    , "type": "oriented-profile"
+    , "backend": "bigwig"
+    , "files": {
+        "./test/store/SRR002051_top_chrI-II-III-IV.profile.bw"
+      , "./test/store/SRR002051_bottom_chrI-II-III-IV.profile.bw"
+    , "style": {
+        "gutter": 25
+      , "shade": true
+      , "nostroke": true
+      , "axis": "0 0 1 1"
+      , "axisxstep": 10
+      , "axisystep": 4
+      }
+    }
   }
 }
