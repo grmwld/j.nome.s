@@ -111,7 +111,7 @@ describe('Track', function() {
 
     });
 
-    describe('with bigwig profile metadata', function() {
+    describe('with bigwig profile', function() {
       var track = new Track(dataset, {
         id: 'rnaseq-bigwig'
       , name: 'RNASeq data bigwig'
@@ -157,7 +157,7 @@ describe('Track', function() {
 
     });
 
-    describe('with non-existent bigwig profile metadata', function() {
+    describe('with non-existent bigwig profile', function() {
       var track = new Track(dataset, {
         id: 'rnaseq-bigwig'
       , name: 'RNASeq data bigwig'
@@ -184,6 +184,81 @@ describe('Track', function() {
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(0);
             done();
+          } catch(err) {
+            done(err);
+          }
+        });
+      });
+
+    });
+
+    describe('with oriented bigwig profile', function() {
+      var track = new Track(dataset, {
+        id: 'rnaseq-bigwig-oriented'
+      , name: 'RNASeq data bigwig'
+      , description: 'RNA-Seq data from SRR002051 (bigwig)'
+      , type: 'oriented-profile'
+      , backend: 'bigwig'
+      , files: {
+          plus_strand: './test/store/oriented/SRR002051_top_chrI-II-III-IV.profile.bw'
+        , minus_strand: './test/store/oriented/SRR002051_bottom_chrI-II-III-IV.profile.bw'
+      }
+      , style: {
+          gutter: 25
+        , shade: true
+        , nostroke: true
+        , axis: '0 0 1 1'
+        , axisxstep: 10
+        , axisystep: 4
+        }
+      });
+
+      it('responds with profile documents - top strand', function(done) {
+        expect(track).to.be.an.instanceof(TrackOrientedProfile);
+        track.fetchInInterval('chrIV', '+', 50192, 1112001, function(err, docs) {
+          try {
+            expect(err).to.not.exist;
+            expect(docs).to.be.an.instanceof(Array);
+            expect(docs).to.have.length(1025);
+            docs.forEach(function(doc) {
+              expect(doc).to.contain.keys([
+              , 'start'
+              , 'end'
+              , 'score'
+              ])
+              expect(doc.score).to.be.a('number');
+              expect(doc.score).to.not.be.below(0);
+              expect(doc.start).to.be.a('number');
+              expect(doc.end).to.be.a('number');
+              expect(doc.start).to.be.below(doc.end);
+            });
+            done(err);
+          } catch(err) {
+            done(err);
+          }
+        });
+      });
+
+      it('responds with profile documents - bottom strand', function(done) {
+        expect(track).to.be.an.instanceof(TrackOrientedProfile);
+        track.fetchInInterval('chrIV', '-', 50192, 1112001, function(err, docs) {
+          try {
+            expect(err).to.not.exist;
+            expect(docs).to.be.an.instanceof(Array);
+            expect(docs).to.have.length(1025);
+            docs.forEach(function(doc) {
+              expect(doc).to.contain.keys([
+              , 'start'
+              , 'end'
+              , 'score'
+              ])
+              expect(doc.score).to.be.a('number');
+              expect(doc.score).to.not.be.below(0);
+              expect(doc.start).to.be.a('number');
+              expect(doc.end).to.be.a('number');
+              expect(doc.start).to.be.below(doc.end);
+            });
+            done(err);
           } catch(err) {
             done(err);
           }
