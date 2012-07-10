@@ -2,4 +2,4 @@
   - each track in tracks
     label(for=track.id)
       input(type='checkbox', id=track.id, name=track.name, value=track.id, checked=checked[track.id]||false)
-      #{track.name} : #{track.description}
+      | #{track.name} : #{track.description}
