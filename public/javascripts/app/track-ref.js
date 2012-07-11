@@ -47,6 +47,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
     return (b.end - b.start) - (a.end - a.start);
   });
   data.forEach(function(doc) {
+    cur_element = new GlyphBase(self.canvas, doc, start, end);
     laidout = false;
     for (var i = 0; i < layers.length; ++i) {
       for (var j = 0; j < layers[i].length; ++j) {
@@ -58,8 +59,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
         }
       }
       if (!next) {
-        cur_element = self.canvas.drawDocument(doc, start, end, i, self.metadata.style);
-        self.documents.push(cur_element);
+        self.documents.push(cur_element.draw(i, self.metadata.style))
         layers[i].push({
           start: doc.start,
           end: doc.end
@@ -73,8 +73,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
       if (layers.length) {
         self.resize(self.canvas.width, self.canvas.height+30);
       }
-      cur_element = self.canvas.drawDocument(doc, start, end, i, self.metadata.style);
-      self.documents.push(cur_element);
+      self.documents.push(cur_element.draw(i, self.metadata.style))
       layers.push([{
         start: doc.start,
         end: doc.end
@@ -90,7 +89,6 @@ TrackRef.prototype.clear = function() {
   TrackBase.prototype.clear.call(this);
   this.canvas.setSize(this.width, this.height);
 };
-
 
 
 /**
@@ -133,6 +131,8 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
   } else {
     doc_element.push(doc_text);
   }
+  console.log(doc_shape_bbox);
+  console.log(doc_text_bbox);
   return doc_element;
 };
 
