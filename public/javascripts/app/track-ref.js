@@ -42,6 +42,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
   var next = false;
   var start_overlap;
   var end_overlap;
+  var cur_element;
   data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
@@ -49,16 +50,20 @@ TrackRef.prototype.drawData = function(data, start, end) {
     laidout = false;
     for (var i = 0; i < layers.length; ++i) {
       for (var j = 0; j < layers[i].length; ++j) {
-        start_overlap = doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1];
-        end_overlap = doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1];
+        start_overlap = doc.start >= layers[i][j]['start'] && doc.start <= layers[i][j]['end'];
+        end_overlap = doc.end >= layers[i][j]['start'] && doc.end <= layers[i][j]['end'];
         if (start_overlap || end_overlap) {
           next = true;
           break;
         }
       }
       if (!next) {
-        self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
-        layers[i].push([doc.start, doc.end]);
+        cur_element = self.canvas.drawDocument(doc, start, end, i, self.metadata.style);
+        self.documents.push(cur_element);
+        layers[i].push({
+          start: doc.start,
+          end: doc.end
+        });
         laidout = true;
         break;
       }
@@ -68,8 +73,12 @@ TrackRef.prototype.drawData = function(data, start, end) {
       if (layers.length) {
         self.resize(self.canvas.width, self.canvas.height+30);
       }
-      self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
-      layers.push([[doc.start, doc.end]]);
+      cur_element = self.canvas.drawDocument(doc, start, end, i, self.metadata.style);
+      self.documents.push(cur_element);
+      layers.push([{
+        start: doc.start,
+        end: doc.end
+      }]);
     }
   });
 };
@@ -103,11 +112,12 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , doc_shape = null
     , doc_text = null
     , doc_element = this.set()
-    , doc_shape_bbox = null;
+    , doc_shape_bbox = null
+    , doc_text_bbox = null;
   if (doc.strand) {
     doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, doc.strand));
   } else {
-    doc_shape = this.rect(rel_start, 20+20*layer, rel_doc_length, 10);
+    doc_shape = this.rect(rel_start, 30+30*layer, rel_doc_length, 10);
   }
   for (var i in doc) {
     title.push(i + ' : ' + doc[i]);
