@@ -127,6 +127,7 @@ describe('Profile Track', function() {
               expect(err).to.not.exist;
               expect(docs).to.be.an.instanceof(Array);
               expect(docs).to.have.length(1025);
+              var total = 0;
               docs.forEach(function(doc) {
                 expect(doc).to.contain.keys([
                 , 'start'
@@ -138,7 +139,9 @@ describe('Profile Track', function() {
                 expect(doc.start).to.be.a('number');
                 expect(doc.end).to.be.a('number');
                 expect(doc.start).to.be.below(doc.end);
+                total += doc.score;
               });
+              expect(total).to.not.equal(0);
               done(err);
             } catch(err) {
               done(err);
@@ -192,6 +195,7 @@ describe('Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(801);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -203,7 +207,9 @@ describe('Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -217,6 +223,7 @@ describe('Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(532);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -228,7 +235,9 @@ describe('Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -261,6 +270,7 @@ describe('Oriented Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(1025);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -272,7 +282,9 @@ describe('Oriented Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -286,6 +298,7 @@ describe('Oriented Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(1025);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -297,7 +310,9 @@ describe('Oriented Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -325,6 +340,7 @@ describe('Oriented Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(801);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -336,7 +352,9 @@ describe('Oriented Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -350,6 +368,7 @@ describe('Oriented Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(801);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -361,7 +380,9 @@ describe('Oriented Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -375,6 +396,7 @@ describe('Oriented Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(532);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -386,7 +408,9 @@ describe('Oriented Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
@@ -400,6 +424,7 @@ describe('Oriented Profile Track', function() {
             expect(err).to.not.exist;
             expect(docs).to.be.an.instanceof(Array);
             expect(docs).to.have.length(532);
+            var total = 0;
             docs.forEach(function(doc) {
               expect(doc).to.contain.keys([
               , 'start'
@@ -411,7 +436,9 @@ describe('Oriented Profile Track', function() {
               expect(doc.start).to.be.a('number');
               expect(doc.end).to.be.a('number');
               expect(doc.start).to.be.below(doc.end);
+              total += doc.score;
             });
+            expect(total).to.not.equal(0);
             done(err);
           } catch(err) {
             done(err);
