@@ -66,7 +66,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
     }
     if (!laidout) {
       if (layers.length) {
-        self.resize(self.canvas.width, self.canvas.height+20);
+        self.resize(self.canvas.width, self.canvas.height+30);
       }
       self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
       layers.push([[doc.start, doc.end]]);
@@ -100,7 +100,10 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
     , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
     , rel_doc_length = rel_end - rel_start
     , title = []
-    , doc_shape = null;
+    , doc_shape = null
+    , doc_text = null
+    , doc_element = this.set()
+    , doc_shape_bbox = null;
   if (doc.strand) {
     doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, doc.strand));
   } else {
@@ -111,7 +114,16 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
   }
   doc_shape.attr({ title: title.join('\n') });
   doc_shape.attr(style);
-  return doc_shape;
+  doc_shape_bbox = doc_shape.getBBox();
+  doc_text = this.text(doc_shape_bbox.x+doc_shape_bbox.width/2, doc_shape_bbox.y-1-doc_shape_bbox.height/2, doc.name);
+  doc_text_bbox = doc_text.getBBox();
+  doc_element.push(doc_shape);
+  if (doc_text_bbox.width > doc_shape_bbox.width) {
+    doc_text.remove();
+  } else {
+    doc_element.push(doc_text);
+  }
+  return doc_element;
 };
 
 /**
@@ -128,7 +140,7 @@ var traceOrientedGlyph = function(start, end, layer, strand) {
     , tip_length = length > 10 ? 10 : length/1.5;
   if (strand === '+') {
     path = [
-      'M' + start + ' ' + (20+20*layer)
+      'M' + start + ' ' + (30+30*layer)
     , 'h' + (length - tip_length)
     , 'l' + tip_length + ' ' + 5
     , 'l' + (-tip_length) + ' ' + 5
@@ -138,7 +150,7 @@ var traceOrientedGlyph = function(start, end, layer, strand) {
   }
   else if (strand === '-') {
     path = [
-      'M' + (start + tip_length) + ' ' + (20+20*layer)
+      'M' + (start + tip_length) + ' ' + (30+30*layer)
     , 'h' + (length - tip_length)
     , 'v' + 10
     , 'h' + (-(length - tip_length))
