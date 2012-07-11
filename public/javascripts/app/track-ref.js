@@ -118,7 +118,7 @@ Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
   doc_text = this.text(doc_shape_bbox.x+doc_shape_bbox.width/2, doc_shape_bbox.y-1-doc_shape_bbox.height/2, doc.name);
   doc_text_bbox = doc_text.getBBox();
   doc_element.push(doc_shape);
-  if (doc_text_bbox.width > doc_shape_bbox.width) {
+  if (doc_text_bbox.width > doc_shape_bbox.width || doc.name === undefined) {
     doc_text.remove();
   } else {
     doc_element.push(doc_text);
