@@ -78,7 +78,10 @@ GlyphGeneric.prototype.draw = function(style, packed) {
   doc_shape.attr({ title: title.join('\n') });
   doc_shape.attr(style);
   doc_shape_bbox = doc_shape.getBBox();
-  doc_text = this.canvas.text(doc_shape_bbox.x+doc_shape_bbox.width/2, doc_shape_bbox.y-1-doc_shape_bbox.height/2, self.document.name);
+  doc_text = this.canvas.text(doc_shape_bbox.x, doc_shape_bbox.y-1-doc_shape_bbox.height/2).attr({
+    'text': self.document.name,
+    'text-anchor': 'start'
+  });
   doc_text_bbox = doc_text.getBBox();
   doc_element.push(doc_shape);
   if (self.document.name === undefined || (packed && doc_text_bbox.width > doc_shape_bbox.width)) {
