@@ -35,13 +35,15 @@ GlyphGeneric.prototype.getGenomicPosition = function() {
 };
 
 GlyphGeneric.prototype.adjustToLayer = function(layer) {
-  this.glyph.transform('T0,'+(40*layer));
+  var translation = 'T0,'+(40*layer);
+  //this.glyph.transform(translation);
+  this.glyph.animate({transform: translation}, 500);
 };
 
 /**
  * Draw a feature element
  */
-GlyphGeneric.prototype.draw = function(layer, style) {
+GlyphGeneric.prototype.draw = function(style, packed) {
   self = this;
   var view_span = self.viewEnd - self.viewStart
     , nf = new PHP_JS().number_format
@@ -53,11 +55,12 @@ GlyphGeneric.prototype.draw = function(layer, style) {
     , doc_text = null
     , doc_element = this.canvas.set()
     , doc_shape_bbox = null
-    , doc_text_bbox = null;
+    , doc_text_bbox = null
+    , packed = typeof packed !== 'undefined' ? packed : true;
   //if (self.document.strand) {
     //doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, self.document.strand));
   //} else {
-    doc_shape = this.canvas.rect(rel_start, 30+40*layer, rel_doc_length, 10);
+    doc_shape = this.canvas.rect(rel_start, 30, rel_doc_length, 10);
   //}
   for (var i in self.document) {
     title.push(i + ' : ' + self.document[i]);
@@ -68,7 +71,7 @@ GlyphGeneric.prototype.draw = function(layer, style) {
   doc_text = this.canvas.text(doc_shape_bbox.x+doc_shape_bbox.width/2, doc_shape_bbox.y-1-doc_shape_bbox.height/2, self.document.name);
   doc_text_bbox = doc_text.getBBox();
   doc_element.push(doc_shape);
-  if (self.document.name === undefined) {
+  if (self.document.name === undefined || (packed && doc_text_bbox.width > doc_shape_bbox.width)) {
     doc_text.remove();
   } else {
     doc_element.push(doc_text);

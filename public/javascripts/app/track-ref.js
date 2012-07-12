@@ -23,7 +23,7 @@ TrackRef.prototype = new TrackBase;
 TrackRef.prototype.draw = function(seqid, start, end) {
   var self = this;
   self.getData(seqid, start, end, function(data) {
-    self.drawData(data, start, end);
+    self.drawData(data, start, end, false);
   });
 };
 
@@ -35,7 +35,7 @@ TrackRef.prototype.draw = function(seqid, start, end) {
  * @param {Number} end
  * @see drawDocument()
  */
-TrackRef.prototype.drawData = function(data, start, end) {
+TrackRef.prototype.drawData = function(data, start, end, packed) {
   var self = this;
   var layers = [];
   var laidout = false;
@@ -48,7 +48,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
   });
   data.forEach(function(doc) {
     glyph.coat(doc);
-    self.documents.push(glyph.draw(0, self.metadata.style));
+    self.documents.push(glyph.draw(self.metadata.style, packed));
     glyphPos = glyph.getGenomicPosition();
     laidout = false;
     for (var i = 0; i < layers.length; ++i) {
@@ -79,61 +79,6 @@ TrackRef.prototype.drawData = function(data, start, end) {
 };
 
 /**
- * Draw the documents in the track canvas
- *
- * @param {Array} data
- * @param {Number} start
- * @param {Number} end
- * @see drawDocument()
- */
-TrackRef.prototype.drawData2 = function(data, start, end) {
-  var self = this;
-  var layers = [];
-  var laidout = false;
-  var next = false;
-  var start_overlap;
-  var end_overlap;
-  var glyph = new GlyphGeneric(self.canvas, start, end);
-  data.sort(function(a, b) {
-    return (b.end - b.start) - (a.end - a.start);
-  });
-  data.forEach(function(doc) {
-    glyph.coat(doc);
-
-    laidout = false;
-    for (var i = 0; i < layers.length; ++i) {
-      for (var j = 0; j < layers[i].length; ++j) {
-        start_overlap = doc.start >= layers[i][j]['start'] && doc.start <= layers[i][j]['end'];
-        end_overlap = doc.end >= layers[i][j]['start'] && doc.end <= layers[i][j]['end'];
-        if (start_overlap || end_overlap) {
-          next = true;
-          break;
-        }
-      }
-      if (!next) {
-        self.documents.push(glyph.draw(i, self.metadata.style))
-        //console.log('doc : ', doc.start, doc.end);
-        //console.log('glyph : ', glyph.getGenomicPosition().start, glyph.getGenomicPosition().end);
-        layers[i].push(glyph.getGenomicPosition());
-        laidout = true;
-        break;
-      }
-      next = false;
-    }
-    if (!laidout) {
-      if (layers.length) {
-        self.resize(self.canvas.width, self.canvas.height+30);
-      }
-      self.documents.push(glyph.draw(i, self.metadata.style))
-      layers.push([{
-        start: doc.start,
-        end: doc.end
-      }]);
-    }
-  });
-};
-
-/**
  * Clears the documents from the track canvas
  */
 TrackRef.prototype.clear = function() {
@@ -141,51 +86,6 @@ TrackRef.prototype.clear = function() {
   this.canvas.setSize(this.width, this.height);
 };
 
-
-/**
- * Draw a document
- *
- * @param {Object} doc
- * @param {Number} view_start
- * @param {Number} view_end
- * @param {Number} layer
- * @param {Object} style
- */
-Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  var view_span = view_end - view_start
-    , nf = new PHP_JS().number_format
-    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_doc_length = rel_end - rel_start
-    , title = []
-    , doc_shape = null
-    , doc_text = null
-    , doc_element = this.set()
-    , doc_shape_bbox = null
-    , doc_text_bbox = null;
-  if (doc.strand) {
-    doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, doc.strand));
-  } else {
-    doc_shape = this.rect(rel_start, 30+30*layer, rel_doc_length, 10);
-  }
-  for (var i in doc) {
-    title.push(i + ' : ' + doc[i]);
-  }
-  doc_shape.attr({ title: title.join('\n') });
-  doc_shape.attr(style);
-  doc_shape_bbox = doc_shape.getBBox();
-  doc_text = this.text(doc_shape_bbox.x+doc_shape_bbox.width/2, doc_shape_bbox.y-1-doc_shape_bbox.height/2, doc.name);
-  doc_text_bbox = doc_text.getBBox();
-  doc_element.push(doc_shape);
-  if (doc_text_bbox.width > doc_shape_bbox.width || doc.name === undefined) {
-    doc_text.remove();
-  } else {
-    doc_element.push(doc_text);
-  }
-  console.log(doc_shape_bbox);
-  console.log(doc_text_bbox);
-  return doc_element;
-};
 
 /**
  * Computes the path necessary to represent an oriented glyph
