@@ -42,7 +42,7 @@ TrackRef.prototype.drawData = function(data, start, end, packed) {
   var next = false;
   var start_overlap;
   var end_overlap;
-  var glyph = new GlyphGeneric(self.canvas, start, end);
+  var glyph = new GlyphGenericOriented(self.canvas, start, end);
   data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
@@ -85,39 +85,3 @@ TrackRef.prototype.clear = function() {
   TrackBase.prototype.clear.call(this);
   this.canvas.setSize(this.width, this.height);
 };
-
-
-/**
- * Computes the path necessary to represent an oriented glyph
- *
- * @param {Number} start
- * @param {Number} end
- * @param {Number} layer
- * @param {String} strand
- */
-var traceOrientedGlyph = function(start, end, layer, strand) {
-  var path = null
-    , length = end - start
-    , tip_length = length > 10 ? 10 : length/1.5;
-  if (strand === '+') {
-    path = [
-      'M' + start + ' ' + (30+30*layer)
-    , 'h' + (length - tip_length)
-    , 'l' + tip_length + ' ' + 5
-    , 'l' + (-tip_length) + ' ' + 5
-    , 'h' + (-(length - tip_length))
-    , 'v' + (-10)
-    ];
-  }
-  else if (strand === '-') {
-    path = [
-      'M' + (start + tip_length) + ' ' + (30+30*layer)
-    , 'h' + (length - tip_length)
-    , 'v' + 10
-    , 'h' + (-(length - tip_length))
-    , 'l' + (-tip_length) + ' ' + (-5)
-    , 'l' + tip_length + ' ' + (-5)
-    ];
-  }
-  return path.join(' ');
-}
