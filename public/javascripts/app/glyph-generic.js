@@ -75,7 +75,6 @@ GlyphGeneric.prototype.draw = function(style, packed) {
   for (var i in self.document) {
     title.push(i + ' : ' + self.document[i]);
   }
-  doc_shape.attr({ title: title.join('\n') });
   doc_shape.attr(style);
   doc_shape_bbox = doc_shape.getBBox();
   doc_text = this.canvas.text(doc_shape_bbox.x, doc_shape_bbox.y-1-doc_shape_bbox.height/2).attr({
@@ -89,6 +88,10 @@ GlyphGeneric.prototype.draw = function(style, packed) {
   } else {
     doc_element.push(doc_text);
   }
+  doc_element.attr({
+    title: title.join('\n'),
+    cursor: 'help'
+  });
   this.glyph = doc_element;
   return doc_element;
 };
