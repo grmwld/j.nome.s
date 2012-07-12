@@ -26,6 +26,36 @@ GlyphGeneric.prototype.drawShape = function(start, end) {
 };
 
 /**
+ * Draw the oriented shape
+ */
+GlyphGeneric.prototype.drawOrientedShape = function(start, end) {
+  var path = null
+    , length = end - start
+    , tip_length = length > 10 ? 10 : length/1.5;
+  if (this.document.strand === '+') {
+    path_string = [
+      'M' + start + ' ' + (30)
+    , 'h' + (length - tip_length)
+    , 'l' + tip_length + ' ' + 5
+    , 'l' + (-tip_length) + ' ' + 5
+    , 'h' + (-(length - tip_length))
+    , 'v' + (-10)
+    ];
+  }
+  else if (this.document.strand === '-') {
+    path_string = [
+      'M' + (start + tip_length) + ' ' + (30)
+    , 'h' + (length - tip_length)
+    , 'v' + 10
+    , 'h' + (-(length - tip_length))
+    , 'l' + (-tip_length) + ' ' + (-5)
+    , 'l' + tip_length + ' ' + (-5)
+    ];
+  }
+  return this.canvas.path(path_string.join(' '));
+};
+
+/**
  * Draw a feature element
  */
 GlyphGeneric.prototype.draw = function(style, packed) {
@@ -59,4 +89,3 @@ GlyphGeneric.prototype.draw = function(style, packed) {
   this.glyph = doc_element;
   return doc_element;
 };
-

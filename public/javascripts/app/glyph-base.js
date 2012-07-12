@@ -21,6 +21,11 @@ var GlyphBase = function(canvas, viewStart, viewEnd) {
  */
 GlyphBase.prototype.coat = function(doc) {
   this.document = doc;
+  if (this.document.hasOwnProperty('strand')) {
+    this.drawShape = this.drawOrientedShape;
+  } else {
+    this.drawShape = this.drawShape;
+  }
 };
 
 GlyphBase.prototype.getGenomicPosition = function() {
@@ -44,6 +49,12 @@ GlyphBase.prototype.adjustToLayer = function(layer) {
  * Draw the shape
  */
 GlyphBase.prototype.drawShape = function(start, end) {
+};
+
+/**
+ * Draw the oriented shape
+ */
+GlyphBase.prototype.drawOrientedShape = function(start, end) {
 };
 
 /**

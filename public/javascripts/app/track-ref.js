@@ -33,7 +33,6 @@ TrackRef.prototype.draw = function(seqid, start, end) {
  * @param {Array} data
  * @param {Number} start
  * @param {Number} end
- * @see drawDocument()
  */
 TrackRef.prototype.drawData = function(data, start, end, packed) {
   var self = this;
@@ -42,7 +41,7 @@ TrackRef.prototype.drawData = function(data, start, end, packed) {
   var next = false;
   var start_overlap;
   var end_overlap;
-  var glyph = new GlyphGenericOriented(self.canvas, start, end);
+  var glyph = new GlyphGeneric(self.canvas, start, end);
   data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
@@ -51,8 +50,8 @@ TrackRef.prototype.drawData = function(data, start, end, packed) {
     self.documents.push(glyph.draw(self.metadata.style, packed));
     glyphPos = glyph.getGenomicPosition();
     laidout = false;
-    for (var i = 0; i < layers.length; ++i) {
-      for (var j = 0; j < layers[i].length; ++j) {
+    for (var i = 0, l = layers.length; i < l; ++i) {
+      for (var j = 0, m = layers[i].length; j < m; ++j) {
         start_overlap = glyphPos.start >= layers[i][j]['start'] && glyphPos.start <= layers[i][j]['end'];
         end_overlap = glyphPos.end >= layers[i][j]['start'] && glyphPos.end <= layers[i][j]['end'];
         if (start_overlap || end_overlap) {
