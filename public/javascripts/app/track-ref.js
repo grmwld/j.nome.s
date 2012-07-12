@@ -42,12 +42,64 @@ TrackRef.prototype.drawData = function(data, start, end) {
   var next = false;
   var start_overlap;
   var end_overlap;
-  var cur_element;
+  var glyph = new GlyphGeneric(self.canvas, start, end);
   data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
   data.forEach(function(doc) {
-    cur_element = new GlyphBase(self.canvas, doc, start, end);
+    glyph.coat(doc);
+    self.documents.push(glyph.draw(0, self.metadata.style));
+    glyphPos = glyph.getGenomicPosition();
+    laidout = false;
+    for (var i = 0; i < layers.length; ++i) {
+      for (var j = 0; j < layers[i].length; ++j) {
+        start_overlap = glyphPos.start >= layers[i][j]['start'] && glyphPos.start <= layers[i][j]['end'];
+        end_overlap = glyphPos.end >= layers[i][j]['start'] && glyphPos.end <= layers[i][j]['end'];
+        if (start_overlap || end_overlap) {
+          next = true;
+          break;
+        }
+      }
+      if (!next) {
+        glyph.adjustToLayer(i);
+        layers[i].push(glyph.getGenomicPosition());
+        laidout = true;
+        break;
+      }
+      next = false;
+    }
+    if (!laidout) {
+      if (layers.length) {
+        self.resize(self.canvas.width, self.canvas.height+40);
+      }
+      glyph.adjustToLayer(i);
+      layers.push([glyph.getGenomicPosition()]);
+    }
+  });
+};
+
+/**
+ * Draw the documents in the track canvas
+ *
+ * @param {Array} data
+ * @param {Number} start
+ * @param {Number} end
+ * @see drawDocument()
+ */
+TrackRef.prototype.drawData2 = function(data, start, end) {
+  var self = this;
+  var layers = [];
+  var laidout = false;
+  var next = false;
+  var start_overlap;
+  var end_overlap;
+  var glyph = new GlyphGeneric(self.canvas, start, end);
+  data.sort(function(a, b) {
+    return (b.end - b.start) - (a.end - a.start);
+  });
+  data.forEach(function(doc) {
+    glyph.coat(doc);
+
     laidout = false;
     for (var i = 0; i < layers.length; ++i) {
       for (var j = 0; j < layers[i].length; ++j) {
@@ -59,11 +111,10 @@ TrackRef.prototype.drawData = function(data, start, end) {
         }
       }
       if (!next) {
-        self.documents.push(cur_element.draw(i, self.metadata.style))
-        layers[i].push({
-          start: doc.start,
-          end: doc.end
-        });
+        self.documents.push(glyph.draw(i, self.metadata.style))
+        //console.log('doc : ', doc.start, doc.end);
+        //console.log('glyph : ', glyph.getGenomicPosition().start, glyph.getGenomicPosition().end);
+        layers[i].push(glyph.getGenomicPosition());
         laidout = true;
         break;
       }
@@ -73,7 +124,7 @@ TrackRef.prototype.drawData = function(data, start, end) {
       if (layers.length) {
         self.resize(self.canvas.width, self.canvas.height+30);
       }
-      self.documents.push(cur_element.draw(i, self.metadata.style))
+      self.documents.push(glyph.draw(i, self.metadata.style))
       layers.push([{
         start: doc.start,
         end: doc.end
