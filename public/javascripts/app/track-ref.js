@@ -52,16 +52,14 @@ TrackRef.prototype.drawData = function(data, start, end, packed) {
     laidout = false;
     for (var i = 0, l = layers.length; i < l; ++i) {
       for (var j = 0, m = layers[i].length; j < m; ++j) {
-        start_overlap = glyphPos.start >= layers[i][j]['start'] && glyphPos.start <= layers[i][j]['end'];
-        end_overlap = glyphPos.end >= layers[i][j]['start'] && glyphPos.end <= layers[i][j]['end'];
-        if (start_overlap || end_overlap) {
+        if (glyph.overlapsWith(layers[i][j])) {
           next = true;
           break;
         }
       }
       if (!next) {
         glyph.adjustToLayer(i);
-        layers[i].push(glyph.getBBox());
+        layers[i].push(glyphPos);
         laidout = true;
         break;
       }
@@ -70,9 +68,9 @@ TrackRef.prototype.drawData = function(data, start, end, packed) {
     if (!laidout) {
       if (layers.length) {
         self.resize(self.canvas.width, self.canvas.height+40);
+        glyph.adjustToLayer(i);
       }
-      glyph.adjustToLayer(i);
-      layers.push([glyph.getBBox()]);
+      layers.push([glyphPos]);
     }
   });
 };

@@ -8,12 +8,12 @@
  * @param {Number} height
  */
 var GlyphBase = function(canvas, viewStart, viewEnd) {
-  var self = this;
-  self.canvas = canvas;
-  self.viewStart = viewStart;
-  self.viewEnd = viewEnd;
-  self.document = null;
-  self.glyph = null;
+  this.canvas = canvas;
+  this.viewStart = viewStart;
+  this.viewEnd = viewEnd;
+  this.document = null;
+  this.glyph = null;
+  this.bbox = null;
 };
 
 /**
@@ -28,11 +28,19 @@ GlyphBase.prototype.coat = function(doc) {
   }
 };
 
+GlyphBase.prototype.overlapsWith = function(other) {
+  var glyphPos = this.getBBox();
+  var v1 = other.end - glyphPos.end;
+  var v2 = other.end - glyphPos.start;
+  var v3 = other.start - glyphPos.end;
+  var v4 = other.start - glyphPos.start;
+  return (!((v1>0 && v2>0 && v3>0 && v4>0) || (v1<0 && v2<0 && v3<0 && v4<0)));
+};
+
 GlyphBase.prototype.getBBox = function() {
-  var gBBox = this.glyph.getBBox();
   return {
-    start: gBBox.x,
-    end: gBBox.x + gBBox.width
+    start: this.bbox.x,
+    end: this.bbox.x + this.bbox.width
   }
 };
 

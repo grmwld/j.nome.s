@@ -8,12 +8,12 @@
  * @param {Number} height
  */
 var GlyphGeneric = function(canvas, viewStart, viewEnd) {
-  var self = this;
-  self.canvas = canvas;
-  self.viewStart = viewStart;
-  self.viewEnd = viewEnd;
-  self.document = null;
-  self.glyph = null;
+  this.canvas = canvas;
+  this.viewStart = viewStart;
+  this.viewEnd = viewEnd;
+  this.document = null;
+  this.glyph = null;
+  this.bbox = null;
 };
 
 GlyphGeneric.prototype = new GlyphBase;
@@ -92,6 +92,7 @@ GlyphGeneric.prototype.draw = function(style, packed) {
     title: title.join('\n'),
     cursor: 'help'
   });
+  this.bbox = doc_element.getBBox();
   this.glyph = doc_element;
   return doc_element;
 };
