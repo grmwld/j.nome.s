@@ -28,14 +28,11 @@ GlyphBase.prototype.coat = function(doc) {
   }
 };
 
-GlyphBase.prototype.getGenomicPosition = function() {
-  var view_span = this.viewEnd - this.viewStart;
+GlyphBase.prototype.getBBox = function() {
   var gBBox = this.glyph.getBBox();
-  var start = (((gBBox.x-50) / (this.canvas.width-100)) * view_span) + this.viewStart;
-  var end = (((gBBox.x+gBBox.width-50) / (this.canvas.width-100)) * view_span) + this.viewStart;
   return {
-    start: start,
-    end: end
+    start: gBBox.x,
+    end: gBBox.x + gBBox.width
   }
 };
 
