@@ -23,7 +23,7 @@ TrackRef.prototype = new TrackBase;
 TrackRef.prototype.draw = function(seqid, start, end) {
   var self = this;
   self.getData(seqid, start, end, function(data) {
-    self.drawData(data, start, end);
+    self.drawData(data, start, end, false);
   });
 };
 
@@ -33,32 +33,33 @@ TrackRef.prototype.draw = function(seqid, start, end) {
  * @param {Array} data
  * @param {Number} start
  * @param {Number} end
- * @see drawDocument()
  */
-TrackRef.prototype.drawData = function(data, start, end) {
+TrackRef.prototype.drawData = function(data, start, end, packed) {
   var self = this;
   var layers = [];
   var laidout = false;
   var next = false;
   var start_overlap;
   var end_overlap;
+  var glyph = new GlyphGeneric(self.canvas, start, end);
   data.sort(function(a, b) {
     return (b.end - b.start) - (a.end - a.start);
   });
   data.forEach(function(doc) {
+    glyph.coat(doc);
+    self.documents.push(glyph.draw(self.metadata.style, packed));
+    glyphPos = glyph.getBBox();
     laidout = false;
-    for (var i = 0; i < layers.length; ++i) {
-      for (var j = 0; j < layers[i].length; ++j) {
-        start_overlap = doc.start >= layers[i][j][0] && doc.start <= layers[i][j][1];
-        end_overlap = doc.end >= layers[i][j][0] && doc.end <= layers[i][j][1];
-        if (start_overlap || end_overlap) {
+    for (var i = 0, l = layers.length; i < l; ++i) {
+      for (var j = 0, m = layers[i].length; j < m; ++j) {
+        if (glyph.overlapsWith(layers[i][j])) {
           next = true;
           break;
         }
       }
       if (!next) {
-        self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
-        layers[i].push([doc.start, doc.end]);
+        glyph.adjustToLayer(i);
+        layers[i].push(glyphPos);
         laidout = true;
         break;
       }
@@ -66,10 +67,10 @@ TrackRef.prototype.drawData = function(data, start, end) {
     }
     if (!laidout) {
       if (layers.length) {
-        self.resize(self.canvas.width, self.canvas.height+30);
+        self.resize(self.canvas.width, self.canvas.height+40);
+        glyph.adjustToLayer(i);
       }
-      self.documents.push(self.canvas.drawDocument(doc, start, end, i, self.metadata.style));
-      layers.push([[doc.start, doc.end]]);
+      layers.push([glyphPos]);
     }
   });
 };
@@ -81,82 +82,3 @@ TrackRef.prototype.clear = function() {
   TrackBase.prototype.clear.call(this);
   this.canvas.setSize(this.width, this.height);
 };
-
-
-
-/**
- * Draw a document
- *
- * @param {Object} doc
- * @param {Number} view_start
- * @param {Number} view_end
- * @param {Number} layer
- * @param {Object} style
- */
-Raphael.fn.drawDocument = function(doc, view_start, view_end, layer, style) {
-  var view_span = view_end - view_start
-    , nf = new PHP_JS().number_format
-    , rel_start = (((Math.max(doc.start, view_start) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_end = (((Math.min(doc.end, view_end) - view_start) / view_span) * (this.width-100)) + 50
-    , rel_doc_length = rel_end - rel_start
-    , title = []
-    , doc_shape = null
-    , doc_text = null
-    , doc_element = this.set()
-    , doc_shape_bbox = null;
-  if (doc.strand) {
-    doc_shape = this.path(traceOrientedGlyph(rel_start, rel_end, layer, doc.strand));
-  } else {
-    doc_shape = this.rect(rel_start, 20+20*layer, rel_doc_length, 10);
-  }
-  for (var i in doc) {
-    title.push(i + ' : ' + doc[i]);
-  }
-  doc_shape.attr({ title: title.join('\n') });
-  doc_shape.attr(style);
-  doc_shape_bbox = doc_shape.getBBox();
-  doc_text = this.text(doc_shape_bbox.x+doc_shape_bbox.width/2, doc_shape_bbox.y-1-doc_shape_bbox.height/2, doc.name);
-  doc_text_bbox = doc_text.getBBox();
-  doc_element.push(doc_shape);
-  if (doc_text_bbox.width > doc_shape_bbox.width || doc.name === undefined) {
-    doc_text.remove();
-  } else {
-    doc_element.push(doc_text);
-  }
-  return doc_element;
-};
-
-/**
- * Computes the path necessary to represent an oriented glyph
- *
- * @param {Number} start
- * @param {Number} end
- * @param {Number} layer
- * @param {String} strand
- */
-var traceOrientedGlyph = function(start, end, layer, strand) {
-  var path = null
-    , length = end - start
-    , tip_length = length > 10 ? 10 : length/1.5;
-  if (strand === '+') {
-    path = [
-      'M' + start + ' ' + (30+30*layer)
-    , 'h' + (length - tip_length)
-    , 'l' + tip_length + ' ' + 5
-    , 'l' + (-tip_length) + ' ' + 5
-    , 'h' + (-(length - tip_length))
-    , 'v' + (-10)
-    ];
-  }
-  else if (strand === '-') {
-    path = [
-      'M' + (start + tip_length) + ' ' + (30+30*layer)
-    , 'h' + (length - tip_length)
-    , 'v' + 10
-    , 'h' + (-(length - tip_length))
-    , 'l' + (-tip_length) + ' ' + (-5)
-    , 'l' + tip_length + ' ' + (-5)
-    ];
-  }
-  return path.join(' ');
-}
