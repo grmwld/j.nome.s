@@ -3,8 +3,8 @@
  *
  * A glyph is a visual representation of a feature element.
  *
- * @param {String} trackid
- * @param {Number} width
+ * @param {String} canvas
+ * @param {Number} viewStart
  * @param {Number} height
  */
 var GlyphGeneric = function(canvas, viewStart, viewEnd) {
@@ -20,6 +20,9 @@ GlyphGeneric.prototype = new GlyphBase;
 
 /**
  * Draw the shape
+ *
+ * @param {Number} start
+ * @param {Number} end
  */
 GlyphGeneric.prototype.drawShape = function(start, end) {
   return this.canvas.rect(start, 30, end-start, 10);
@@ -27,6 +30,9 @@ GlyphGeneric.prototype.drawShape = function(start, end) {
 
 /**
  * Draw the oriented shape
+ *
+ * @param {Number} start
+ * @param {Number} end
  */
 GlyphGeneric.prototype.drawOrientedShape = function(start, end) {
   var path = null

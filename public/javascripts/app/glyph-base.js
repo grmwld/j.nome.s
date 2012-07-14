@@ -3,9 +3,9 @@
  *
  * A glyph is a visual representation of a feature element.
  *
- * @param {String} trackid
- * @param {Number} width
- * @param {Number} height
+ * @param {String} canvas
+ * @param {Number} viewStart
+ * @param {Number} viewEnd
  */
 var GlyphBase = function(canvas, viewStart, viewEnd) {
   this.canvas = canvas;
@@ -18,6 +18,10 @@ var GlyphBase = function(canvas, viewStart, viewEnd) {
 
 /**
  * Bind to a feature document.
+ *
+ * The drawing method (standard or oriented) is picked here
+ *
+ * @param {Object} doc
  */
 GlyphBase.prototype.coat = function(doc) {
   this.document = doc;
@@ -28,6 +32,11 @@ GlyphBase.prototype.coat = function(doc) {
   }
 };
 
+/**
+ * Test if a glyph overlaps with another one
+ *
+ * @param {Object} other
+ */
 GlyphBase.prototype.overlapsWith = function(other) {
   var glyphPos = this.getBBox();
   var v1 = other.end - glyphPos.end;
@@ -37,6 +46,9 @@ GlyphBase.prototype.overlapsWith = function(other) {
   return (!((v1>0 && v2>0 && v3>0 && v4>0) || (v1<0 && v2<0 && v3<0 && v4<0)));
 };
 
+/**
+ * Access a simplified bbox of the glyph
+ */
 GlyphBase.prototype.getBBox = function() {
   return {
     start: this.bbox.x,
@@ -44,6 +56,11 @@ GlyphBase.prototype.getBBox = function() {
   }
 };
 
+/**
+ * Move the glyph on the Y to a specified layer
+ *
+ * @param {Number} layer
+ */
 GlyphBase.prototype.adjustToLayer = function(layer) {
   var translation = 'T0,'+(40*layer);
   //this.glyph.transform(translation);
@@ -52,6 +69,10 @@ GlyphBase.prototype.adjustToLayer = function(layer) {
 
 /**
  * Draw a feature element
+ *
+ * @param {Object} style
+ * @param {Boolean} packed
+ * @returns element
  */
 GlyphBase.prototype.draw = function(style, packed) {
   self = this;
