@@ -73,7 +73,7 @@ GlyphGeneric.prototype.draw = function(style, packed) {
   var packed = typeof packed !== 'undefined' ? packed : true;
   var doc_shape = this.drawShape(rel_start, rel_end);
   for (var i in self.document) {
-    title.push(i + ' : ' + self.document[i]);
+    title.push('<strong>'+i+'</strong>' + ' : ' + self.document[i]);
   }
   doc_shape.attr(style);
   doc_shape_bbox = doc_shape.getBBox();
@@ -89,8 +89,13 @@ GlyphGeneric.prototype.draw = function(style, packed) {
     doc_element.push(doc_text);
   }
   doc_element.attr({
-    title: title.join('\n'),
     cursor: 'help'
+  });
+  doc_element.forEach(function(e) {
+    $(e.node).qtip({
+      content: { text: title.join('<br />') },
+      style: { classes: 'ui-tooltip-bootstrap' }
+    });
   });
   this.bbox = doc_element.getBBox();
   this.glyph = doc_element;
