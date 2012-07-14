@@ -122,11 +122,13 @@ GlyphBase.prototype.draw = function(style, packed) {
  * Draw the shape
  */
 GlyphBase.prototype.drawShape = function(start, end) {
+  throw 'Abstract method drawShape(start, end) not implemented';
 };
 
 /**
  * Draw the oriented shape
  */
 GlyphBase.prototype.drawOrientedShape = function(start, end) {
+  throw 'Abstract method drawOrientedShape(start, end) not implemented';
 };
 
