@@ -72,8 +72,34 @@ GlyphBase.prototype.adjustToLayer = function(layer) {
  */
 GlyphBase.prototype.tooltip = function() {
   var tooltip_text = [];
+  var std_fields = [
+    '_id',
+    'seqid',
+    'start',
+    'end',
+    'score',
+    'strand',
+    'type',
+    'source'
+  ];
+  var opt_fields = [
+    'name',
+    'gene',
+    'alias',
+    'note'
+  ]
+  for (var i = 0, l = std_fields.length ; i < l ; ++i) {
+    tooltip_text.push('<strong>'+std_fields[i]+'</strong>' + ' : ' + this.document[std_fields[i]]);
+  }
+  for (var i = 0, l = opt_fields.length ; i < l ; ++i) {
+    if (typeof document[i] !== 'undefined') {
+      tooltip_text.push('<strong>'+opt_fields[i]+'</strong>' + ' : ' + this.document[opt_fields[i]]);
+    }
+  }
   for (var i in this.document) {
-    tooltip_text.push('<strong>'+i+'</strong>' + ' : ' + this.document[i]);
+    if (std_fields.indexOf(i) === -1 && opt_fields.indexOf(i) === -1) {
+      tooltip_text.push('<strong>'+i+'</strong>' + ' : ' + this.document[i]);
+    }
   }
   this.glyph.forEach(function(e) {
     $(e.node).qtip({
