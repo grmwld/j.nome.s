@@ -1,4 +1,11 @@
 
+0.9.5 / 2012-07-16 
+==================
+
+  * Updated version dates
+  * Fix non-oriented features. Closes #3
+  * Update package version
+
 0.9.4 / 2012-07-15 
 ==================
 
