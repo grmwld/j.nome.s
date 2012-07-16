@@ -1,4 +1,11 @@
 
+0.9.5 / 2012-07-16 
+==================
+
+  * Updated version dates
+  * Fix non-oriented features. Closes #3
+  * Update package version
+
 0.9.4 / 2012-07-15 
 ==================
 
@@ -22,24 +29,24 @@
   * Tests whether profiles are composed of only zeros
   * Fix track names in track selector
 
-0.9.0 / 2012-07-11 
+0.9.0 / 2012-07-10 
 ==================
 
   * Added support for querying oriented bigwig files
   * Test dataset for oriented bigwig
 
-0.8.3 / 2012-07-11 
+0.8.3 / 2012-07-10 
 ==================
 
   * Use interfaces to C functions to eliminate C++ warnings
   * Inhibit warnings only for Jim Kent's library
 
-0.8.2 / 2012-07-11 
+0.8.2 / 2012-07-09 
 ==================
 
   * Added hmmstats
 
-0.8.1 / 2012-07-11 
+0.8.1 / 2012-07-09 
 ==================
 
   * Fix make test
@@ -50,7 +57,7 @@
   * Use vanilla src files from Jim Kent's lib.
   * Add travis config file
 
-0.8.0 / 2012-07-11 
+0.8.0 / 2012-07-08 
 ==================
 
   * osx specific flags
@@ -71,12 +78,12 @@
   * Added tool necessary for generation of bigwig files
   * Included generation of bigwig file in demo package
 
-0.7.5 / 2012-07-11 
+0.7.5 / 2012-02-29 
 ==================
 
   * Disable caching
 
-0.7.4 / 2012-07-11 
+0.7.4 / 2012-02-28
 ==================
 
   * Added 0 baseline in oriented profiles
@@ -84,7 +91,7 @@
   * ui elements independance
   * Balanced profiles height proportions
 
-0.7.3 / 2012-07-11 
+0.7.3 / 2012-02-27
 ==================
 
   * Remove artifacts of dual popups
@@ -92,19 +99,19 @@
   * Functional oriented profiles rescaling
   * Fix oriented profiles crashing when rescaling
 
-0.7.2 / 2012-07-11 
+0.7.2 / 2012-02-27
 ==================
 
   * Center oriented profiles on 0
   * Fix buttons css in firefox
   * Added black stroke to ref glyphs
 
-0.7.1 / 2012-07-11 
+0.7.1 / 2012-02-26 
 ==================
 
   * Fix input fields in firefox. Closes #10
 
-0.7.0 / 2012-07-11 
+0.7.0 / 2012-02-26
 ==================
 
   * Fix selection rectangle in firefox. Closes #11
@@ -120,7 +127,7 @@
   * Added rule to remove the demo data. Closes #6
   * Added mocha in devDependencies
 
-0.6.0 / 2012-07-11 
+0.6.0 / 2012-02-11 
 ==================
 
   * Updated expressjs to 2.5.8, and current version to 0.6.0
@@ -132,32 +139,32 @@
   * Fixed bugged profile representation at extremities. Closes #3
   * Updated jquery and jquery-ui
 
-0.5.0 / 2012-07-11 
+0.5.0 / 2012-02-08 
 ==================
 
   * Fixes bad _id handling by buffalo (mongolian >= 0.1.15)
   * Update mongolian to 0.1.17
 
-0.4.12 / 2012-07-11 
+0.4.12 / 2012-02-06 
 ==================
 
   * Updated expressjs to 2.5.7, for node 0.6.x support.
   * Optimized a bit the way the values are passed to g.linechart
 
-0.4.11 / 2012-07-11 
+0.4.11 / 2012-02-01 
 ==================
 
   * Fix processProfile with node v0.6.x. Closes #1
   * Removed unnecessary sessionStore
 
-0.4.10 / 2012-07-11 
+0.4.10 / 2012-01-30 
 ==================
 
   * Track title down 2px
   * Gene annotaions ('ref' type in config) are now oriented.
   * New script to easily load profiles.
 
-0.4.9 / 2012-07-11 
+0.4.9 / 2012-01-29
 ==================
 
   * Updated dependencies.
@@ -172,7 +179,7 @@
   * Sliding panel for track selection.
   * Better handling of form values.
 
-0.4.8 / 2011-07-22 
+0.4.8 / 2011-07-22
 ==================
 
   * Fixed bug in profiles if Y values = 0.
@@ -183,7 +190,7 @@
   * Improved profile caching mechanism to play well with huge references (> 10M).
   * Better looking selection rectangle.
 
-0.4.6 / 2012-07-18 
+0.4.6 / 2011-07-18 
 ==================
 
   * Corrected typos.
@@ -195,7 +202,7 @@
   * Fixed bug when submitting parameters via the form from a blank page.
   * Fixed bug in seqid metadata fetching when switching dataset.
 
-0.4.4 / 2012-07-17 
+0.4.4 / 2011-07-17 
 ==================
 
   * Fixed bug in loadFastaRef.py
