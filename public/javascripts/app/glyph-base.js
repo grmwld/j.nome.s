@@ -25,7 +25,7 @@ var GlyphBase = function(canvas, viewStart, viewEnd) {
  */
 GlyphBase.prototype.coat = function(doc) {
   this.document = doc;
-  if (this.document.hasOwnProperty('strand')) {
+  if (this.document.strand) {
     this.drawShape = this.drawOrientedShape;
   } else {
     this.drawShape = this.drawShape;
