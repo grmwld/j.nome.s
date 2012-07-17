@@ -103,8 +103,18 @@ GlyphBase.prototype.tooltip = function() {
   }
   this.glyph.forEach(function(e) {
     $(e.node).qtip({
-      content: { text: tooltip_text.join('<br />') },
-      style: { classes: 'ui-tooltip-bootstrap' }
+      content: {
+        text: tooltip_text.join('<br />')
+      },
+      style: {
+        classes: 'ui-tooltip-bootstrap'
+      },
+      position: {
+        viewport: $(window),
+        adjust: {
+          method: 'shift'
+        }
+      }
     });
     e.attr({ cursor: 'help' });
   });
