@@ -1,4 +1,10 @@
 
+0.9.6 / 2012-07-17 
+==================
+
+  * Fix some document fields not appearing in tooltip
+  * Fix qtips not staying in the window viewport
+
 0.9.5 / 2012-07-16 
 ==================
 
