@@ -112,7 +112,9 @@ GlyphBase.prototype.tooltip = function() {
       position: {
         viewport: $(window),
         adjust: {
-          method: 'shift'
+          method: 'shift',
+          x: 10,
+          y: 10
         }
       }
     });
