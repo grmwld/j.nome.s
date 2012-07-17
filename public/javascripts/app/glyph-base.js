@@ -87,12 +87,12 @@ GlyphBase.prototype.tooltip = function() {
     'gene',
     'alias',
     'note'
-  ]
+  ];
   for (var i = 0, l = std_fields.length ; i < l ; ++i) {
     tooltip_text.push('<strong>'+std_fields[i]+'</strong>' + ' : ' + this.document[std_fields[i]]);
   }
   for (var i = 0, l = opt_fields.length ; i < l ; ++i) {
-    if (typeof document[i] !== 'undefined') {
+    if (typeof this.document[opt_fields[i]] !== 'undefined') {
       tooltip_text.push('<strong>'+opt_fields[i]+'</strong>' + ' : ' + this.document[opt_fields[i]]);
     }
   }
@@ -103,8 +103,20 @@ GlyphBase.prototype.tooltip = function() {
   }
   this.glyph.forEach(function(e) {
     $(e.node).qtip({
-      content: { text: tooltip_text.join('<br />') },
-      style: { classes: 'ui-tooltip-bootstrap' }
+      content: {
+        text: tooltip_text.join('<br />')
+      },
+      style: {
+        classes: 'ui-tooltip-bootstrap'
+      },
+      position: {
+        viewport: $(window),
+        adjust: {
+          method: 'shift',
+          x: 10,
+          y: 10
+        }
+      }
     });
     e.attr({ cursor: 'help' });
   });
