@@ -110,9 +110,10 @@ GlyphBase.prototype.tooltip = function() {
         classes: 'ui-tooltip-bootstrap'
       },
       position: {
+        target: 'mouse',
         viewport: $(window),
         adjust: {
-          method: 'shift',
+          method: 'flipinvert shift',
           x: 10,
           y: 10
         }
