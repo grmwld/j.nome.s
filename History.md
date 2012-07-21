@@ -1,4 +1,11 @@
 
+0.9.7 / 2012-07-21 
+==================
+
+  * Prevent selecting label while selecting a dataset (avetisk)
+  * Navigation ruler's ticks mark whole numbers. Closes #4
+  * Better tooltip positioning when overflowing
+
 0.9.6 / 2012-07-17 
 ==================
 
