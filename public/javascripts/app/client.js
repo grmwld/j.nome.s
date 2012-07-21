@@ -15,7 +15,12 @@ $(document).ready(function() {
   , pos: 0
   , seqid: ""
   };
-  
+
+  /**
+   * Select default value even with history.back
+   */
+  $('select[name="dataset_select"] option[value="selectdataset"]').attr('selected', 'selected');
+
   /**
    * Toggle a sliding panel for track selection
    */
@@ -35,7 +40,7 @@ $(document).ready(function() {
     fetchTracksData(seqid, start, end, true);
     navigation.display(seqid, start, end);
   });
-  
+
   /**
    * Handle browsing from main form.
    */
@@ -238,9 +243,12 @@ var OnSelect = function(dropdown) {
   var index = dropdown.selectedIndex
     , selected = dropdown.options[index]
     , baseURL = '/browse/' + selected.value;
-  if (selected.value != 'Select a dataset') {
+
+  if (selected.value != 'selectdataset') {
     top.location.href = baseURL;
+
     return true;
   }
+
   return false;
 };

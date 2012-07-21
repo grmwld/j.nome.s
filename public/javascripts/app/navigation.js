@@ -301,6 +301,37 @@ Separator.prototype.display = function(style) {
 
 
 
+/**
+ * Convert base pair to pixel coordinates according to the current min and max
+ *
+ * @param {Number} min
+ * @param {Number} max
+ * @returns {Number}
+ */
+var bp2px = function(bp_pos, view_start, view_end, canvas_width) {
+  var canvas_width = typeof canvas_width === 'undefined' ? 1100 : canvas_width;
+  var view_span = view_end - view_start;
+  return Math.round((((Math.max(bp_pos, view_start) - view_start) / view_span) * (canvas_width-100)) + 50);
+}
+
+
+/**
+ * Get the step of the ruler's ticks (in base pairs) according to the current
+ * span
+ *
+ * @param {Number} view_start
+ * @param {Number} view_end
+ * @returns {Number}
+ */
+var getTickStep = function(view_start, view_end) {
+  var span = view_end - view_start;
+  var log10span = Math.log(span) / Math.LN10;
+  var flog10span = Math.floor(log10span);
+  var pflog10span = Math.pow(10, flog10span);
+  var a = Math.ceil(span / pflog10span);
+  return a * Math.pow(10, (flog10span - 1));
+}
+
 
 /**
  * Draw the labeled ruler
@@ -312,15 +343,44 @@ Separator.prototype.display = function(style) {
 Raphael.fn.drawMainRuler = function(view_start, view_end, style) {
   var nf = new PHP_JS().number_format
   var view_span = view_end - view_start;
-  var view_step = view_span / 5;
+  var view_step = getTickStep(view_start, view_end);
+  var first_tick = view_start - (view_start % view_step) + view_step;
+  var px_first_tick = bp2px(first_tick, view_start, view_end);
+  var px_step = bp2px(first_tick+view_step, view_start, view_end) - bp2px(first_tick, view_start, view_end);
+  var px_minor_tick_step = px_step / 10;
+  var left_text;
+  var right_text;
+  var tick_text;
   var ruler = this.set();
+  // draw the horizontal axis
   ruler.push(this.lineTo(50, 2*this.height/3, this.width-50, 2*this.height/3).attr(style));
-  for (var x = 50.5; x <= this.width-50; x += 40) {
-    ruler.push(this.lineTo(x, 2*this.height/3-3, x, 2*this.height/3+3).attr(style));
+  // Add ticks at min and max
+  left_text = this.text(50, 12, nf(view_start));
+  ruler.push(left_text);
+  ruler.push(this.lineTo(50.5, 2*this.height/3-8, 50.5, 2*this.height/3+8).attr(style));
+  right_text = this.text(this.width-50, 12, nf(view_end));
+  ruler.push(right_text);
+  ruler.push(this.lineTo(this.width-49.5, 2*this.height/3-8, this.width-49.5, 2*this.height/3+8).attr(style));
+  // Add intermediate ticks
+  for (var x = px_first_tick+0.5, c = 0; x <= this.width-50; x += px_step, ++c) {
+    // major ticks
+    ruler.push(this.lineTo(x, 2*this.height/3-8, x, 2*this.height/3+8).attr(style));
+    tick_text = this.text(x, 12, nf(first_tick + view_step * c ));
+    if (Raphael.isBBoxIntersect(tick_text.getBBox(), left_text.getBBox())
+        || Raphael.isBBoxIntersect(tick_text.getBBox(), right_text.getBBox())) {
+      tick_text.remove();
+    }
+    else {
+      ruler.push(tick_text);
+    }
+    // minor ticks
+    for (var j = x, xf = Math.min(x+px_step, this.width-49.5); j < xf; j += px_minor_tick_step) {
+      ruler.push(this.lineTo(j, 2*this.height/3-3, j, 2*this.height/3+3).attr(style));
+    }
   }
-  for (var x = 50; x <= this.width-50; x += 200) {
-    ruler.push(this.text(x, 12, nf(view_start+view_step*((x-50)/200))));
-    ruler.push(this.lineTo(x+0.5, 2*this.height/3-8, x+0.5, 2*this.height/3+8).attr(style));
+  // leftmost minor ticks
+  for (var x = px_first_tick-px_minor_tick_step; x > 50.5; x -= px_minor_tick_step) {
+    ruler.push(this.lineTo(x, 2*this.height/3-3, x, 2*this.height/3+3).attr(style));
   }
   return ruler;
 }
