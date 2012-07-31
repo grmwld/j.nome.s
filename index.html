@@ -1,0 +1,575 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>J.nome.s by agrimaldi</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>J.nome.s</h1>
+        <p>A lightweight genome browser entirely written in javascript.</p>
+
+        <p class="view"><a href="https://github.com/agrimaldi/j.nome.s">View the Project on GitHub <small>agrimaldi/j.nome.s</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/agrimaldi/j.nome.s/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/agrimaldi/j.nome.s/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/agrimaldi/j.nome.s">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><a href="http://travis-ci.org/agrimaldi/j.nome.s"><img src="https://secure.travis-ci.org/agrimaldi/j.nome.s.png" alt="Build Status"></a></p>
+
+<h2>Introduction</h2>
+
+<h4>What is j.nome.s</h4>
+
+<p>j.nome.s is a fast, simple, lightweight genome browser.
+It is built on top of <a href="http://expressjs.com/">expressjs</a> and <a href="http://nodejs.org/">Node.JS</a>,
+and uses <a href="http://www.mongodb.org/">MongoDB</a> for storing the data.</p>
+
+<h4>Why j.nome.s</h4>
+
+<p>Current genome browsers include <a href="http://www.gbrowse.org/index.html">GBrowse</a>, the <a href="http://genome.ucsc.edu/">UCSC genome browser</a>
+or <a href="http://jbrowse.org/">Jbrowse</a>. The main problem with those project, is that they
+heavily rely on <a href="http://www.perl.org/">perl</a> and <a href="http://www.bioperl.org/">BioPerl</a> scripts in order to both crunch data
+and render the output.
+Although <a href="http://www.perl.org/">perl</a> is widely used by bioinformaticians, it is a very inelegant
+language, very often leading to bloatware.
+Representing genomes is not an easy task considering the huge amout of data
+that has to be handled and shown in an intelligible way.</p>
+
+<p>j.nome.s aims to provide a simple genome browser environment, convenient to
+both the user, and the developer.
+It is based on <a href="http://nodejs.org/">Node.JS</a>, which allowed to build a custom non
+IO-blocking server application. The data is stored in a 
+<a href="http://www.mongodb.org/">MongoDB</a> database, providing a scallable and
+efficient way to respectively store and access huge amount of data.</p>
+
+<h4>Who</h4>
+
+<p>j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Avetis KAZARIAN.</p>
+
+<hr><h2>Summary</h2>
+
+<ul>
+<li>
+<a href="#a1">Installation</a>
+
+<ul>
+<li><a href="#a1-1">Pre-requisites</a></li>
+<li><a href="#a1-2">Installation</a></li>
+<li><a href="#a1-3">Updating</a></li>
+<li><a href="#a1-4">Testing</a></li>
+<li><a href="#a1-5">Running the j.nome.s server</a></li>
+</ul>
+</li>
+<li>
+<a href="#a2">Loading datasets</a>
+
+<ul>
+<li><a href="#a2-1">Reference genome</a></li>
+<li><a href="#a2-2-1">Non quantitative data</a></li>
+<li><a href="#a2-2-2">Quantitative data</a></li>
+</ul>
+</li>
+<li>
+<a href="#a3">Configuration</a>
+
+<ul>
+<li><a href="#a3-1">Global</a></li>
+<li><a href="#a3-2-2-1">Non-quantitative data tracks</a></li>
+<li><a href="#a3-2-2-2">Quantitative data tracks</a></li>
+</ul>
+</li>
+</ul><hr><p><a name="a1"></a></p>
+
+<h2>Installation</h2>
+
+<p><a name="a1-1"></a></p>
+
+<h4>Pre-requisites</h4>
+
+<p>Before installation, please ensure that you installed <a href="http://nodejs.org/">Node.JS</a> and <a href="http://www.mongodb.org/">MongoDB</a>.
+Check their web pages for more information.</p>
+
+<p>In order to get the node module dependencies required to run j.nome.s, you will also
+need <a href="http://npmjs.org/">NPM</a>, the node package manager.
+Please follow the instructions provided on the <a href="http://npmjs.org/">NPM website</a> to install npm alongside node. Starting from nodejs 0.8, npm should be included.</p>
+
+<p><a name="a1-2"></a></p>
+
+<h4>Setting up the j.nome.s server</h4>
+
+<p>Clone the repository from github, and install the module dependencies.</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>git clone git://github.com/agrimaldi/j.nome.s.git
+<span class="nv">$ </span><span class="nb">cd </span>j.nome.s
+<span class="nv">$ </span>npm install
+</pre></div>
+
+<p>Finally, you should create a local branch specifically for your personal datasets</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>git branch my-dataset
+<span class="nv">$ </span>git checkout my-dataset
+</pre></div>
+
+<p><a name="a1-3"></a></p>
+
+<h4>Updating</h4>
+
+<p>To update j.nome.s to the latest version, pull from the repository</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>git checkout master
+<span class="nv">$ </span>git pull origin master
+</pre></div>
+
+<p>If your configuration files are on a separate branch (which you should do), rebase with</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>git checkout my-branch
+<span class="nv">$ </span>git rebase master
+</pre></div>
+
+<p><a name="a1-4"></a></p>
+
+<h4>Running tests</h4>
+
+<p>To run the tests, just go with</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>make <span class="nb">test</span>
+</pre></div>
+
+<p>This will setup a demo dataset (of Saccharomyces cerevisiae), run various tests, and remove the demo dataset.
+If you wish to keep the demo dataset around, just run</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>make install-demo
+</pre></div>
+
+<p>To remove it, run</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>make remove-demo
+</pre></div>
+
+<p><a name="a1-5"></a></p>
+
+<h4>Running the server</h4>
+
+<p>To run the j.nome.s server, simply execute</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>node app.js
+</pre></div>
+
+<p>from the root directory j.nome.s</p>
+
+<p>Alternatively, if you wish a more robust running instance, we suggest to use <a href="forever">forever</a>.
+To install it system wide, simple run the following :</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>npm install -g forever
+</pre></div>
+
+<p>Running the j.nome.s server in daemon mode through <a href="forever">forever</a> is as simple as</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>forever start app.js
+</pre></div>
+
+<p>Either way, once the j.nome.s server is up and running, point your browser to the machine running it on port 3000.
+If j.nome.s is accessed on the same machine as the server, point your browser to <code>http://localhost:3000/</code>
+If you want to remotely access j.nome.s, point your browser to <code>http://www.myjnomesserver.com:3000/</code></p>
+
+<hr><p><a name="a2"></a></p>
+
+<h2>Loading datasets</h2>
+
+<p>All the data and metadata is stored in a <a href="http://www.mongodb.org/">MongoDB</a> instance, with a precise schema :</p>
+
+<ol>
+<li>The name of the database is the ID of the corresponding dataset.</li>
+<li>Inside the database, the reference genome sequence is stored in a GridFS, resulting in the <code>fs.files</code> and <code>fs.chunks</code> collections.</li>
+<li>The data of your tracks must be contained in a collection in JFF format (a JSON equivalent to the <a href="http://www.sanger.ac.uk/resources/software/gff/spec.html">GFF</a> format), JWIG format (a JSON equivalent of the <a href="https://cgwb.nci.nih.gov/goldenPath/help/bedgraph.html">bedgraph</a> format), or in a <a href="http://genome.ucsc.edu/goldenPath/help/bigWig.html">bigwig</a> file.</li>
+</ol><p><a name="a2-1"></a></p>
+
+<h3>Reference genome</h3>
+
+<p>To load a new reference genome, use the <code>loadFastaRef.py</code> script provided in the <code>bin/</code> folder.</p>
+
+<pre><code>./loadFastaRef.py -h
+usage: loadFastaRef.py [-h] [-i [FILE]] [-d DATABASE] [-D]
+
+Load in MongoDB a FASTA file containing a reference genome.
+
+optional arguments:
+-h, --help            show this help message and exit
+-i [FILE], --infile [FILE]
+                      Input file.
+-d DATABASE, --database DATABASE
+                      MongoDB database where the data is stored.
+-D, --debug           Debug mode.
+</code></pre>
+
+<p>Just specify the name of the mongo database to use for the new dataset and the FASTA file containing the reference genome, and you are good to go.</p>
+
+<p><a name="a2-2"></a></p>
+
+<h3>Data</h3>
+
+<p><a name="a2-2-1"></a></p>
+
+<h4>Non quantitative data</h4>
+
+<p>The JFF format follows the <a href="http://www.sanger.ac.uk/resources/software/gff/spec.html">GFF specifications</a> with the only required field being <code>_id</code>, which must be a unique integer in the collection.</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="nt">"seqid"</span> <span class="p">:</span> <span class="s2">"scaffold_1"</span><span class="p">,</span>
+    <span class="nt">"source"</span> <span class="p">:</span> <span class="s2">"assembly"</span><span class="p">,</span>
+    <span class="nt">"type"</span> <span class="p">:</span> <span class="s2">"gap"</span><span class="p">,</span>
+    <span class="nt">"start"</span> <span class="p">:</span> <span class="mi">910</span><span class="p">,</span>
+    <span class="nt">"end"</span> <span class="p">:</span> <span class="mi">960</span><span class="p">,</span>
+    <span class="nt">"score"</span> <span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="nt">"strand"</span> <span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="nt">"phase"</span> <span class="p">:</span> <span class="kc">null</span><span class="p">,</span>
+    <span class="nt">"_id"</span> <span class="p">:</span> <span class="mi">0</span>
+<span class="p">}</span>
+</pre></div>
+
+<p>To load non-quantitative data (such as a gene annotation), your raw data must be in JFF format. To convert a gff file into jff, a dedicated script is included in the <code>bin/</code> folder:</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>./bin/gff2json.py -h
+usage: gff2json.py <span class="o">[</span>-h<span class="o">]</span> <span class="o">[</span>-i <span class="o">[</span>FILE<span class="o">]]</span> <span class="o">[</span>-o <span class="o">[</span>FILE<span class="o">]]</span> <span class="o">[</span>-g <span class="o">{</span>2, 3<span class="o">}]</span>
+
+optional arguments:
+  -h, --help            show this <span class="nb">help </span>message and <span class="nb">exit</span>
+  -i <span class="o">[</span>FILE<span class="o">]</span>, --in <span class="o">[</span>FILE<span class="o">]</span>
+                        Input file.
+  -o <span class="o">[</span>FILE<span class="o">]</span>, --out <span class="o">[</span>FILE<span class="o">]</span>
+                        Output file.
+  -g <span class="o">{</span>2, 3<span class="o">}</span>, --gff_version <span class="o">{</span>2, 3<span class="o">}</span>
+                        GFF version of the file to parse.
+</pre></div>
+
+<p>The script will detect any additional values in the ninth field, and include them nicely in the JSON structure.
+Then use the <a href="http://www.mongodb.org/display/DOCS/Import+Export+Tools">mongoimport</a> command to load it in the dataset of your choice.
+Typically, it would be something like :</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>mongoimport -d myDataset -c myTrack --file myTrackData.json
+</pre></div>
+
+<p>Check the <a href="http://www.mongodb.org/display/DOCS/Home">MongoDB documentation</a> for more details.</p>
+
+<p><a name="a2-2-2"></a></p>
+
+<h4>Quantitative data</h4>
+
+<p>Quantitative data are currently rendered as profiles, that is a basic X-Y plot.</p>
+
+<p>The raw data should be stored in a tsv or csv file format similar to the <a href="https://cgwb.nci.nih.gov/goldenPath/help/bedgraph.html">BedGraph format</a>:</p>
+
+<pre lang="csv"><code>seqid           start   end     score
+scaffold_1      0       26      0
+scaffold_1      26      80      1
+scaffold_1      80      130     2
+scaffold_1      130     157     3
+scaffold_1      157     259     4
+</code></pre>
+
+<p>The bedgraph data can be loaded as is in mongodb and queries can be performed directly on in mongodb. Alternativeley, the bedgraph file can be converted to a bigwig file thanks to a dedicated script.</p>
+
+<p><a name="a2-2-2-1"></a></p>
+
+<h5>Direct-mongodb adaptor</h5>
+
+<p>To directly load the bedgraph file in mongodb, use the script provided in the <code>./bin</code> folder</p>
+
+<div class="highlight"><pre><span class="nv">$ </span>./bin/load_bed_profile.py -h
+usage: load_bed_profile.py <span class="o">[</span>-h<span class="o">]</span> -i INFILE -d DATABASE -c COLLECTION <span class="o">[</span>-r<span class="o">]</span>
+
+  <span class="o">||</span>    Script used to easily load bed profiles.
+  <span class="o">||</span>
+  <span class="o">||</span>       The data should be formated as follow:
+  <span class="o">||</span>
+  <span class="o">||</span>           scaffold_1      0       26      0
+  <span class="o">||</span>           scaffold_1      26      80      1
+  <span class="o">||</span>           scaffold_1      80      130     2
+  <span class="o">||</span>           scaffold_1      130     157     3
+  <span class="o">||</span>           scaffold_1      157     259     4
+  <span class="o">||</span>
+  <span class="o">||</span>       where columns correspond to <span class="o">(</span>from left to right<span class="o">)</span>: seqid, start, end, score
+
+optional arguments:
+  -h, --help            show this <span class="nb">help </span>message and <span class="nb">exit</span>
+  -i INFILE, --infile INFILE
+                        Input file.
+  -d DATABASE, --db DATABASE
+                        Database to use.
+  -c COLLECTION, --collection COLLECTION
+                        Collection to use.
+  -r, --drop            Drop the collection <span class="k">if </span>it already exists.
+</pre></div>
+
+<p>It will take care of loading the data and creating relevant indexes required for high performance of mongodb in queries handling.
+If you wish to represent oriented profiles (one profile for each strand, all in the same track), profiles for each strand should be generated in the following format :</p>
+
+<pre lang="csv"><code>seqid           strand  start   end     score
+scaffold_1      +        0       26      0
+scaffold_1      +        26      80      1
+scaffold_1      +        80      130     2
+scaffold_1      +        130     157     3
+scaffold_1      +        157     259     4
+</code></pre>
+
+<p>and imported in mongodb <strong>in the same</strong> collection using <code>./bin/load_bed_profile.py</code></p>
+
+<p><a name="a2-2-2-2"></a></p>
+
+<h5>Bigwig file adaptor</h5>
+
+<p>A better option is to use the <a href="http://genome.ucsc.edu/goldenPath/help/bigWig.html">bigwig</a> format, since it is both faster and less memory hungry. Bigwig files are also significantly smaller than their bedgraph counterparts (up to 6 times smaller). Libraries necessary for handling such files are provided by Jim Kent and are part of the UCSC genome browser. Both the libraries and nodejs bindings are compiled during j.nome.s installation.
+Using it is quite straightforward. A utility script is generated in the <code>./bin</code> directory during the setup phase.
+It can be used to convert <a href="https://cgwb.nci.nih.gov/goldenPath/help/bedgraph.html">bedgraph</a> files in <a href="http://genome.ucsc.edu/goldenPath/help/bigWig.html">bigwig</a></p>
+
+<div class="highlight"><pre><span class="nv">$ </span>./bin/wigToBigWig 
+wigToBigWig v 4 - Convert ascii format wig file <span class="o">(</span>in fixedStep, variableStep
+or bedGraph format<span class="o">)</span> to binary big wig format.
+usage:
+   wigToBigWig in.wig chrom.sizes out.bw
+Where in.wig is in one of the ascii wiggle formats, but not including track lines
+and chrom.sizes is two column: &lt;chromosome name&gt; &lt;size in bases&gt;
+and out.bw is the output indexed big wig file.
+Use the script: fetchChromSizes to obtain the actual chrom.sizes information
+from UCSC, please <span class="k">do </span>not make up a chrom sizes from your own information.
+options:
+   -blockSize<span class="o">=</span>N - Number of items to bundle in r-tree.  Default 256
+   -itemsPerSlot<span class="o">=</span>N - Number of data points bundled at lowest level. Default 1024
+   -clip - If <span class="nb">set </span>just issue warning messages rather than dying <span class="k">if </span>wig
+                  file contains items off end of chromosome.
+   -unc - If <span class="nb">set</span>, <span class="k">do </span>not use compression.
+</pre></div>
+
+<p>The locations of the bigwig files will have to be provided in the configuration of the track that should make use of it.
+See the <a href="https://github.com/agrimaldi/j.nome.s/wiki/Configuration">appropriate section</a> about configuring datasets and tracks.</p>
+
+<hr><p><a name="a3"></a></p>
+
+<h2>Configuration</h2>
+
+<p>Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
+These configuration files can be found in <code>j.nome.s/config</code>.
+It is strongly advised that you create a separate branch for editing and adding configuration files. See the <a href="https://github.com/agrimaldi/j.nome.s/wiki/Configuration#wiki-Installation">Installation section</a> for more information.</p>
+
+<p><a name="a3-1"></a></p>
+
+<h3>Global configuration</h3>
+
+<p>The only required file is <strong>global.json</strong> which contains general settings. You
+can then add as many configuration files as you need, one per dataset.
+The <code>config/global.json</code> file provides the following information :</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">"datasets"</span><span class="o">:</span> <span class="p">{</span>    
+        <span class="s2">"Xentr42"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// Each entry contains metadata of a dataset. The key must be the name of the corresponding mongo database.</span>
+            <span class="s2">"file"</span><span class="o">:</span> <span class="s2">"Xentr42.json"</span> <span class="c1">// The name of the configuration file associated to the dataset. The scope is config/</span>
+          <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Xentr42"</span> <span class="c1">// the name of the dataset, which can be used for display.</span>
+          <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"Xenopus tropicalis genome v4"</span> <span class="c1">// A short description of the dataset.</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// Each entry maps a style name to raphael style-attributes. This is where you can customize the look of j.nome.s</span>
+        <span class="s2">"bgrules"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// The rules used for the background.</span>
+            <span class="s2">"stroke"</span><span class="o">:</span> <span class="s2">"#eee"</span>
+        <span class="p">}</span>
+      <span class="p">,</span> <span class="s2">"ruler"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// The ruler with precise graduations.</span>
+            <span class="s2">"stroke"</span><span class="o">:</span> <span class="s2">"#000"</span>
+        <span class="p">}</span>
+      <span class="p">,</span> <span class="s2">"selectedspan"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// The rectangle showing the currently selected region.</span>
+            <span class="s2">"fill"</span><span class="o">:</span> <span class="s2">"#00ABFA"</span>
+          <span class="p">,</span> <span class="s2">"fill-opacity"</span><span class="o">:</span> <span class="mf">0.2</span>
+          <span class="p">,</span> <span class="s2">"stroke-width"</span><span class="o">:</span> <span class="mi">2</span>
+        <span class="p">}</span>
+      <span class="p">,</span> <span class="s2">"selectionspan"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// The rectangle showing the region being selected via mouse dragging.</span>
+            <span class="s2">"fill"</span><span class="o">:</span> <span class="s2">"#00ABFA"</span>
+          <span class="p">,</span> <span class="s2">"fill-opacity"</span><span class="o">:</span> <span class="mf">0.3</span>
+          <span class="p">,</span> <span class="s2">"stroke-width"</span><span class="o">:</span> <span class="mi">2</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2"></a></p>
+
+<h3>Datasets configuration</h3>
+
+<p>Each dataset should have a separate associated file, which is specified in the <code>./config/global.json</code> file</p>
+
+<p><a name="a3-2-1"></a></p>
+
+<h4>Dataset specific metadata</h4>
+
+<p>The dataset specific configuration should begin with the following key:</p>
+
+<div class="highlight"><pre><span class="p">{</span>
+    <span class="s2">"dbname"</span><span class="o">:</span> <span class="s2">"SacCer-demo"</span><span class="p">,</span>
+<span class="c1">//  ...</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2-2"></a></p>
+
+<h4>Tracks</h4>
+
+<p>After specifying the database name, each track is included in the <code>tracks</code> dictionary.</p>
+
+<div class="highlight"><pre><span class="s2">"tracks"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"ensembl_genes"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// Should match the collection name in mongodb</span>
+        <span class="s2">"id"</span><span class="o">:</span> <span class="s2">"ensembl_genes"</span> <span class="c1">// Should match the collection name in mongodb</span>
+      <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Ensembl genes"</span> <span class="c1">// Name of the track</span>
+      <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"Ensembl genes"</span> <span class="c1">// Short description of the track</span>
+      <span class="p">,</span> <span class="s2">"type"</span><span class="o">:</span> <span class="p">(</span> <span class="s2">"ref"</span> <span class="o">|</span> <span class="s2">"profile"</span> <span class="o">|</span> <span class="s2">"oriented-profile"</span> <span class="p">)</span> <span class="c1">// The type of the track. Determines how it will be displayed </span>
+      <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span>
+<span class="c1">//          ... Style to display</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2-2-1"></a></p>
+
+<h5>Non-quantitative data tracks</h5>
+
+<p>Non-quantitative data (such as gene annotation) should be configured this way. Note the <code>"type": "ref"</code> field.</p>
+
+<div class="highlight"><pre><span class="s2">"ensembl_genes"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="o">:</span> <span class="s2">"ensembl_genes"</span>
+  <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Ensembl genes"</span>
+  <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"Ensembl genes"</span>
+  <span class="p">,</span> <span class="s2">"type"</span><span class="o">:</span> <span class="s2">"ref"</span> <span class="c1">// Use "ref" for non-quantitative data</span>
+  <span class="p">,</span> <span class="s2">"backend"</span><span class="o">:</span> <span class="s2">"json"</span>
+  <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"fill"</span><span class="o">:</span> <span class="s2">"purple"</span> <span class="c1">// The color of each block</span>
+      <span class="p">,</span> <span class="s2">"stroke"</span><span class="o">:</span> <span class="s2">"black"</span> <span class="c1">// The color of the outer line</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2-2-2"></a></p>
+
+<h5>Quantitative data tracks</h5>
+
+<p>Quantitative data can be displayed either from mongodb or a bigwig file.</p>
+
+<p><a name="a3-2-2-2-1"></a></p>
+
+<h6>MongoDB adaptor</h6>
+
+<p>In case the data is queried from mongodb, the backend can be set to "json" (although it is the default value).</p>
+
+<p><a name="a3-2-2-2-1-1"></a></p>
+
+<h6># Standard</h6>
+
+<div class="highlight"><pre><span class="s2">"rnaseq"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="o">:</span> <span class="s2">"rnaseq"</span>
+  <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"RNASeq data"</span>
+  <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"RNA-Seq data from SRR002051"</span>
+  <span class="p">,</span> <span class="s2">"type"</span><span class="o">:</span> <span class="s2">"profile"</span> <span class="c1">// Here the type should be set to "profile".</span>
+  <span class="p">,</span> <span class="s2">"backend"</span><span class="o">:</span> <span class="s2">"json"</span> <span class="c1">// Use "json" backend when querying mongodb directly</span>
+  <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s2">"gutter"</span><span class="o">:</span> <span class="mi">25</span> <span class="c1">// Mandatory</span>
+      <span class="p">,</span> <span class="s2">"shade"</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="p">,</span> <span class="s2">"nostroke"</span><span class="o">:</span> <span class="kc">true</span> <span class="c1">// Do not draw a line delimiting the profile, only colorizing the area under the curve</span>
+      <span class="p">,</span> <span class="s2">"axis"</span><span class="o">:</span> <span class="s2">"0 0 1 1"</span> <span class="c1">// Where should the axis labels be (top right bottom left)</span>
+      <span class="p">,</span> <span class="s2">"axisxstep"</span><span class="o">:</span> <span class="mi">10</span> <span class="c1">// Number of ticks on the X axis</span>
+      <span class="p">,</span> <span class="s2">"axisystep"</span><span class="o">:</span> <span class="mi">4</span> <span class="c1">// Number of ticks on the Y axis</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2-2-2-1-2"></a></p>
+
+<h6># Oriented</h6>
+
+<div class="highlight"><pre><span class="s2">"rnaseq_oriented"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="o">:</span> <span class="s2">"rnaseq_oriented"</span>
+  <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"RNASeq data (oriented)"</span>
+  <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"RNA-Seq data from SRR002051 (oriented)"</span>
+  <span class="p">,</span> <span class="s2">"type"</span><span class="o">:</span> <span class="s2">"oriented-profile"</span> <span class="c1">// Here the type should be set to "oriented-profile" to display 2 profiles on the same track.</span>
+  <span class="p">,</span> <span class="s2">"backend"</span><span class="o">:</span> <span class="s2">"json"</span> <span class="c1">// Use "json" backend when querying mongodb directly</span>
+  <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span>
+<span class="c1">//      ...</span>
+      <span class="p">,</span> <span class="s2">"colors"</span><span class="o">:</span> <span class="p">[</span>
+            <span class="s2">"#555599"</span> <span class="c1">// Color of the profile</span>
+          <span class="p">,</span> <span class="s2">"#ffffff"</span> <span class="c1">// Mandatory. Set to same color as the background (white)</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2-2-2-2"></a></p>
+
+<h6>Bigwig adaptor</h6>
+
+<p>To use bigwig files, the <code>"backend"</code> should be set to <code>"bigwig"</code></p>
+
+<p><a name="a3-2-2-2-2-1"></a></p>
+
+<h6># Standard</h6>
+
+<div class="highlight"><pre><span class="s2">"rnaseq_bigwig"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="o">:</span> <span class="s2">"rnaseq_bigwig"</span>
+  <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"RNASeq data (bigwig)"</span>
+  <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"RNA-Seq data from SRR002051 (bigwig)"</span>
+  <span class="p">,</span> <span class="s2">"type"</span><span class="o">:</span> <span class="s2">"profile"</span>
+  <span class="p">,</span> <span class="s2">"backend"</span><span class="o">:</span> <span class="s2">"bigwig"</span> <span class="c1">// Set the backend to "bigwig"</span>
+  <span class="p">,</span> <span class="s2">"file"</span><span class="o">:</span> <span class="s2">"./test/store/SRR002051_chrI-II-III-IV.profile.bw"</span> <span class="c1">// Full path to the bigwig file</span>
+  <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span>
+<span class="c1">//      ... Same as for non-oriented profiles from mongodb</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+
+<p><a name="a3-2-2-2-2-2"></a></p>
+
+<h6># Oriented</h6>
+
+<div class="highlight"><pre><span class="s2">"rnaseq_bigwig_oriented"</span><span class="o">:</span> <span class="p">{</span>
+    <span class="s2">"id"</span><span class="o">:</span> <span class="s2">"rnaseq_bigwig_oriented"</span>
+  <span class="p">,</span> <span class="s2">"name"</span><span class="o">:</span> <span class="s2">"Oriented RNASeq data (bigwig)"</span>
+  <span class="p">,</span> <span class="s2">"description"</span><span class="o">:</span> <span class="s2">"Oriented RNA-Seq data from SRR002051 (bigwig)"</span>
+  <span class="p">,</span> <span class="s2">"type"</span><span class="o">:</span> <span class="s2">"profile"</span>
+  <span class="p">,</span> <span class="s2">"files"</span><span class="o">:</span> <span class="p">{</span> <span class="c1">// Full paths to the bigwig files containing the sense and antisense strand data.</span>
+        <span class="s2">"plus_strand"</span><span class="o">:</span> <span class="s2">"./test/store/oriented/SRR002051_top_chrI-II-III-IV.profile.bw"</span>
+      <span class="p">,</span> <span class="s2">"minus_strand"</span><span class="o">:</span> <span class="s2">"./test/store/oriented/SRR002051_bottom_chrI-II-III-IV.profile.bw"</span>
+    <span class="p">}</span>
+  <span class="p">,</span> <span class="s2">"backend"</span><span class="o">:</span> <span class="s2">"bigwig"</span> <span class="c1">// Set the backend to "bigwig"</span>
+  <span class="p">,</span> <span class="s2">"style"</span><span class="o">:</span> <span class="p">{</span>
+<span class="c1">//      ... Same as for oriented profiles from mongodb</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/agrimaldi">agrimaldi</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-33554564-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
