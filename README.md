@@ -258,6 +258,168 @@ See the [appropriate section](https://github.com/agrimaldi/j.nome.s/wiki/Configu
 
 ---
 
+# Configuration
+
+Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
+These configuration files can be found in `j.nome.s/config`.
+It is strongly advised that you create a separate branch for editing and adding configuration files. See the [Installation section](https://github.com/agrimaldi/j.nome.s/wiki/Configuration#wiki-Installation) for more information.
+
+## Global configuration
+The only required file is **global.json** which contains general settings. You
+can then add as many configuration files as you need, one per dataset.
+The `config/global.json` file provides the following information :
+```javascript
+{
+    "datasets": {    
+        "Xentr42": { // Each entry contains metadata of a dataset. The key must be the name of the corresponding mongo database.
+            "file": "Xentr42.json" // The name of the configuration file associated to the dataset. The scope is config/
+          , "name": "Xentr42" // the name of the dataset, which can be used for display.
+          , "description": "Xenopus tropicalis genome v4" // A short description of the dataset.
+        }
+    }
+  , "style": { // Each entry maps a style name to raphael style-attributes. This is where you can customize the look of j.nome.s
+        "bgrules": { // The rules used for the background.
+            "stroke": "#eee"
+        }
+      , "ruler": { // The ruler with precise graduations.
+            "stroke": "#000"
+        }
+      , "selectedspan": { // The rectangle showing the currently selected region.
+            "fill": "#00ABFA"
+          , "fill-opacity": 0.2
+          , "stroke-width": 2
+        }
+      , "selectionspan": { // The rectangle showing the region being selected via mouse dragging.
+            "fill": "#00ABFA"
+          , "fill-opacity": 0.3
+          , "stroke-width": 2
+        }
+    }
+}
+```
+
+## Datasets configuration
+Each dataset should have a separate associated file, which is specified in the `./config/global.json` file
+
+### Dataset specific metadata
+The dataset specific configuration should begin with the following key:
+```javascript
+{
+    "dbname": "SacCer-demo",
+//  ...
+}
+```
+
+### Tracks
+After specifying the database name, each track is included in the `tracks` dictionary.
+```javascript
+"tracks": {
+    "ensembl_genes": { // Should match the collection name in mongodb
+        "id": "ensembl_genes" // Should match the collection name in mongodb
+      , "name": "Ensembl genes" // Name of the track
+      , "description": "Ensembl genes" // Short description of the track
+      , "type": ( "ref" | "profile" | "oriented-profile" ) // The type of the track. Determines how it will be displayed 
+      , "style": {
+//          ... Style to display
+        }
+    }
+}
+```
+
+#### Non-quantitative data tracks
+Non-quantitative data (such as gene annotation) should be configured this way. Note the `"type": "ref"` field.
+```javascript
+"ensembl_genes": {
+    "id": "ensembl_genes"
+  , "name": "Ensembl genes"
+  , "description": "Ensembl genes"
+  , "type": "ref" // Use "ref" for non-quantitative data
+  , "backend": "json"
+  , "style": {
+        "fill": "purple" // The color of each block
+      , "stroke": "black" // The color of the outer line
+    }
+}
+```
+
+#### Quantitative data tracks
+Quantitative data can be displayed either from mongodb or a bigwig file.
+
+##### MongoDB adaptor
+In case the data is queried from mongodb, the backend can be set to "json" (although it is the default value).
+
+###### Standard
+```javascript
+"rnaseq": {
+    "id": "rnaseq"
+  , "name": "RNASeq data"
+  , "description": "RNA-Seq data from SRR002051"
+  , "type": "profile" // Here the type should be set to "profile".
+  , "backend": "json" // Use "json" backend when querying mongodb directly
+  , "style": {
+        "gutter": 25 // Mandatory
+      , "shade": true
+      , "nostroke": true // Do not draw a line delimiting the profile, only colorizing the area under the curve
+      , "axis": "0 0 1 1" // Where should the axis labels be (top right bottom left)
+      , "axisxstep": 10 // Number of ticks on the X axis
+      , "axisystep": 4 // Number of ticks on the Y axis
+    }
+}
+```
+
+###### Oriented
+```javascript
+"rnaseq_oriented": {
+    "id": "rnaseq_oriented"
+  , "name": "RNASeq data (oriented)"
+  , "description": "RNA-Seq data from SRR002051 (oriented)"
+  , "type": "oriented-profile" // Here the type should be set to "oriented-profile" to display 2 profiles on the same track.
+  , "backend": "json" // Use "json" backend when querying mongodb directly
+  , "style": {
+//      ...
+      , "colors": [
+            "#555599" // Color of the profile
+          , "#ffffff" // Mandatory. Set to same color as the background (white)
+        ]
+    }
+}
+```
+
+##### Bigwig adaptor
+To use bigwig files, the `"backend"` should be set to `"bigwig"`
+
+###### Standard
+```javascript
+"rnaseq_bigwig": {
+    "id": "rnaseq_bigwig"
+  , "name": "RNASeq data (bigwig)"
+  , "description": "RNA-Seq data from SRR002051 (bigwig)"
+  , "type": "profile"
+  , "backend": "bigwig" // Set the backend to "bigwig"
+  , "file": "./test/store/SRR002051_chrI-II-III-IV.profile.bw" // Full path to the bigwig file
+  , "style": {
+//      ... Same as for non-oriented profiles from mongodb
+    }
+}
+```
+###### Oriented
+```javascript
+"rnaseq_bigwig_oriented": {
+    "id": "rnaseq_bigwig_oriented"
+  , "name": "Oriented RNASeq data (bigwig)"
+  , "description": "Oriented RNA-Seq data from SRR002051 (bigwig)"
+  , "type": "profile"
+  , "files": { // Full paths to the bigwig files containing the sense and antisense strand data.
+        "plus_strand": "./test/store/oriented/SRR002051_top_chrI-II-III-IV.profile.bw"
+      , "minus_strand": "./test/store/oriented/SRR002051_bottom_chrI-II-III-IV.profile.bw"
+    }
+  , "backend": "bigwig" // Set the backend to "bigwig"
+  , "style": {
+//      ... Same as for oriented profiles from mongodb
+    }
+}
+```
+
 
 [mongodoc]: http://www.mongodb.org/display/DOCS/Home
 [mongoimport]: http://www.mongodb.org/display/DOCS/Import+Export+Tools
