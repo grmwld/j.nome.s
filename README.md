@@ -1,14 +1,14 @@
 [![Build Status](https://secure.travis-ci.org/agrimaldi/j.nome.s.png)](http://travis-ci.org/agrimaldi/j.nome.s)
 
-# Introduction
+## Introduction
 
-### What is j.nome.s
+#### What is j.nome.s
 
 j.nome.s is a fast, simple, lightweight genome browser.
 It is built on top of [expressjs][expressjs] and [Node.JS][nodejs],
 and uses [MongoDB][mongodb] for storing the data.
 
-### Why j.nome.s
+#### Why j.nome.s
 
 Current genome browsers include [GBrowse][gbrowse], the [UCSC genome browser][ucsc_browser]
 or [Jbrowse][jbrowse]. The main problem with those project, is that they
@@ -26,15 +26,36 @@ IO-blocking server application. The data is stored in a
 [MongoDB][mongodb] database, providing a scallable and
 efficient way to respectively store and access huge amount of data.
 
-### Who
+#### Who
 
 j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Avetis KAZARIAN.
 
 ---
 
-# Installation
+## Summary
 
-### <a id="Pre_requisites"></a>Pre-requisites
+- [Installation](#a1)
+    - [Pre-requisites](#a1-1)
+    - [Installation](#a1-2)
+    - [Updating](#a1-3)
+    - [Testing](#a1-4)
+    - [Running the j.nome.s server](#a1-5)
+- [Loading datasets](#a2)
+    - [Reference genome](#a2-1)
+    - [Non quantitative data](#a2-2-1)
+    - [Quantitative data](#a2-2-2)
+- [Configuration](#a3)
+ * [Global](#a3-1)
+ * [Non-quantitative data tracks](#a3-2-2-1)
+ * [Quantitative data tracks](#a3-2-2-2)
+
+---
+
+<a name="a1">
+## Installation
+
+<a name="a1-1">
+#### Pre-requisites
 
 Before installation, please ensure that you installed [Node.JS][nodejs] and [MongoDB][mongodb].
 Check their web pages for more information.
@@ -43,7 +64,8 @@ In order to get the node module dependencies required to run j.nome.s, you will 
 need [NPM][npm], the node package manager.
 Please follow the instructions provided on the [NPM website][npm] to install npm alongside node. Starting from nodejs 0.8, npm should be included.
 
-### Setting up the j.nome.s server
+<a name="a1-2">
+#### Setting up the j.nome.s server
 
 Clone the repository from github, and install the module dependencies.
 ```bash
@@ -57,7 +79,8 @@ $ git branch my-dataset
 $ git checkout my-dataset
 ```
 
-### Updating
+<a name="a1-3">
+#### Updating
 
 To update j.nome.s to the latest version, pull from the repository
 ```bash
@@ -70,7 +93,8 @@ $ git checkout my-branch
 $ git rebase master
 ```
 
-### Running tests
+<a name="a1-4">
+#### Running tests
 
 To run the tests, just go with
 ```bash
@@ -86,7 +110,8 @@ To remove it, run
 $ make remove-demo
 ```
 
-### Running the server
+<a name="a1-5">
+#### Running the server
 
 To run the j.nome.s server, simply execute
 ```bash
@@ -110,7 +135,8 @@ If you want to remotely access j.nome.s, point your browser to `http://www.myjno
 
 ---
 
-# Loading datasets
+<a name="a2">
+## Loading datasets
 
 All the data and metadata is stored in a [MongoDB][mongodb] instance, with a precise schema :
 
@@ -118,7 +144,8 @@ All the data and metadata is stored in a [MongoDB][mongodb] instance, with a pre
 2. Inside the database, the reference genome sequence is stored in a GridFS, resulting in the `fs.files` and `fs.chunks` collections.
 3. The data of your tracks must be contained in a collection in JFF format (a JSON equivalent to the [GFF][gff] format), JWIG format (a JSON equivalent of the [bedgraph][bedgraph] format), or in a [bigwig][bigwig] file.
 
-## Reference genome
+<a name="a2-1">
+### Reference genome
 To load a new reference genome, use the `loadFastaRef.py` script provided in the `bin/` folder.
 
 ```
@@ -137,9 +164,11 @@ optional arguments:
 ```
 Just specify the name of the mongo database to use for the new dataset and the FASTA file containing the reference genome, and you are good to go.
 
-## Data
+<a name="a2-2">
+### Data
 
-### Non quantitative data
+<a name="a2-2-1">
+#### Non quantitative data
 
 The JFF format follows the [GFF specifications][gff] with the only required field being `_id`, which must be a unique integer in the collection.
 ```json
@@ -177,7 +206,8 @@ $ mongoimport -d myDataset -c myTrack --file myTrackData.json
 ```
 Check the [MongoDB documentation][mongodoc] for more details.
 
-### Quantitative data
+<a name="a2-2-2">
+#### Quantitative data
 Quantitative data are currently rendered as profiles, that is a basic X-Y plot.
       
 The raw data should be stored in a tsv or csv file format similar to the [BedGraph format][bedgraph]:
@@ -191,7 +221,8 @@ scaffold_1      157     259     4
 ```
 The bedgraph data can be loaded as is in mongodb and queries can be performed directly on in mongodb. Alternativeley, the bedgraph file can be converted to a bigwig file thanks to a dedicated script.
 
-#### Direct-mongodb adaptor
+<a name="a2-2-2-1">
+##### Direct-mongodb adaptor
 To directly load the bedgraph file in mongodb, use the script provided in the `./bin` folder
 ```bash
 $ ./bin/load_bed_profile.py -h
@@ -231,7 +262,8 @@ scaffold_1      +        157     259     4
 ```
 and imported in mongodb **in the same** collection using `./bin/load_bed_profile.py`
 
-#### Bigwig file adaptor
+<a name="a2-2-2-2">
+##### Bigwig file adaptor
 A better option is to use the [bigwig][bigwig] format, since it is both faster and less memory hungry. Bigwig files are also significantly smaller than their bedgraph counterparts (up to 6 times smaller). Libraries necessary for handling such files are provided by Jim Kent and are part of the UCSC genome browser. Both the libraries and nodejs bindings are compiled during j.nome.s installation.
 Using it is quite straightforward. A utility script is generated in the `./bin` directory during the setup phase.
 It can be used to convert [bedgraph][bedgraph] files in [bigwig][bigwig]
@@ -258,13 +290,15 @@ See the [appropriate section](https://github.com/agrimaldi/j.nome.s/wiki/Configu
 
 ---
 
-# Configuration
+<a name="a3">
+## Configuration
 
 Everything in j.nome.s can easily be configured via simple and consistent JSON configuration files.
 These configuration files can be found in `j.nome.s/config`.
 It is strongly advised that you create a separate branch for editing and adding configuration files. See the [Installation section](https://github.com/agrimaldi/j.nome.s/wiki/Configuration#wiki-Installation) for more information.
 
-## Global configuration
+<a name="a3-1">
+### Global configuration
 The only required file is **global.json** which contains general settings. You
 can then add as many configuration files as you need, one per dataset.
 The `config/global.json` file provides the following information :
@@ -298,10 +332,12 @@ The `config/global.json` file provides the following information :
 }
 ```
 
-## Datasets configuration
+<a name="a3-2">
+### Datasets configuration
 Each dataset should have a separate associated file, which is specified in the `./config/global.json` file
 
-### Dataset specific metadata
+<a name="a3-2-1">
+#### Dataset specific metadata
 The dataset specific configuration should begin with the following key:
 ```javascript
 {
@@ -310,7 +346,8 @@ The dataset specific configuration should begin with the following key:
 }
 ```
 
-### Tracks
+<a name="a3-2-2">
+#### Tracks
 After specifying the database name, each track is included in the `tracks` dictionary.
 ```javascript
 "tracks": {
@@ -326,7 +363,8 @@ After specifying the database name, each track is included in the `tracks` dicti
 }
 ```
 
-#### Non-quantitative data tracks
+<a name="a3-2-2-1">
+##### Non-quantitative data tracks
 Non-quantitative data (such as gene annotation) should be configured this way. Note the `"type": "ref"` field.
 ```javascript
 "ensembl_genes": {
@@ -342,13 +380,16 @@ Non-quantitative data (such as gene annotation) should be configured this way. N
 }
 ```
 
-#### Quantitative data tracks
+<a name="a3-2-2-2">
+##### Quantitative data tracks
 Quantitative data can be displayed either from mongodb or a bigwig file.
 
-##### MongoDB adaptor
+<a name="a3-2-2-2-1">
+###### MongoDB adaptor
 In case the data is queried from mongodb, the backend can be set to "json" (although it is the default value).
 
-###### Standard
+<a name="a3-2-2-2-1-1">
+####### Standard
 ```javascript
 "rnaseq": {
     "id": "rnaseq"
@@ -367,7 +408,8 @@ In case the data is queried from mongodb, the backend can be set to "json" (alth
 }
 ```
 
-###### Oriented
+<a name="a3-2-2-2-1-2">
+####### Oriented
 ```javascript
 "rnaseq_oriented": {
     "id": "rnaseq_oriented"
@@ -385,10 +427,12 @@ In case the data is queried from mongodb, the backend can be set to "json" (alth
 }
 ```
 
-##### Bigwig adaptor
+<a name="a3-2-2-2-2">
+###### Bigwig adaptor
 To use bigwig files, the `"backend"` should be set to `"bigwig"`
 
-###### Standard
+<a name="a3-2-2-2-2-1">
+####### Standard
 ```javascript
 "rnaseq_bigwig": {
     "id": "rnaseq_bigwig"
@@ -402,7 +446,9 @@ To use bigwig files, the `"backend"` should be set to `"bigwig"`
     }
 }
 ```
-###### Oriented
+
+<a name="a3-2-2-2-2-2">
+####### Oriented
 ```javascript
 "rnaseq_bigwig_oriented": {
     "id": "rnaseq_bigwig_oriented"
