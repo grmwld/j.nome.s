@@ -30,7 +30,7 @@ efficient way to respectively store and access huge amount of data.
 
 j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Avetis KAZARIAN.
 
----
+--
 
 ## Summary
 
@@ -49,7 +49,7 @@ j.nome.s is an ongoing project initiated by Alexis GRIMALDI and supervised by Av
  * [Non-quantitative data tracks](#a3-2-2-1)
  * [Quantitative data tracks](#a3-2-2-2)
 
----
+--
 
 <a name="a1">
 ## Installation
@@ -133,7 +133,7 @@ Either way, once the j.nome.s server is up and running, point your browser to th
 If j.nome.s is accessed on the same machine as the server, point your browser to `http://localhost:3000/`
 If you want to remotely access j.nome.s, point your browser to `http://www.myjnomesserver.com:3000/`
 
----
+--
 
 <a name="a2">
 ## Loading datasets
@@ -288,7 +288,7 @@ options:
 The locations of the bigwig files will have to be provided in the configuration of the track that should make use of it.
 See the [appropriate section](https://github.com/agrimaldi/j.nome.s/wiki/Configuration) about configuring datasets and tracks.
 
----
+--
 
 <a name="a3">
 ## Configuration
