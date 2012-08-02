@@ -64,6 +64,9 @@ In order to get the node module dependencies required to run j.nome.s, you will 
 need [NPM][npm], the node package manager.
 Please follow the instructions provided on the [NPM website][npm] to install npm alongside node. Starting from nodejs 0.8, npm should be included.
 
+A number of provided helper scripts interact with mongodb, and thus require [pymongo][pymongo].
+It can be installed via pip or aptitude if you are in a debian environment.
+
 <a name="a1-2">
 #### Setting up the j.nome.s server
 
@@ -483,3 +486,4 @@ To use bigwig files, the `"backend"` should be set to `"bigwig"`
 [nodejs]: http://nodejs.org/
 [mongodb]: http://www.mongodb.org/
 [mongolian]: https://github.com/marcello3d/node-mongolian
+[pymongo]: http://api.mongodb.org/python/current
