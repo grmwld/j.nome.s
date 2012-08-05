@@ -1,5 +1,5 @@
 #trackselector
   - each track in tracks
     label(for=track.id)
-      input(type='checkbox', id=track.id, name=track.name, value=track.id, checked=checked[track.id]||false)
+      input(type='checkbox', id='cb_'+track.id, name=track.name, value=track.id, checked=checked[track.id]||false)
       | #{track.name} : #{track.description}

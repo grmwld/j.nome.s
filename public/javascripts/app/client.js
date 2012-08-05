@@ -56,6 +56,17 @@ $(document).ready(function() {
     return false;
   });
 
+  $(':checkbox[id^="cb_"]').click(function() {
+    validateForm(function(seqid, start, end) {
+      fetchTracksData(seqid, start, end, true);
+      if(navigation.overviewNavigation.canvas) {
+        navigation.refresh(seqid, start, end);
+      } else {
+        navigation.display(seqid, start, end);
+      }
+    });
+  });
+
   /**
    * Makes the tracks divs sortable
    */
